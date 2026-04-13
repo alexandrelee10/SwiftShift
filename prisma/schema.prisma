@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  BROKER
+  DRIVER
+}
+
+enum LoadStatus {
+  POSTED
+  BOOKED
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CONFIRMED
+}
+
+enum TripStatus {
+  ASSIGNED
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+model User {
+  id              String    @id @default(uuid())
+  firstName       String
+  lastName        String
+  phoneNum        String    @unique
+  email           String    @unique
+  password        String
+  role            UserRole
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  brokerLoads     Load[]    @relation("BrokerLoads")
+  driverBookings  Booking[] @relation("DriverBookings")
+  driverTrips     Trip[]    @relation("DriverTrips")
+}
+
+model Load {
+  id                 String      @id @default(uuid())
+  brokerId           String
+  broker             User        @relation("BrokerLoads", fields: [brokerId], references: [id])
+  referenceNumber    String      @unique
+  originCity         String
+  originState        String
+  originAddress      String
+  destinationCity    String
+  destinationState   String
+  destinationAddress String
+  pickupDate         DateTime
+  deliveryDate       DateTime?
+  equipmentType      String
+  weight             Int?
+  commodity          String?
+  rate               Decimal
+  distanceMiles      Int?
+  notes              String?
+  status             LoadStatus  @default(POSTED)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  bookings           Booking[]
+  trips              Trip[]
+
+  @@index([brokerId])
+  @@index([status])
+  @@index([pickupDate])
+}
+
+model Booking {
+  id          String         @id @default(uuid())
+  loadId      String
+  load        Load           @relation(fields: [loadId], references: [id])
+  driverId    String
+  driver      User           @relation("DriverBookings", fields: [driverId], references: [id])
+  status      BookingStatus  @default(PENDING)
+  bookedAt    DateTime       @default(now())
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  trips       Trip[]
+
+  @@index([loadId])
+  @@index([driverId])
+  @@index([status])
+}
+
+model Trip {
+  id                    String      @id @default(uuid())
+  loadId                String
+  load                  Load        @relation(fields: [loadId], references: [id])
+  driverId              String
+  driver                User        @relation("DriverTrips", fields: [driverId], references: [id])
+  bookingId             String      @unique
+  booking               Booking     @relation(fields: [bookingId], references: [id])
+  routeDistanceMiles    Int?
+  routeDurationMinutes  Int?
+  status                TripStatus  @default(ASSIGNED)
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([loadId])
+  @@index([driverId])
+}
