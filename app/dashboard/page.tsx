@@ -1,5 +1,7 @@
 import { requireUser } from "@/lib/requireUser";
 import Link from "next/link";
+import loadCount from "@/public/assets/dashboard/load_count_new_logo.png"
+import Image from "next/image"
 
 export default async function DashboardPage() {
   const session = await requireUser();
@@ -159,10 +161,21 @@ export default async function DashboardPage() {
               <aside>
                 <div className="rounded-2xl bg-white border border-zinc-200 p-5 shadow-sm sticky top-6">
 
-                  {/* Title */}
-                  <h3 className="text-xl font-bold text-zinc-900 mb-4">
-                    Market Snapshot
-                  </h3>
+                  {/* Image container */}
+                  <div className="flex flex-col items-center justify-center mb-4 pb-10">
+                    <div className="rounded-xl">
+                      <Image
+                        src={loadCount}
+                        alt="load count cover"
+                        width={200}
+                        height={200}
+                        className="object-contain"
+                      />
+                    </div>
+
+
+
+                  </div>
 
                   {/* Header row */}
                   <div className="grid grid-cols-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide border-b border-zinc-200 pb-2 mb-3">
@@ -260,8 +273,8 @@ export default async function DashboardPage() {
               </aside>
             </div>
           </div>
-        </main>
-      </div>
-    </div>
+        </main >
+      </div >
+    </div >
   );
 }
