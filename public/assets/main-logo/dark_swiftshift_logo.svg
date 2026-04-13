@@ -1,0 +1,45 @@
+<svg width="520" height="140" viewBox="0 0 520 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Icon (minimal + professional) -->
+  <g transform="translate(20,30)">
+    <!-- Rounded square -->
+    <rect width="80" height="80" rx="16" fill="#2563EB"/>
+
+    <!-- Road line -->
+    <path d="M40 18V62" stroke="white" stroke-width="6" stroke-linecap="round"/>
+
+    <!-- Lane dashes -->
+    <path d="M40 26V32" stroke="#DBEAFE" stroke-width="4" stroke-linecap="round"/>
+    <path d="M40 38V44" stroke="#DBEAFE" stroke-width="4" stroke-linecap="round"/>
+    <path d="M40 50V56" stroke="#DBEAFE" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Side lines (road edges) -->
+    <path d="M22 18V62" stroke="white" stroke-width="3" opacity="0.8"/>
+    <path d="M58 18V62" stroke="white" stroke-width="3" opacity="0.8"/>
+  </g>
+
+  <!-- Wordmark -->
+  <g transform="translate(120,45)">
+    <text x="0" y="36"
+          font-family="Inter, Arial, sans-serif"
+          font-size="42"
+          font-weight="700"
+          fill="#000">
+      Swift<tspan fill="#2563EB">Shift</tspan>
+    </text>
+
+    <!-- subtle underline -->
+    <rect x="0" y="48" width="160" height="3" rx="2" fill="#E5E7EB"/>
+    <rect x="0" y="48" width="90" height="3" rx="2" fill="#2563EB"/>
+
+    <!-- tagline -->
+    <text x="0" y="70"
+          font-family="Inter, Arial, sans-serif"
+          font-size="13"
+          letter-spacing="1.5"
+          fill="#64748B">
+      LOAD BOARD PLATFORM
+    </text>
+  </g>
+
+</svg>

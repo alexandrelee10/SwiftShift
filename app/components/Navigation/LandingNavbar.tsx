@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
-const NavBar = () => {
+const LandingNavBar = () => {
   const [isOpen, setOpen] = useState(false);
 
   const navElements = [
@@ -85,4 +85,4 @@ const NavBar = () => {
   );
 };
 
-export default NavBar;
+export default LandingNavBar;
