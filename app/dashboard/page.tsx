@@ -1,35 +1,58 @@
 import { requireUser } from "@/lib/requireUser";
 import Link from "next/link";
-import loadCount from "@/public/assets/dashboard/load_count_new_logo.png"
-import Image from "next/image"
+import loadCount from "@/public/assets/dashboard/load_count_new_logo.png";
+import Image from "next/image";
+import {
+  LayoutDashboard,
+  Search,
+  Truck,
+  Package,
+  Map as MapIcon,
+  Radio,
+  MessageSquare,
+  CreditCard,
+  Settings as SettingsIcon,
+  type LucideIcon,
+} from "lucide-react";
+
+type SidebarLink = {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+};
+
+type SidebarSection = {
+  title: string;
+  links: SidebarLink[];
+};
 
 export default async function DashboardPage() {
   const session = await requireUser();
 
-  const sidebarSections = [
+  const sidebarSections: SidebarSection[] = [
     {
       title: "Main",
       links: [
-        { name: "Dashboard", href: "/dashboard" },
-        { name: "Search Loads", href: "/loads/search" },
-        { name: "Search Trucks", href: "/trucks/search" },
+        { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+        { name: "Search Loads", href: "/loads/search", icon: Search },
+        { name: "Search Trucks", href: "/trucks/search", icon: Truck },
       ],
     },
     {
       title: "Operations",
       links: [
-        { name: "My Loads", href: "/loads/my-loads" },
-        { name: "My Trucks", href: "/trucks/my-trucks" },
-        { name: "Dispatch", href: "/dispatch" },
-        { name: "Tracking", href: "/tracking" },
+        { name: "My Loads", href: "/loads/my-loads", icon: Package },
+        { name: "My Trucks", href: "/trucks/my-trucks", icon: Truck },
+        { name: "Dispatch", href: "/dispatch", icon: MapIcon },
+        { name: "Tracking", href: "/tracking", icon: Radio },
       ],
     },
     {
       title: "Business",
       links: [
-        { name: "Messages", href: "/messages" },
-        { name: "Payments", href: "/payments" },
-        { name: "Settings", href: "/settings" },
+        { name: "Messages", href: "/messages", icon: MessageSquare },
+        { name: "Payments", href: "/payments", icon: CreditCard },
+        { name: "Settings", href: "/settings", icon: SettingsIcon },
       ],
     },
   ];
@@ -40,12 +63,8 @@ export default async function DashboardPage() {
         {/* Sidebar */}
         <aside className="w-64 min-h-screen bg-zinc-950 text-white border-r border-zinc-800">
           <div className="p-6 border-b border-zinc-800">
-            <h1 className="text-2xl font-bold tracking-tight">
-              SwiftShift
-            </h1>
-            <p className="text-sm text-zinc-400 mt-1">
-              Carrier Dashboard
-            </p>
+            <h1 className="text-2xl font-bold tracking-tight">SwiftShift</h1>
+            <p className="text-sm text-zinc-400 mt-1">Carrier Dashboard</p>
           </div>
 
           <nav className="py-4">
@@ -56,15 +75,23 @@ export default async function DashboardPage() {
                 </p>
 
                 <div className="space-y-1 px-3">
-                  {section.links.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-zinc-300 hover:bg-zinc-900 hover:text-white transition"
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+                  {section.links.map((item) => {
+                    const Icon = item.icon;
+
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-zinc-300 hover:bg-zinc-900 hover:text-white transition group"
+                      >
+                        <Icon
+                          size={18}
+                          className="text-zinc-400 group-hover:text-white transition"
+                        />
+                        <span>{item.name}</span>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -75,9 +102,7 @@ export default async function DashboardPage() {
         <main className="flex-1">
           <div className="border-b border-zinc-200 bg-white px-6 py-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold text-zinc-900">
-                Dashboard
-              </h2>
+              <h2 className="text-3xl font-bold text-zinc-900">Dashboard</h2>
               <div className="text-sm text-zinc-500">
                 Welcome, {session.user?.name}
               </div>
@@ -106,7 +131,8 @@ export default async function DashboardPage() {
                       SwiftShift Mobile
                     </h3>
                     <p className="mt-2 text-sm text-zinc-600 leading-6">
-                      Access your loads, manage routes, and stay updated from anywhere.
+                      Access your loads, manage routes, and stay updated from
+                      anywhere.
                     </p>
                     <button className="mt-6 text-sm font-semibold text-blue-600 hover:text-blue-700">
                       Get the App →
@@ -118,7 +144,8 @@ export default async function DashboardPage() {
                       Help Center
                     </h3>
                     <p className="mt-2 text-sm text-zinc-600 leading-6">
-                      Contact support, troubleshoot platform issues, and browse training resources.
+                      Contact support, troubleshoot platform issues, and browse
+                      training resources.
                     </p>
                     <button className="mt-6 text-sm font-semibold text-blue-600 hover:text-blue-700">
                       Help Center →
@@ -139,7 +166,10 @@ export default async function DashboardPage() {
                       </p>
                       <ul className="mt-3 space-y-3 text-zinc-700">
                         <li>• Carriers can now post trucks faster from mobile.</li>
-                        <li>• Search filters now respond faster on smaller screens.</li>
+                        <li>
+                          • Search filters now respond faster on smaller
+                          screens.
+                        </li>
                       </ul>
                     </div>
 
@@ -149,8 +179,12 @@ export default async function DashboardPage() {
                       </p>
                       <ul className="mt-3 space-y-3 text-zinc-700">
                         <li>• Improved sorting inside load search results.</li>
-                        <li>• Better visibility for load rate and company info.</li>
-                        <li>• Cleaner dashboard spacing and improved readability.</li>
+                        <li>
+                          • Better visibility for load rate and company info.
+                        </li>
+                        <li>
+                          • Cleaner dashboard spacing and improved readability.
+                        </li>
                       </ul>
                     </div>
                   </div>
@@ -160,7 +194,6 @@ export default async function DashboardPage() {
               {/* Right rail */}
               <aside>
                 <div className="rounded-2xl bg-white border border-zinc-200 p-5 shadow-sm sticky top-6">
-
                   {/* Image container */}
                   <div className="flex flex-col items-center justify-center mb-4 pb-10">
                     <div className="rounded-xl">
@@ -172,9 +205,6 @@ export default async function DashboardPage() {
                         className="object-contain"
                       />
                     </div>
-
-
-
                   </div>
 
                   {/* Header row */}
@@ -242,27 +272,27 @@ export default async function DashboardPage() {
                         key={item.state}
                         className="grid grid-cols-3 items-center rounded-lg px-2 py-2 hover:bg-zinc-50 transition"
                       >
-                        {/* State */}
                         <span className="text-sm font-medium text-zinc-900">
                           {item.state}
                         </span>
 
-                        {/* Loads In */}
                         <span className="text-sm text-center text-zinc-700">
                           {item.inbound}
                         </span>
 
-                        {/* Loads Out */}
                         <span className="text-sm text-right text-zinc-700">
                           {item.outbound}
                         </span>
 
-                        {/* Progress bar (full width row below) */}
                         <div className="col-span-3 mt-2 h-2 rounded-full bg-zinc-200 overflow-hidden">
                           <div
                             className="h-full bg-blue-600 rounded-full"
                             style={{
-                              width: `${(item.inbound / (item.inbound + item.outbound)) * 100}%`,
+                              width: `${
+                                (item.inbound /
+                                  (item.inbound + item.outbound)) *
+                                100
+                              }%`,
                             }}
                           />
                         </div>
@@ -273,8 +303,8 @@ export default async function DashboardPage() {
               </aside>
             </div>
           </div>
-        </main >
-      </div >
-    </div >
+        </main>
+      </div>
+    </div>
   );
 }
