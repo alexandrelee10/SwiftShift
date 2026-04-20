@@ -18,3 +18,10 @@ export const signInSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+export const searchSchema = z.object({
+    origin: z.string().min(4, "Invalid"),
+    destination: z.string().min(4, "Invalid"),
+    weight: z.string(),
+    equipment: z.string().min(1, "Invalid"),
+    date: z.string(),
+})

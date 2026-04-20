@@ -9,10 +9,10 @@ import {
   MessageSquare,
   CreditCard,
   Settings as SettingsIcon,
-  Calendar,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import SearchFilter from "@/app/components/SearchFilters";
 
 type SidebarLink = {
   name: string;
@@ -60,8 +60,8 @@ export default async function SearchPage() {
     <div className="min-h-screen bg-zinc-100">
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <aside className="w-64 bg-zinc-950 text-white border-r border-zinc-800">
-          <div className="p-6 border-b border-zinc-800">
+        <aside className="w-64 border-r border-zinc-800 bg-zinc-950 text-white">
+          <div className="border-b border-zinc-800 p-6">
             <h1 className="text-2xl font-bold tracking-tight">SwiftShift</h1>
             <p className="mt-1 text-sm text-zinc-400">Carrier Dashboard</p>
           </div>
@@ -69,7 +69,7 @@ export default async function SearchPage() {
           <nav className="py-4">
             {sidebarSections.map((section) => (
               <div key={section.title} className="mb-6">
-                <p className="px-4 mb-2 text-xs font-semibold uppercase text-zinc-500">
+                <p className="mb-2 px-4 text-xs font-semibold uppercase text-zinc-500">
                   {section.title}
                 </p>
 
@@ -110,78 +110,7 @@ export default async function SearchPage() {
 
           <div className="p-6">
             <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-              {/* TOP ROW */}
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                {/* Origin */}
-                <div className="rounded-md border border-zinc-300 bg-white px-3 py-2">
-                  <label className="block text-[11px] font-medium text-zinc-500">
-                    Origin
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="City, state, or ZIP"
-                    className="mt-1 w-full bg-transparent text-sm text-zinc-900 outline-none"
-                  />
-                </div>
-
-                {/* Destination */}
-                <div className="rounded-md border border-zinc-300 bg-white px-3 py-2">
-                  <label className="block text-[11px] font-medium text-zinc-500">
-                    Destination
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="City, state, or ZIP"
-                    className="mt-1 w-full bg-transparent text-sm text-zinc-900 outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* BOTTOM ROW */}
-              <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
-                {/* Weight */}
-                <div className="rounded-md border border-zinc-300 bg-white px-3 py-2">
-                  <label className="block text-[11px] font-medium text-zinc-500">
-                    Weight lbs
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="45000"
-                    className="mt-1 w-full bg-transparent text-sm text-zinc-900 outline-none"
-                  />
-                </div>
-
-                {/* Equipment (optional but realistic for your app) */}
-                <div className="rounded-md border border-zinc-300 bg-white px-3 py-2">
-                  <label className="block text-[11px] font-medium text-zinc-500">
-                    Equipment
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Dry Van"
-                    className="mt-1 w-full bg-transparent text-sm text-zinc-900 outline-none"
-                  />
-                </div>
-
-                {/* Date */}
-                <div className="rounded-md border border-zinc-300 bg-white px-3 py-2">
-                  <label className="block text-[11px] font-medium text-zinc-500">
-                    Date Range
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Select dates"
-                    className="mt-1 w-full bg-transparent text-sm text-zinc-900 outline-none"
-                  />
-                </div>
-
-                {/* Search Button */}
-                <div className="flex items-end">
-                  <button className="w-full h-[52px] rounded-md bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition">
-                    Search
-                  </button>
-                </div>
-              </div>
+              <SearchFilter />
             </div>
           </div>
         </main>
