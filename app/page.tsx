@@ -1,4 +1,4 @@
-import NavBar from './components/Navigation/LandingNavbar'
+import NavBar from './components/LandingNavbar'
 import ipads from '../public/assets/homepage/ipads.png'
 import Image from 'next/image'
 import GetStarted from './components/getStarted'
