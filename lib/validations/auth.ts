@@ -19,9 +19,9 @@ export const signInSchema = z.object({
 });
 
 export const searchSchema = z.object({
-    origin: z.string().min(4, "Invalid"),
-    destination: z.string().min(4, "Invalid"),
-    weight: z.string(),
-    equipment: z.string().min(1, "Invalid"),
-    date: z.string(),
-})
+  origin: z.string().trim().optional(),
+  destination: z.string().trim().optional(),
+  weight: z.string().optional(),
+  equipment: z.string().trim().optional(),
+  date: z.string().optional(),
+});

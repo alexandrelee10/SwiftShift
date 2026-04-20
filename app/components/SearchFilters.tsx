@@ -6,28 +6,33 @@ type SearchFormData = {
   origin: string;
   destination: string;
   weight: string;
-  equipment: String;
-  dateRange: String;
+  equipmentType: string;
+  pickupDate: string;
 };
 
 type LoadResult = {
   id: string;
-  origin: string;
-  destination: string;
-  rate: number;
-  equipment: string;
+  referenceNumber: string;
+  originCity: string;
+  originState: string;
+  destinationCity: string;
+  destinationState: string;
+  rate: string;
+  equipmentType: string;
+  weight: number | null;
+  pickupDate: string;
 };
 
 export default function SearchFilters() {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<SearchFormData>({
     origin: "",
     destination: "",
     weight: "",
-    equipment: "",
-    dateRange: "",
+    equipmentType: "",
+    pickupDate: "",
   });
 
-  const [results, setResult] = useState<LoadResult[]>([]);
+  const [results, setResults] = useState<LoadResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -55,21 +60,22 @@ export default function SearchFilters() {
       });
 
       const data = await res.json();
+      console.log("SEARCH RESPONSE:", data);
 
       if (!res.ok) {
-        setError(data.error || "Something went wrong");
-        setResult([]);
+        setError(data.message || "Something went wrong");
+        setResults([]);
         return;
       }
-      setResult(data.loads);
-    } catch (err) {
+
+      setResults(data.loads ?? []);
+    } catch {
       setError("Failed to search loads");
-      setResult([]);
+      setResults([]);
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="space-y-6">
@@ -128,8 +134,8 @@ export default function SearchFilters() {
             </label>
             <input
               type="text"
-              name="equipment"
-              value={form.equipment}
+              name="equipmentType"
+              value={form.equipmentType}
               onChange={onChange}
               placeholder="Dry Van"
               className="mt-1 w-full bg-transparent text-sm text-zinc-900 outline-none"
@@ -138,14 +144,13 @@ export default function SearchFilters() {
 
           <div className="rounded-md border border-zinc-300 bg-white px-3 py-2">
             <label className="block text-[11px] font-medium text-zinc-500">
-              Date Range
+              Pickup Date
             </label>
             <input
-              type="text"
-              name="dateRange"
-              value={form.dateRange}
+              type="date"
+              name="pickupDate"
+              value={form.pickupDate}
               onChange={onChange}
-              placeholder="Select dates"
               className="mt-1 w-full bg-transparent text-sm text-zinc-900 outline-none"
             />
           </div>
@@ -162,6 +167,8 @@ export default function SearchFilters() {
         </div>
       </form>
 
+      <p className="text-sm text-zinc-500">Found {results.length} loads</p>
+
       {error ? (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
           {error}
@@ -175,12 +182,21 @@ export default function SearchFilters() {
             className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm"
           >
             <h3 className="text-lg font-semibold text-zinc-900">
-              {load.origin} → {load.destination}
+              {load.originCity}, {load.originState} → {load.destinationCity},{" "}
+              {load.destinationState}
             </h3>
+
             <p className="mt-1 text-sm text-zinc-600">
-              Equipment: {load.equipment}
+              Equipment: {load.equipmentType}
             </p>
+
             <p className="mt-1 text-sm text-zinc-600">Rate: ${load.rate}</p>
+
+            {load.weight ? (
+              <p className="mt-1 text-sm text-zinc-600">
+                Weight: {load.weight.toLocaleString()} lbs
+              </p>
+            ) : null}
           </div>
         ))}
       </div>

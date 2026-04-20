@@ -1,29 +1,26 @@
 import { NextResponse } from "next/server";
-import { LoadStatus } from "@/generated/prisma/client";
-import { prisma } from "@/lib/prisma";
+import { LoadStatus } from "@prisma/client";
+import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { origin, destination, weight, equipmentType, pickupDate } = body;
 
-    const where = {
-      status: LoadStatus.POSTED,
-      AND: [] as any[],
-    };
+    const andFilters: any[] = [];
 
-    if (origin) {
-      where.AND.push({
+    if (origin?.trim()) {
+      andFilters.push({
         OR: [
           {
             originCity: {
-              contains: origin,
+              contains: origin.trim(),
               mode: "insensitive",
             },
           },
           {
             originState: {
-              contains: origin,
+              contains: origin.trim(),
               mode: "insensitive",
             },
           },
@@ -31,18 +28,18 @@ export async function POST(req: Request) {
       });
     }
 
-    if (destination) {
-      where.AND.push({
+    if (destination?.trim()) {
+      andFilters.push({
         OR: [
           {
             destinationCity: {
-              contains: destination,
+              contains: destination.trim(),
               mode: "insensitive",
             },
           },
           {
             destinationState: {
-              contains: destination,
+              contains: destination.trim(),
               mode: "insensitive",
             },
           },
@@ -50,29 +47,29 @@ export async function POST(req: Request) {
       });
     }
 
-    if (weight) {
-      where.AND.push({
+    if (weight?.trim()) {
+      andFilters.push({
         weight: {
           lte: Number(weight),
         },
       });
     }
 
-    if (equipmentType) {
-      where.AND.push({
+    if (equipmentType?.trim()) {
+      andFilters.push({
         equipmentType: {
-          contains: equipmentType,
+          contains: equipmentType.trim(),
           mode: "insensitive",
         },
       });
     }
 
-    if (pickupDate) {
+    if (pickupDate?.trim()) {
       const start = new Date(pickupDate);
       const end = new Date(pickupDate);
       end.setHours(23, 59, 59, 999);
 
-      where.AND.push({
+      andFilters.push({
         pickupDate: {
           gte: start,
           lte: end,
@@ -81,28 +78,30 @@ export async function POST(req: Request) {
     }
 
     const loads = await prisma.load.findMany({
-      where,
+      where: {
+        status: LoadStatus.POSTED,
+        ...(andFilters.length ? { AND: andFilters } : {}),
+      },
       orderBy: {
         createdAt: "desc",
       },
-      take: 25,
       include: {
         broker: {
           select: {
-            id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           },
         },
       },
     });
 
-    const safeLoads = loads.map((load) => ({
-      ...load,
-      rate: load.rate.toString(),
-    }));
-
-    return NextResponse.json({ loads: safeLoads });
+    return NextResponse.json({
+      loads: loads.map((load) => ({
+        ...load,
+        rate: load.rate.toString(),
+      })),
+    });
   } catch (error) {
     console.error("LOAD_SEARCH_ERROR", error);
 
