@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   Search,
-  Truck,
   Package,
   Map,
   Radio,
@@ -18,8 +17,7 @@ const sidebarSections = [
     title: "Main",
     links: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { name: "Search Loads", href: "/loads/search", icon: Search },
-      { name: "Search Trucks", href: "/trucks/search", icon: Truck },
+      { name: "Search Loads", href: "/dashboard/loads/search", icon: Search },
     ],
   },
   {
