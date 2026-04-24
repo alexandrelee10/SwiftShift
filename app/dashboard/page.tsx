@@ -1,101 +1,89 @@
 import { requireUser } from "@/lib/requireUser";
-import MarketSnapshot from "@/app/components/MarketSnapshot";
+import Image from "next/image"
+import {
+  Truck,
+  CircleCheckBig,
+  Landmark,
+  FuelIcon
+} from "lucide-react"
 
 export default async function DashboardPage() {
   const session = await requireUser();
 
+  const upperIcons = [
+    {
+      name: "Active Loads",
+      content: 2,
+      status: "In Transit",
+      icon: Truck,
+      color: "bg-blue-100 text-blue-600",
+    },
+    {
+      name: "Delivered (30d)",
+      content: "8",
+      status: "+14% vs last 30d",
+      icon: CircleCheckBig,
+      color: "bg-green-100 text-green-600",
+    },
+    {
+      name: "Earnings",
+      content: "$10,956",
+      status: "+*% vs last 30d",
+      icon: Landmark,
+      color: "bg-yellow-100 text-yellow-600",
+    },
+    {
+      name: "Fuel Spending (30d)",
+      content: "$3,123",
+      status: "-10% vs last 30d",
+      icon: FuelIcon,
+      color: "bg-red-100 text-red-600",
+    },
+  ];
   return (
     <div className="min-h-screen bg-zinc-100">
       <main className="min-w-0">
-        {/* Top header */}
-        <div className="border-b border-zinc-200 bg-white px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-bold text-zinc-900">Dashboard</h2>
-            <div className="text-sm text-zinc-500">
-              Welcome, {session.user?.name}
+
+        <div className="">
+          <div className="p-4 flex flex-col">
+            <div>
+              <h2 className="text-zinc-700 font-bold text-xl">Welcome, {session.user?.name}!</h2>
+              <p className="text-sm text-zinc-500 ">Here's what's happening with your loads today</p>
             </div>
-          </div>
-        </div>
 
-        {/* Page content */}
-        <div className="p-6">
-          {/* Quick action buttons */}
-          <div className="mb-6 flex flex-wrap gap-3">
-            <button className="rounded-full border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-800 hover:bg-zinc-50">
-              Search Loads
-            </button>
-            <button className="rounded-full border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-800 hover:bg-zinc-50">
-              Search Trucks
-            </button>
-          </div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+              {upperIcons.map((item) => {
+                const Icon = item.icon;
 
-          {/* Main dashboard layout */}
-          <div className="flex flex-col gap-6 xl:flex-row">
-            {/* Left content */}
-            <section className="min-w-0 flex-1 space-y-6">
-              {/* Top cards */}
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-                  <h3 className="text-xl font-semibold text-zinc-900">
-                    SwiftShift Mobile
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-zinc-600">
-                    Access your loads, manage routes, and stay updated from
-                    anywhere.
-                  </p>
-                  <button className="mt-6 text-sm font-semibold text-blue-600 hover:text-blue-700">
-                    Get the App →
-                  </button>
-                </div>
+                return (
+                  <div
+                    key={item.name}
+                    className="flex items-center gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"
+                  >
+                    {/* Icon LEFT */}
+                    <div
+                      className={`flex h-12 w-12 items-center justify-center rounded-xl ${item.color}`}
+                    >
+                      <Icon size={22} />
+                    </div>
 
-                <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-                  <h3 className="text-xl font-semibold text-zinc-900">
-                    Help Center
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-zinc-600">
-                    Contact support, troubleshoot platform issues, and browse
-                    training resources.
-                  </p>
-                  <button className="mt-6 text-sm font-semibold text-blue-600 hover:text-blue-700">
-                    Help Center →
-                  </button>
-                </div>
-              </div>
+                    {/* Content RIGHT */}
+                    <div className="flex flex-col">
+                      <p className="text-sm font-medium text-zinc-500">
+                        {item.name}
+                      </p>
 
-              {/* What's New */}
-              <div className="min-h-[420px] rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
-                <h3 className="text-2xl font-semibold text-zinc-900">
-                  What’s New
-                </h3>
+                      <p className="text-xl font-bold text-zinc-900">
+                        {item.content}
+                      </p>
 
-                <div className="mt-8 space-y-8">
-                  <div>
-                    <p className="text-sm font-bold uppercase tracking-wide text-zinc-400">
-                      New April 13th, 2026
-                    </p>
-                    <ul className="mt-3 space-y-3 text-zinc-700">
-                      <li>• Carriers can now post trucks faster from mobile.</li>
-                      <li>• Search filters now respond faster on smaller screens.</li>
-                    </ul>
+                      <p className="text-xs text-zinc-500">
+                        {item.status}
+                      </p>
+                    </div>
                   </div>
-
-                  <div>
-                    <p className="text-lg font-semibold text-zinc-900">
-                      Recent Platform Improvements
-                    </p>
-                    <ul className="mt-3 space-y-3 text-zinc-700">
-                      <li>• Improved sorting inside load search results.</li>
-                      <li>• Better visibility for load rate and company info.</li>
-                      <li>• Cleaner dashboard spacing and improved readability.</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Right rail */}
-            <div className="w-full xl:w-[320px] xl:shrink-0">
-              <MarketSnapshot />
+                );
+              })}
             </div>
           </div>
         </div>
