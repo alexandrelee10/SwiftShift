@@ -239,79 +239,88 @@ export default async function LoadSearchPage({
 }
 
 function LoadRow({ load }: { load: any }) {
+  const ratePerMile =
+    load.rate && load.miles ? (load.rate / load.miles).toFixed(2) : null;
+
   return (
-    <div className="grid gap-4 border-b border-slate-100 px-5 py-5 last:border-0 lg:grid-cols-[110px_1fr_110px_100px_auto]">
-      <div>
-        <span className="rounded-md bg-blue-100 px-2 py-1 text-[11px] font-medium text-blue-600">
-          AVAILABLE
-        </span>
-
-        <h3 className="mt-3 text-xl font-semibold text-slate-950">
+    <div className="grid items-center gap-4 border-b border-slate-100 px-5 py-4 hover:bg-slate-50 transition last:border-0 lg:grid-cols-[90px_1fr_140px_120px_auto]">
+      
+      {/* LEFT ID */}
+      <div className="min-w-0">
+        <p className="text-xs text-slate-400">Load</p>
+        <p className="font-semibold text-slate-900 truncate">
           #{load.id.slice(0, 6)}
-        </h3>
-
-        <p className="mt-2 text-sm text-slate-500">Recently posted</p>
+        </p>
       </div>
 
-      <div>
-        <div className="grid gap-4 md:grid-cols-[1fr_30px_1fr] md:items-start">
+      {/* ROUTE */}
+      <div className="min-w-0">
+        <div className="grid items-center gap-3 md:grid-cols-[1fr_30px_1fr]">
+          
           <LocationBlock
-            city={`${load.pickupCity}, ${load.pickupState}`}
+            label="Origin"
+            city={load.originCity || "N/A"}
+            state={load.originState || ""}
             time={formatDate(load.pickupDate)}
             color="bg-green-500"
           />
 
-          <div className="hidden justify-center pt-3 text-slate-900 md:flex">
+          <div className="hidden text-center text-slate-400 md:block">
             →
           </div>
 
           <LocationBlock
-            city={`${load.deliveryCity}, ${load.deliveryState}`}
+            label="Dest"
+            city={load.destinationCity || "N/A"}
+            state={load.destinationState || ""}
             time={formatDate(load.deliveryDate)}
             color="bg-red-500"
           />
         </div>
 
-        <div className="mt-7 grid gap-3 text-sm text-slate-500 sm:grid-cols-3">
-          <span className="inline-flex items-center gap-2">
-            <Truck size={16} /> {load.equipment}
+        {/* DETAILS */}
+        <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500">
+          <span className="flex items-center gap-1">
+            <Truck size={14} /> {load.equipmentType || "Dry Van"}
           </span>
 
-          <span className="inline-flex items-center gap-2">
-            <Weight size={16} /> {load.weight?.toLocaleString()} lbs
+          <span className="flex items-center gap-1">
+            <Weight size={14} />{" "}
+            {load.weight ? load.weight.toLocaleString() : "—"} lbs
           </span>
 
-          <span className="inline-flex items-center gap-2">
-            <Box size={16} /> {load.loadType || "Full Truckload"}
+          <span className="flex items-center gap-1">
+            <Box size={14} /> {load.loadType || "FTL"}
           </span>
         </div>
       </div>
 
-      <div>
-        <p className="text-xl font-semibold text-slate-950">
-          ${load.rate?.toLocaleString()}
+      {/* RATE */}
+      <div className="text-right">
+        <p className="text-lg font-semibold text-slate-900">
+          ${load.rate ? load.rate.toLocaleString() : "—"}
         </p>
-        <p className="mt-2 text-sm text-slate-500">Rate</p>
+        {ratePerMile && (
+          <p className="text-xs text-green-600">${ratePerMile}/mi</p>
+        )}
       </div>
 
-      <div>
-        <p className="font-semibold text-slate-950">
-          {load.miles?.toLocaleString()} mi
-        </p>
-        <p className="mt-2 text-sm text-slate-500">Distance</p>
+      {/* MILES */}
+      <div className="text-right text-sm text-slate-600">
+        {load.miles ? load.miles.toLocaleString() : "—"} mi
       </div>
 
-      <div className="flex items-center gap-3 lg:justify-end">
-        <button className="rounded-lg border border-slate-200 bg-white p-3 text-slate-500 hover:bg-slate-50">
-          <Bookmark size={18} />
+      {/* ACTION */}
+      <div className="flex justify-end gap-2">
+        <button className="rounded-md border border-slate-200 p-2 text-slate-500 hover:bg-slate-100">
+          <Bookmark size={16} />
         </button>
 
         <Link
           href={`/loads/${load.id}`}
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700"
+          className="rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700"
         >
-          View Details
-          <ChevronRight size={17} />
+          View
         </Link>
       </div>
     </div>
@@ -319,22 +328,37 @@ function LoadRow({ load }: { load: any }) {
 }
 
 function LocationBlock({
+  label,
   city,
+  state,
   time,
   color,
 }: {
+  label: string;
   city: string;
+  state: string;
   time: string;
   color: string;
 }) {
   return (
-    <div>
+    <div className="min-w-0">
       <div className="flex items-center gap-2">
         <span className={`h-2.5 w-2.5 rounded-full ${color}`} />
-        <p className="font-semibold text-slate-900">{city}</p>
+        <p className="text-xs font-semibold uppercase text-slate-400">
+          {label}
+        </p>
       </div>
 
-      <p className="mt-2 pl-5 text-sm text-slate-500">{time}</p>
+      {/* ✅ ONE LINE CITY */}
+      <p className="truncate text-sm font-semibold text-slate-900">
+        {city}
+        {state && <span className="text-slate-500">, {state}</span>}
+      </p>
+
+      {/* ✅ ONE LINE DATE */}
+      <p className="truncate text-xs text-slate-500">
+        {time}
+      </p>
     </div>
   );
 }
