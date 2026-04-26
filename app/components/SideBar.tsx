@@ -25,9 +25,8 @@ const sidebarSections = [
   {
     links: [
       { name: "Dashboard", href: "/dashboard", icon: Home },
-      { name: "Loads", href: "/loads", icon: TruckIcon },
       { name: "Find Loads", href: "/dashboard/loads/search", icon: Search },
-      { name: "My Loads", href: "/loads", icon: Package },
+      { name: "My Loads", href: "/dashboard/loads/myloads", icon: Package },
       { name: "Tracking", href: "/tracking", icon: Map },
       { name: "Documents", href: "/dashboard/documents", icon: FilesIcon },
       { name: "Dispatch", href: "/dispatch", icon: Radio },
