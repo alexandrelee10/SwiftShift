@@ -1,75 +1,72 @@
-import "dotenv/config";
-import { PrismaClient, UserRole, LoadStatus } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import bcrypt from "bcryptjs";
+import prisma from "@/lib/prisma";
+import { LoadStatus, Prisma } from "@prisma/client";
 
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL!,
-});
+const cities = [
+  { city: "Miami", state: "FL" },
+  { city: "Orlando", state: "FL" },
+  { city: "Tampa", state: "FL" },
+  { city: "Atlanta", state: "GA" },
+  { city: "Dallas", state: "TX" },
+  { city: "Houston", state: "TX" },
+  { city: "Chicago", state: "IL" },
+  { city: "Nashville", state: "TN" },
+  { city: "Charlotte", state: "NC" },
+  { city: "Phoenix", state: "AZ" },
+];
 
-const prisma = new PrismaClient({ adapter });
+const equipmentTypes = ["Dry Van", "Reefer", "Flatbed"];
 
-async function main() {
-  console.log("🌱 Seeding...");
-
-  await prisma.trip.deleteMany();
-  await prisma.booking.deleteMany();
-  await prisma.load.deleteMany();
-  await prisma.user.deleteMany();
-
-  const password = await bcrypt.hash("password123", 10);
-
-  const broker = await prisma.user.create({
-    data: {
-      firstName: "Test",
-      lastName: "Broker",
-      phoneNum: "1111111111",
-      email: "broker@test.com",
-      password,
-      role: UserRole.BROKER,
-    },
-  });
-
-  const driver = await prisma.user.create({
-    data: {
-      firstName: "Test",
-      lastName: "Driver",
-      phoneNum: "2222222222",
-      email: "driver@test.com",
-      password,
-      role: UserRole.DRIVER,
-    },
-  });
-
-  await prisma.load.create({
-    data: {
-      brokerId: broker.id,
-      referenceNumber: "LOAD001",
-      originCity: "Miami",
-      originState: "FL",
-      originAddress: "123 St",
-      destinationCity: "Atlanta",
-      destinationState: "GA",
-      destinationAddress: "456 St",
-      pickupDate: new Date(),
-      equipmentType: "Dry Van",
-      weight: 45000,
-      rate: "2500.00",
-      status: LoadStatus.POSTED,
-    },
-  });
-
-  console.log("✅ Done seeding");
-  console.log("Broker:", broker.email);
-  console.log("Driver:", driver.email);
+function randomFromArray<T>(arr: T[]) {
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
-main()
-  .catch((e) => {
-    console.error("❌ Seed failed");
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
+function randomRate() {
+  return (1800 + Math.random() * 2000).toFixed(2);
+}
+
+function randomWeight() {
+  return Math.floor(20000 + Math.random() * 30000);
+}
+
+function randomMiles() {
+  return Math.floor(250 + Math.random() * 1500);
+}
+
+export async function seedLoads(brokerId: string) {
+  const loads: Prisma.LoadCreateManyInput[] = [];
+
+  for (let i = 1; i <= 25; i++) {
+    let origin = randomFromArray(cities);
+    let destination = randomFromArray(cities);
+
+    while (destination.city === origin.city) {
+      destination = randomFromArray(cities);
+    }
+
+    const pickupDate = new Date(Date.now() + i * 86400000);
+    const deliveryDate = new Date(pickupDate.getTime() + 2 * 86400000);
+
+    loads.push({
+      brokerId,
+      referenceNumber: `LOAD${String(i).padStart(3, "0")}`,
+      originCity: origin.city,
+      originState: origin.state,
+      originAddress: `${Math.floor(Math.random() * 999)} Main St`,
+      destinationCity: destination.city,
+      destinationState: destination.state,
+      destinationAddress: `${Math.floor(Math.random() * 999)} Market St`,
+      pickupDate,
+      deliveryDate,
+      equipmentType: randomFromArray(equipmentTypes),
+      weight: randomWeight(),
+      commodity: "General Freight",
+      rate: randomRate(),
+      distanceMiles: randomMiles(),
+      status: LoadStatus.POSTED,
+    });
+  }
+
+  await prisma.load.createMany({
+    data: loads,
   });
+}

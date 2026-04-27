@@ -1,4 +1,4 @@
-import  prisma  from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import LoadSearchFilters from "@/app/components/LoadSearchFilters";
 import Link from "next/link";
 import {
@@ -15,6 +15,7 @@ import {
   Truck,
   Weight,
 } from "lucide-react";
+import LoadMap from "@/app/components/LoadMap";
 
 type SearchParams = {
   origin?: string;
@@ -40,47 +41,47 @@ export default async function LoadSearchPage({
       AND: [
         origin
           ? {
-              OR: [
-                { originCity: { contains: origin, mode: "insensitive" } },
-                { originState: { contains: origin, mode: "insensitive" } },
-              ],
-            }
+            OR: [
+              { originCity: { contains: origin, mode: "insensitive" } },
+              { originState: { contains: origin, mode: "insensitive" } },
+            ],
+          }
           : {},
 
         destination
           ? {
-              OR: [
-                {
-                  destinationCity: {
-                    contains: destination,
-                    mode: "insensitive",
-                  },
+            OR: [
+              {
+                destinationCity: {
+                  contains: destination,
+                  mode: "insensitive",
                 },
-                {
-                  destinationState: {
-                    contains: destination,
-                    mode: "insensitive",
-                  },
+              },
+              {
+                destinationState: {
+                  contains: destination,
+                  mode: "insensitive",
                 },
-              ],
-            }
+              },
+            ],
+          }
           : {},
 
         equipment
           ? {
-              equipmentType: {
-                contains: equipment,
-                mode: "insensitive",
-              },
-            }
+            equipmentType: {
+              contains: equipment,
+              mode: "insensitive",
+            },
+          }
           : {},
 
         minRate
           ? {
-              rate: {
-                gte: minRate,
-              },
-            }
+            rate: {
+              gte: minRate,
+            },
+          }
           : {},
       ],
     },
@@ -171,32 +172,32 @@ export default async function LoadSearchPage({
           </section>
 
           {/* RIGHT SIDE */}
+          {/* RIGHT SIDE */}
           <aside className="space-y-4">
+            {/* SEARCH AREA */}
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-slate-900">
-                  Search Area
-                </h2>
-                <Maximize2 size={16} className="text-slate-500" />
+                <div>
+                  <h2 className="text-sm font-semibold text-slate-900">
+                    Search Area
+                  </h2>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Live route preview
+                  </p>
+                </div>
+
+                <button className="rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-50">
+                  <Maximize2 size={16} />
+                </button>
               </div>
 
-              <div className="relative h-[350px] overflow-hidden rounded-xl bg-[linear-gradient(120deg,#dbeafe,#ecfeff,#bfdbfe)]">
-                <div className="absolute left-[48%] top-16 h-56 w-1 rotate-[-18deg] rounded-full bg-blue-600" />
-
-                <div className="absolute left-[42%] top-14 flex h-9 w-9 items-center justify-center rounded-full bg-red-500 text-white shadow-md">
-                  <MapPin size={19} fill="currentColor" />
-                </div>
-
-                <div className="absolute left-[50%] top-[38%] flex h-10 w-10 items-center justify-center rounded-full border-4 border-white bg-blue-600 text-white shadow-md">
-                  <Truck size={18} />
-                </div>
-
-                <div className="absolute bottom-16 right-24 flex h-9 w-9 items-center justify-center rounded-full bg-green-600 text-white shadow-md">
-                  <MapPin size={19} fill="currentColor" />
-                </div>
+              {/* REAL MAP */}
+              <div className="h-[350px] overflow-hidden rounded-xl border border-slate-200">
+                <LoadMap className="h-full w-full" />
               </div>
             </div>
 
+            {/* MARKET INSIGHTS */}
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <h2 className="mb-5 text-base font-semibold text-slate-900">
                 Market Insights
@@ -208,6 +209,7 @@ export default async function LoadSearchPage({
               <InsightRow label="Fuel Average" value="$3.72 / gal" />
             </div>
 
+            {/* NOTIFICATION CARD */}
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="rounded-xl bg-blue-50 p-5">
                 <div className="flex gap-4">
@@ -244,7 +246,7 @@ function LoadRow({ load }: { load: any }) {
 
   return (
     <div className="grid items-center gap-4 border-b border-slate-100 px-5 py-4 hover:bg-slate-50 transition last:border-0 lg:grid-cols-[90px_1fr_140px_120px_auto]">
-      
+
       {/* LEFT ID */}
       <div className="min-w-0">
         <p className="text-xs text-slate-400">Load</p>
@@ -256,7 +258,7 @@ function LoadRow({ load }: { load: any }) {
       {/* ROUTE */}
       <div className="min-w-0">
         <div className="grid items-center gap-3 md:grid-cols-[1fr_30px_1fr]">
-          
+
           <LocationBlock
             label="Origin"
             city={load.originCity || "N/A"}
