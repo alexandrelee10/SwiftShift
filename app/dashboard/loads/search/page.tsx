@@ -15,6 +15,7 @@ import {
   Truck,
   Weight,
 } from "lucide-react";
+import { bookLoad } from "./[id]/action";
 
 type SearchParams = {
   origin?: string;
@@ -57,44 +58,44 @@ export default async function LoadSearchPage({
       AND: [
         origin
           ? {
-              OR: [
-                { originCity: { contains: origin, mode: "insensitive" } },
-                { originState: { contains: origin, mode: "insensitive" } },
-              ],
-            }
+            OR: [
+              { originCity: { contains: origin, mode: "insensitive" } },
+              { originState: { contains: origin, mode: "insensitive" } },
+            ],
+          }
           : {},
         destination
           ? {
-              OR: [
-                {
-                  destinationCity: {
-                    contains: destination,
-                    mode: "insensitive",
-                  },
+            OR: [
+              {
+                destinationCity: {
+                  contains: destination,
+                  mode: "insensitive",
                 },
-                {
-                  destinationState: {
-                    contains: destination,
-                    mode: "insensitive",
-                  },
+              },
+              {
+                destinationState: {
+                  contains: destination,
+                  mode: "insensitive",
                 },
-              ],
-            }
+              },
+            ],
+          }
           : {},
         equipment
           ? {
-              equipmentType: {
-                contains: equipment,
-                mode: "insensitive",
-              },
-            }
+            equipmentType: {
+              contains: equipment,
+              mode: "insensitive",
+            },
+          }
           : {},
         minRate
           ? {
-              rate: {
-                gte: minRate,
-              },
-            }
+            rate: {
+              gte: minRate,
+            },
+          }
           : {},
       ],
     },
@@ -154,22 +155,20 @@ export default async function LoadSearchPage({
                 <div className="flex overflow-hidden rounded-lg border border-slate-200 bg-white">
                   <Link
                     href={`?${listParams.toString()}`}
-                    className={`p-2 ${
-                      view === "list"
+                    className={`p-2 ${view === "list"
                         ? "bg-slate-100 text-slate-700"
                         : "text-slate-500 hover:bg-slate-50"
-                    }`}
+                      }`}
                   >
                     <List size={17} />
                   </Link>
 
                   <Link
                     href={`?${gridParams.toString()}`}
-                    className={`p-2 ${
-                      view === "grid"
+                    className={`p-2 ${view === "grid"
                         ? "bg-slate-100 text-slate-700"
                         : "text-slate-500 hover:bg-slate-50"
-                    }`}
+                      }`}
                   >
                     <Grid2X2 size={17} />
                   </Link>
@@ -221,7 +220,7 @@ export default async function LoadSearchPage({
               </div>
 
               <div className="h-[350px] overflow-hidden rounded-xl border border-slate-200">
-                <LoadMap className="h-full w-full" />
+                <LoadMap className="h-full w-full" loadId={loads[0]?.id} />
               </div>
             </div>
 
@@ -331,10 +330,14 @@ function LoadRow({ load }: { load: any }) {
       </div>
 
       <div className="flex justify-end gap-2">
-        <button className="rounded-md border border-slate-200 p-2 text-slate-500 hover:bg-slate-100">
-          <Bookmark size={16} />
-        </button>
-
+        <form action={bookLoad.bind(null, load.id)}>
+          <button
+            type="submit"
+            className="rounded-md bg-green-600 px-3 py-2 text-xs font-medium text-white hover:bg-green-700"
+          >
+            Book
+          </button>
+        </form>
         <Link
           href={`/dashboard/loads/search/${load.id}`}
           className="rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700"
