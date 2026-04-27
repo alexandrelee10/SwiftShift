@@ -31,7 +31,7 @@ async function geocodeAddress(address: string): Promise<Coords | null> {
   const encoded = encodeURIComponent(address);
   const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
   const res = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json?access_token=${token}&country=US&limit=1`
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json?access_token=${token}&country=US&limit=1`,
   );
   if (!res.ok) return null;
   const data = await res.json();
@@ -42,12 +42,12 @@ async function geocodeAddress(address: string): Promise<Coords | null> {
 
 async function fetchRoadRoute(
   origin: Coords,
-  destination: Coords
+  destination: Coords,
 ): Promise<GeoJSON.LineString | null> {
   const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
   const coords = `${origin[0]},${origin[1]};${destination[0]},${destination[1]}`;
   const res = await fetch(
-    `https://api.mapbox.com/directions/v5/mapbox/driving/${coords}?geometries=geojson&overview=full&access_token=${token}`
+    `https://api.mapbox.com/directions/v5/mapbox/driving/${coords}?geometries=geojson&overview=full&access_token=${token}`,
   );
   if (!res.ok) return null;
   const data = await res.json();
@@ -95,8 +95,8 @@ export default function LoadMap({ loadId, className = "" }: LoadMapProps) {
     map.addControl(new mapboxgl.NavigationControl(), "bottom-right");
 
     map.on("load", async () => {
-      const originFull = `${load.originAddress}, ${load.originCity}, ${load.originState}`;
-      const destFull = `${load.destinationAddress}, ${load.destinationCity}, ${load.destinationState}`;
+      const originFull = `${load.originCity}, ${load.originState}`; // Add precise addresses later on 
+      const destFull = `${load.destinationCity}, ${load.destinationState}`; // Add precise addresses later
 
       const [originCoords, destCoords] = await Promise.all([
         geocodeAddress(originFull),
@@ -157,7 +157,7 @@ export default function LoadMap({ loadId, className = "" }: LoadMapProps) {
         "Pickup",
         `${load.originCity}, ${load.originState}`,
         load.originAddress,
-        "green"
+        "green",
       );
       addMarker(
         map,
@@ -165,7 +165,7 @@ export default function LoadMap({ loadId, className = "" }: LoadMapProps) {
         "Delivery",
         `${load.destinationCity}, ${load.destinationState}`,
         load.destinationAddress,
-        "red"
+        "red",
       );
 
       // Fit map to route bounds
@@ -177,7 +177,7 @@ export default function LoadMap({ loadId, className = "" }: LoadMapProps) {
       if (allCoords.length > 0) {
         const bounds = allCoords.reduce(
           (b, c) => b.extend(c),
-          new mapboxgl.LngLatBounds(allCoords[0], allCoords[0])
+          new mapboxgl.LngLatBounds(allCoords[0], allCoords[0]),
         );
         map.fitBounds(bounds, { padding: 60, maxZoom: 12 });
       }
@@ -243,7 +243,7 @@ function addMarker(
   title: string,
   cityState: string,
   address: string,
-  color: "green" | "red"
+  color: "green" | "red",
 ) {
   const colors = { green: "#16a34a", red: "#ef4444" };
 
@@ -261,7 +261,7 @@ function addMarker(
           <p style="margin:2px 0 0;font-weight:600;">${cityState}</p>
           <p style="margin:2px 0 0;color:#52525b;">${address}</p>
         </div>
-      `)
+      `),
     )
     .addTo(map);
 }

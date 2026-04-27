@@ -1,20 +1,48 @@
 import { requireUser } from "@/lib/requireUser";
-import {
-  Truck,
-  CircleCheckBig,
-  Landmark,
-  FuelIcon,
-} from "lucide-react";
+import prisma from "@/lib/prisma";
+import { Truck, CircleCheckBig, Landmark, FuelIcon } from "lucide-react";
 import LoadMap from "../components/LoadMap";
+import Link from "next/link";
 
 export default async function DashboardPage() {
   const session = await requireUser();
 
+  if (!session.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: {
+      email: session.user.email,
+    },
+  });
+
+  if (!dbUser) {
+    throw new Error("User not found");
+  }
+
+  const activeLoad = await prisma.load.findFirst({
+    where: {
+      status: "IN_TRANSIT",
+      bookings: {
+        some: {
+          driverId: dbUser.id,
+        },
+      },
+    },
+    include: {
+      broker: true,
+    },
+    orderBy: {
+      pickupDate: "asc",
+    },
+  });
+
   const upperIcons = [
     {
       name: "Active Loads",
-      content: 2,
-      status: "In Transit",
+      content: activeLoad ? 1 : 0,
+      status: activeLoad ? "In Transit" : "No active load",
       icon: Truck,
       color: "bg-blue-100 text-blue-600",
     },
@@ -48,10 +76,10 @@ export default async function DashboardPage() {
           {/* Header */}
           <div>
             <h2 className="text-lg font-semibold text-zinc-800">
-              Welcome, {session.user?.name}!
+              Welcome, {session.user?.name || "Driver"}!
             </h2>
             <p className="text-sm text-zinc-500">
-              Here's what's happening with your loads today.
+              Here&apos;s what&apos;s happening with your loads today.
             </p>
           </div>
 
@@ -98,91 +126,140 @@ export default async function DashboardPage() {
                     </h2>
 
                     <span className="rounded-full bg-green-100 px-3 py-1 text-[11px] font-medium text-green-700">
-                      IN TRANSIT
+                      {activeLoad ? "IN TRANSIT" : "NONE"}
                     </span>
                   </div>
 
-                  <button className="text-sm text-blue-600 hover:text-blue-700">
+                  <Link
+                    href="/dashboard/myloads?status=IN_TRANSIT"
+                    className="text-sm text-blue-600 hover:text-blue-700"
+                  >
                     View All Loads
-                  </button>
+                  </Link>
                 </div>
 
-                <div className="grid lg:grid-cols-[310px_1fr]">
-                  {/* Load Info */}
-                  <div className="p-5">
-                    <h3 className="text-lg font-semibold text-zinc-900">
-                      Load #48291
-                    </h3>
+                {activeLoad ? (
+                  <div className="grid lg:grid-cols-[310px_1fr]">
+                    {/* Load Info */}
+                    <div className="p-5">
+                      <h3 className="text-lg font-semibold text-zinc-900">
+                        Load #{activeLoad.referenceNumber}
+                      </h3>
 
-                    <div className="mt-2 flex items-center gap-2 text-sm text-zinc-600">
-                      <span>Miami, FL</span>
-                      <span>→</span>
-                      <span>Atlanta, GA</span>
+                      <div className="mt-2 flex items-center gap-2 text-sm text-zinc-600">
+                        <span>
+                          {activeLoad.originCity}, {activeLoad.originState}
+                        </span>
+                        <span>→</span>
+                        <span>
+                          {activeLoad.destinationCity},{" "}
+                          {activeLoad.destinationState}
+                        </span>
+                      </div>
+
+                      {/* Timeline */}
+                      <div className="mt-6 space-y-5">
+                        <TimelineItem
+                          dotColor="bg-green-500"
+                          title="Picked up"
+                          detail={
+                            <>
+                              {formatDate(activeLoad.pickupDate)} <br />
+                              {activeLoad.originCity}, {activeLoad.originState}
+                            </>
+                          }
+                        />
+
+                        <TimelineItem
+                          dotColor="bg-blue-500"
+                          title="In transit"
+                          active
+                          detail={
+                            <>
+                              Current route <br />
+                              Updated recently
+                            </>
+                          }
+                        />
+
+                        <TimelineItem
+                          dotColor="bg-red-500"
+                          title="Delivery"
+                          detail={
+                            <>
+                              {formatDate(activeLoad.deliveryDate)} <br />
+                              {activeLoad.destinationCity},{" "}
+                              {activeLoad.destinationState}
+                            </>
+                          }
+                        />
+                      </div>
+
+                      <div className="my-5 border-t border-zinc-200" />
+
+                      {/* Details */}
+                      <div className="grid grid-cols-3 gap-4 text-sm">
+                        <SmallDetail
+                          label="Equipment"
+                          value={activeLoad.equipmentType}
+                        />
+                        <SmallDetail
+                          label="Weight"
+                          value={
+                            activeLoad.weight
+                              ? `${activeLoad.weight.toLocaleString()} lbs`
+                              : "—"
+                          }
+                        />
+                        <SmallDetail
+                          label="Rate"
+                          value={`$${Number(activeLoad.rate).toLocaleString()}`}
+                        />
+                      </div>
+
+                      {/* Buttons */}
+                      <div className="mt-6 grid grid-cols-2 gap-3">
+                        <Link
+                          href={`/dashboard/search/${activeLoad.id}`}
+                          className="rounded-lg bg-blue-600 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-700"
+                        >
+                          Track Load
+                        </Link>
+
+                        <Link
+                          href={`/dashboard/search/${activeLoad.id}`}
+                          className="rounded-lg border border-zinc-200 px-4 py-2.5 text-center text-sm font-medium text-blue-600 hover:bg-zinc-50"
+                        >
+                          View Details
+                        </Link>
+                      </div>
                     </div>
 
-                    {/* Timeline */}
-                    <div className="mt-6 space-y-5">
-                      <TimelineItem
-                        dotColor="bg-green-500"
-                        title="Picked up"
-                        detail={
-                          <>
-                            Apr 24, 8:00 AM <br />
-                            Miami, FL
-                          </>
-                        }
+                    {/* Map */}
+                    <div className="h-[420px] border-t border-zinc-200 bg-white lg:border-l lg:border-t-0">
+                      <LoadMap
+                        loadId={activeLoad.id}
+                        className="h-full w-full"
                       />
-
-                      <TimelineItem
-                        dotColor="bg-blue-500"
-                        title="In transit"
-                        active
-                        detail={
-                          <>
-                            Valdosta, GA <br />
-                            Updated 2 min ago
-                          </>
-                        }
-                      />
-
-                      <TimelineItem
-                        dotColor="bg-red-500"
-                        title="Delivery"
-                        detail={
-                          <>
-                            Apr 25, 4:00 PM <br />
-                            Atlanta, GA
-                          </>
-                        }
-                      />
-                    </div>
-
-                    <div className="my-5 border-t border-zinc-200" />
-
-                    {/* Details */}
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <SmallDetail label="Equipment" value="Dry Van" />
-                      <SmallDetail label="Weight" value="38,000 lbs" />
-                      <SmallDetail label="Rate" value="$2,450" />
-                    </div>
-
-                    {/* Buttons */}
-                    <div className="mt-6 grid grid-cols-2 gap-3">
-                      <button className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700">
-                        Track Load
-                      </button>
-
-                      <button className="rounded-lg border border-zinc-200 px-4 py-2.5 text-sm font-medium text-blue-600 hover:bg-zinc-50">
-                        View Details
-                      </button>
                     </div>
                   </div>
+                ) : (
+                  <div className="p-8 text-center">
+                    <p className="text-sm font-medium text-zinc-900">
+                      No active load right now
+                    </p>
+                    <p className="mt-1 text-sm text-zinc-500">
+                      Book a load and start the trip to see it here.
+                    </p>
 
-                  {/* Simple Map Placeholder */}
-                  <div className="min-h-[420px] border-t border-zinc-200 bg-white lg:border-l lg:border-t-0">
-                    <LoadMap className="h-full min-h-[420px] w-full" />
+                    <Link
+                      href="/dashboard/search"
+                      className="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                    >
+                      Find Loads
+                    </Link>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Lower Cards */}
@@ -192,8 +269,16 @@ export default async function DashboardPage() {
 
                   <div className="space-y-4 text-sm">
                     <SearchRow from="Miami, FL" to="Atlanta, GA" count="128" />
-                    <SearchRow from="Orlando, FL" to="Charlotte, NC" count="96" />
-                    <SearchRow from="Tampa, FL" to="Nashville, TN" count="105" />
+                    <SearchRow
+                      from="Orlando, FL"
+                      to="Charlotte, NC"
+                      count="96"
+                    />
+                    <SearchRow
+                      from="Tampa, FL"
+                      to="Nashville, TN"
+                      count="105"
+                    />
                   </div>
                 </div>
 
@@ -201,9 +286,18 @@ export default async function DashboardPage() {
                   <CardHeader title="Bookmarked Loads" />
 
                   <div className="space-y-4 text-sm">
-                    <BookmarkedRow route="Miami, FL → Atlanta, GA" rate="$2,450" />
-                    <BookmarkedRow route="Orlando, FL → Charlotte, NC" rate="$2,100" />
-                    <BookmarkedRow route="Tampa, FL → Nashville, TN" rate="$2,850" />
+                    <BookmarkedRow
+                      route="Miami, FL → Atlanta, GA"
+                      rate="$2,450"
+                    />
+                    <BookmarkedRow
+                      route="Orlando, FL → Charlotte, NC"
+                      rate="$2,100"
+                    />
+                    <BookmarkedRow
+                      route="Tampa, FL → Nashville, TN"
+                      rate="$2,850"
+                    />
                   </div>
                 </div>
               </div>
@@ -330,13 +424,7 @@ function SearchRow({
   );
 }
 
-function BookmarkedRow({
-  route,
-  rate,
-}: {
-  route: string;
-  rate: string;
-}) {
+function BookmarkedRow({ route, rate }: { route: string; rate: string }) {
   return (
     <div className="flex items-center justify-between border-b border-zinc-100 pb-3 last:border-0">
       <p className="text-zinc-600">⭐ {route}</p>
@@ -375,17 +463,22 @@ function PickupRow({
   );
 }
 
-function NotificationRow({
-  title,
-  desc,
-}: {
-  title: string;
-  desc: string;
-}) {
+function NotificationRow({ title, desc }: { title: string; desc: string }) {
   return (
     <div>
       <p className="text-sm font-medium text-zinc-900">{title}</p>
       <p className="mt-1 text-sm text-zinc-500">{desc}</p>
     </div>
   );
+}
+
+function formatDate(date: Date | string | null) {
+  if (!date) return "No date";
+
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
