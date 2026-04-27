@@ -220,7 +220,7 @@ export default async function DashboardPage() {
                       {/* Buttons */}
                       <div className="mt-6 grid grid-cols-2 gap-3">
                         <Link
-                          href={`/dashboard/search/${activeLoad.id}`}
+                          href={`/dashboard/loads/track`}
                           className="rounded-lg bg-blue-600 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-700"
                         >
                           Track Load
@@ -482,3 +482,6 @@ function formatDate(date: Date | string | null) {
     minute: "2-digit",
   });
 }
+
+
+// Add document section tha cater to this load. 

@@ -1,7 +1,7 @@
 import { requireUser } from "@/lib/requireUser";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { startTrip } from "./action";
+import { startTrip, markDelivered } from "./action";
 
 export default async function MyLoadsPage({
   searchParams,
@@ -121,9 +121,14 @@ function LoadRow({ load }: { load: any }) {
         )}
 
         {load.status === "IN_TRANSIT" && (
-          <button className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white">
-            Mark Delivered
-          </button>
+          <form action={markDelivered.bind(null, load.id)}>
+            <button
+              type="submit"
+              className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+            >
+              Mark Delivered
+            </button>
+          </form>
         )}
 
         {load.status === "DELIVERED" && (

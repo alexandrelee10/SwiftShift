@@ -45,3 +45,43 @@ export async function startTrip(loadId: string) {
 
     
 }
+
+export async function markDelivered(loadId: string) {
+  const session = await requireUser();
+
+  if (!session.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const driver = await prisma.user.findUnique({
+    where: {
+      email: session.user.email,
+    },
+  });
+
+  if (!driver) {
+    throw new Error("Driver not found");
+  }
+
+  const booking = await prisma.booking.findFirst({
+    where: {
+      loadId,
+      driverId: driver.id,
+    },
+  });
+
+  if (!booking) {
+    throw new Error("You have not booked this load.");
+  }
+
+  await prisma.load.update({
+    where: {
+      id: loadId,
+    },
+    data: {
+      status: LoadStatus.DELIVERED,
+    },
+  });
+
+  redirect("/dashboard/loads/myloads?status=DELIVERED");
+}
