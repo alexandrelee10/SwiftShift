@@ -15,6 +15,7 @@ import {
   Truck,
   Weight,
 } from "lucide-react";
+import { bookLoad } from "./action";
 
 export default async function LoadDetailsPage({
   params,
@@ -102,7 +103,7 @@ export default async function LoadDetailsPage({
               </div>
 
               <div className="h-[380px] overflow-hidden rounded-xl border border-slate-200">
-                <LoadMap  loadId={id} className="h-full w-full" />
+                <LoadMap loadId={id} className="h-full w-full" />
               </div>
             </div>
 
@@ -246,10 +247,15 @@ export default async function LoadDetailsPage({
               </h2>
 
               <div className="mt-5 space-y-3">
-                <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700">
-                  <Play size={16} />
-                  Book Load
-                </button>
+                <form action={bookLoad.bind(null, load.id)}>
+                  <button
+                    type="submit"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500"
+                  >
+                    <Play size={16} />
+                    Book Now
+                  </button>
+                </form>
 
                 <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-slate-50">
                   <Phone size={16} />
