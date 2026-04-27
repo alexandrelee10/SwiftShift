@@ -22,6 +22,7 @@ type SearchParams = {
   equipment?: string;
   minRate?: string;
   view?: "list" | "grid";
+  sort?: "newest" | "rate-high" | "rate-low" | "distance-low";
 };
 
 export default async function LoadSearchPage({
@@ -30,6 +31,7 @@ export default async function LoadSearchPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
+  const sort = params.sort || "newest";
 
   const origin = params.origin?.trim() || "";
   const destination = params.destination?.trim() || "";
@@ -334,7 +336,7 @@ function LoadRow({ load }: { load: any }) {
         </button>
 
         <Link
-          href={`/loads/${load.id}`}
+          href={`/dashboard/loads/search/${load.id}`}
           className="rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700"
         >
           View
@@ -426,7 +428,7 @@ function LoadGridCard({ load }: { load: any }) {
         </button>
 
         <Link
-          href={`/loads/${load.id}`}
+          href={`/dashboard/loads/search/${load.id}`}
           className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
         >
           View Details

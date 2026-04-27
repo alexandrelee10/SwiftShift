@@ -27,7 +27,7 @@ const sidebarSections = [
       { name: "Dashboard", href: "/dashboard", icon: Home },
       { name: "Find Loads", href: "/dashboard/loads/search", icon: Search },
       { name: "My Loads", href: "/dashboard/loads/myloads", icon: Package },
-      { name: "Tracking", href: "/tracking", icon: Map },
+      { name: "Saved", href: "/dashboard/loads/tracking", icon: Map },
       { name: "Documents", href: "/dashboard/documents", icon: FilesIcon },
       { name: "Dispatch", href: "/dispatch", icon: Radio },
       { name: "Messages", href: "/messages", icon: MessageSquare },
