@@ -253,7 +253,7 @@ export default async function DashboardPage() {
                     </p>
 
                     <Link
-                      href="/dashboard/search"
+                      href="/dashboard/loads/search"
                       className="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
                     >
                       Find Loads

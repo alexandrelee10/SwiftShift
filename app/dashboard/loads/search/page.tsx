@@ -110,7 +110,7 @@ export default async function LoadSearchPage({
       <div className="mx-auto max-w-7xl">
         <div className="mb-7 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-950">
               Find Loads
             </h1>
             <p className="mt-2 text-sm text-slate-500">

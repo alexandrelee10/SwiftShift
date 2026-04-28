@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { LoadStatus, Prisma } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const cities = [
   { city: "Miami", state: "FL" },
@@ -16,38 +17,36 @@ const cities = [
 
 const equipmentTypes = ["Dry Van", "Reefer", "Flatbed"];
 
-// Chooses a random element in an array
 function randomFromArray<T>(arr: T[]) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
-// Chooses a random rate
+
 function randomRate() {
   return (1800 + Math.random() * 2000).toFixed(2);
 }
-// Chooses a random weight
+
 function randomWeight() {
   return Math.floor(20000 + Math.random() * 30000);
 }
-// Chooses random miles
+
 function randomMiles() {
   return Math.floor(250 + Math.random() * 1500);
 }
 
 async function seedLoads(brokerId: string) {
-  const loads: Prisma.LoadCreateManyInput[] = []; // temp list to store all loads before saving them
+  const loads: Prisma.LoadCreateManyInput[] = [];
 
   for (let i = 1; i <= 25; i++) {
     let origin = randomFromArray(cities);
     let destination = randomFromArray(cities);
 
-    // ensures pick up and delivery aren't the same
     while (destination.city === origin.city) {
       destination = randomFromArray(cities);
     }
 
     const pickupDate = new Date(Date.now() + i * 86400000);
     const deliveryDate = new Date(pickupDate.getTime() + 2 * 86400000);
-    // Creates the load 
+
     loads.push({
       brokerId,
       referenceNumber: `LOAD${String(i).padStart(3, "0")}`,
@@ -68,7 +67,6 @@ async function seedLoads(brokerId: string) {
     });
   }
 
-  // This will load all the loads within the loads array inside of the db 
   await prisma.load.createMany({
     data: loads,
   });
@@ -79,18 +77,56 @@ async function seedLoads(brokerId: string) {
 async function main() {
   console.log("🌱 Seed started");
 
-  const broker = await prisma.user.findFirst();
-
-  if (!broker) {
-    throw new Error("No broker found. Create a user first.");
-  }
-
-  console.log("Broker found:", broker.id);
-
-  // Prevent duplicate LOAD001, LOAD002, etc. errors when re-running seed
+  // Delete loads first because loads depend on users
   await prisma.load.deleteMany();
 
+  const password = "password123"
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+const broker = await prisma.user.upsert({
+  where: {
+    email: "broker@test.com",
+  },
+  update: {
+    password: hashedPassword,
+    phoneNum: "5550001000",
+    role: "BROKER",
+  },
+  create: {
+    firstName: "Demo",
+    lastName: "Broker",
+    email: "broker@test.com",
+    phoneNum: "5550001000",
+    password: hashedPassword,
+    role: "BROKER",
+  },
+});
+
+const driver = await prisma.user.upsert({
+  where: {
+    email: "driver@test.com",
+  },
+  update: {
+    password: hashedPassword,
+    phoneNum: "5550002000",
+    role: "DRIVER",
+  },
+  create: {
+    firstName: "Demo",
+    lastName: "Driver",
+    email: "driver@test.com",
+    phoneNum: "5550002000",
+    password: hashedPassword,
+    role: "DRIVER",
+  },
+});
+  console.log("Broker found/created:", broker.id);
+  console.log("Driver found/created:", driver.id);
+
   await seedLoads(broker.id);
+
+  console.log("✅ Seed complete");
 }
 
 main()

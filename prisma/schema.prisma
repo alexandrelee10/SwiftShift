@@ -53,6 +53,8 @@ model User {
   brokerLoads     Load[]    @relation("BrokerLoads")
   driverBookings  Booking[] @relation("DriverBookings")
   driverTrips     Trip[]    @relation("DriverTrips")
+
+  documents Document[]
 }
 
 model Load {
@@ -84,6 +86,7 @@ model Load {
   @@index([brokerId])
   @@index([status])
   @@index([pickupDate])
+  documents Document[]
 }
 
 model Booking {
@@ -120,4 +123,18 @@ model Trip {
 
   @@index([loadId])
   @@index([driverId])
+}
+
+model Document {
+  id String @id @default(cuid())
+  loadId String
+  load Load @relation(fields: [loadId], references: [id])
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  type String
+  fileUrl String
+  fileName String
+  status String @default("UPLOADED")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
