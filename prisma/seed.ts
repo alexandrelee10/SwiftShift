@@ -65,6 +65,8 @@ async function seedLoads(brokerId: string) {
       distanceMiles: randomMiles(),
       status: LoadStatus.POSTED,
     });
+
+    
   }
 
   await prisma.load.createMany({
