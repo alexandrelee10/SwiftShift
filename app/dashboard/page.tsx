@@ -38,6 +38,23 @@ export default async function DashboardPage() {
     },
   });
 
+  const deliveredLoads = await prisma.load.findMany({
+    where: {
+      status: "DELIVERED",
+      bookings: {
+        some: {
+          driverId: dbUser.id,
+        },
+      },
+    },
+    include: {
+      broker: true,
+    },
+    orderBy: {
+      pickupDate: "asc"
+    },
+  });
+
   const upperIcons = [
     {
       name: "Active Loads",
@@ -48,8 +65,8 @@ export default async function DashboardPage() {
     },
     {
       name: "Delivered (30d)",
-      content: "8",
-      status: "+14% vs last 30d",
+      content: deliveredLoads ? 1 : 0,
+      status: deliveredLoads ? "Deliveries Completed" : "None Delivered",
       icon: CircleCheckBig,
       color: "bg-green-100 text-green-600",
     },
