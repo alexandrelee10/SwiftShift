@@ -11,6 +11,7 @@ export default async function DashboardPage() {
     throw new Error("Unauthorized");
   }
 
+  // USER
   const dbUser = await prisma.user.findUnique({
     where: {
       email: session.user.email,
@@ -20,6 +21,38 @@ export default async function DashboardPage() {
   if (!dbUser) {
     throw new Error("User not found");
   }
+
+  // Loads
+  const upcomingLoads = await prisma.load.findMany({
+    where: {
+      status: "IN_TRANSIT",
+      bookings: {
+        some: {
+          driverId: dbUser.id,
+        },
+      },
+    },
+    orderBy: {
+      pickupDate: "asc",
+    },
+  });
+
+  const bookedLoads = await prisma.load.findMany({
+    where: {
+      status: "BOOKED",
+      bookings: {
+        some: {
+          driverId: dbUser.id,
+        },
+      },
+    },
+    include: {
+      broker: true,
+    },
+    orderBy: {
+      pickupDate: "asc",
+    },
+  });
 
   const activeLoad = await prisma.load.findFirst({
     where: {
@@ -51,7 +84,7 @@ export default async function DashboardPage() {
       broker: true,
     },
     orderBy: {
-      pickupDate: "asc"
+      pickupDate: "asc",
     },
   });
 
@@ -244,7 +277,7 @@ export default async function DashboardPage() {
                         </Link>
 
                         <Link
-                          href={`/dashboard/search/${activeLoad.id}`}
+                          href={`/dashboard/loads/myloads`}
                           className="rounded-lg border border-zinc-200 px-4 py-2.5 text-center text-sm font-medium text-blue-600 hover:bg-zinc-50"
                         >
                           View Details
@@ -300,21 +333,22 @@ export default async function DashboardPage() {
                 </div>
 
                 <div className="rounded-xl border border-zinc-200 bg-white p-5">
-                  <CardHeader title="Bookmarked Loads" />
+                  <CardHeader title="Booked Loads" />
 
                   <div className="space-y-4 text-sm">
-                    <BookmarkedRow
-                      route="Miami, FL → Atlanta, GA"
-                      rate="$2,450"
-                    />
-                    <BookmarkedRow
-                      route="Orlando, FL → Charlotte, NC"
-                      rate="$2,100"
-                    />
-                    <BookmarkedRow
-                      route="Tampa, FL → Nashville, TN"
-                      rate="$2,850"
-                    />
+                    {bookedLoads.length > 0 ? (
+                      bookedLoads.map((load) => (
+                        <BookmarkedRow
+                          key={load.id}
+                          route={`${load.originCity}, ${load.originState} → ${load.destinationCity}, ${load.destinationState}`}
+                          rate={`$${Number(load.rate).toLocaleString()}`}
+                        />
+                      ))
+                    ) : (
+                      <p className="text-sm text-zinc-500">
+                        No bookmarked loads yet
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -323,33 +357,37 @@ export default async function DashboardPage() {
             {/* Right Column */}
             <aside className="space-y-5">
               <div className="rounded-xl border border-zinc-200 bg-white p-5">
-                <CardHeader title="Upcoming Pickups" />
+                <CardHeader title="Upcoming Loads" />
 
                 <div className="space-y-4">
-                  <PickupRow
-                    day="25"
-                    month="APR"
-                    time="7:00 AM"
-                    load="#48293"
-                    city="Tampa, FL"
-                  />
-                  <PickupRow
-                    day="26"
-                    month="APR"
-                    time="6:00 AM"
-                    load="#48301"
-                    city="Orlando, FL"
-                  />
-                  <PickupRow
-                    day="27"
-                    month="APR"
-                    time="8:30 AM"
-                    load="#48312"
-                    city="Jacksonville, FL"
-                  />
+                  {upcomingLoads.length > 0 ? (
+                    upcomingLoads.map((load) => {
+                      const date = new Date(load.pickupDate);
+
+                      return (
+                        <PickupRow
+                          key={load.id}
+                          day={date.toLocaleDateString("en-US", {
+                            day: "2-digit",
+                          })}
+                          month={date
+                            .toLocaleDateString("en-US", { month: "short" })
+                            .toUpperCase()}
+                          time={date.toLocaleTimeString("en-US", {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                          load={`#${load.referenceNumber}`}
+                          city={`${load.originCity}, ${load.originState}`}
+                        />
+                      );
+                    })
+                  ) : (
+                    <p className="text-sm text-zinc-500">No upcoming loads</p>
+                  )}
                 </div>
               </div>
-
+                {/* Convert to earnings card */}
               <div className="rounded-xl border border-zinc-200 bg-white p-5">
                 <CardHeader title="Notifications" />
 
@@ -412,9 +450,12 @@ function CardHeader({ title }: { title: string }) {
   return (
     <div className="mb-4 flex items-center justify-between">
       <h3 className="text-sm font-semibold text-zinc-900">{title}</h3>
-      <button className="text-sm text-blue-600 hover:text-blue-700">
+      <Link
+        href={"/dashboard/loads/myloads"}
+        className="text-sm text-blue-600 hover:text-blue-700"
+      >
         View All
-      </button>
+      </Link>
     </div>
   );
 }
@@ -500,5 +541,4 @@ function formatDate(date: Date | string | null) {
   });
 }
 
-
-// Add document section tha cater to this load. 
+// Add document section tha cater to this load.

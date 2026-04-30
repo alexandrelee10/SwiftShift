@@ -247,3 +247,7 @@ function formatDate(date: Date | string) {
     day: "numeric",
   });
 }
+
+
+// Make sure you update the badges based on the status 
+// Also make sure that documents dont save duplicates on the page
