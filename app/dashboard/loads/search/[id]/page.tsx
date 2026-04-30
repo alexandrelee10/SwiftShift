@@ -14,7 +14,10 @@ import {
   ShieldAlert,
   Truck,
   Weight,
+  EyeIcon,
+  FileText
 } from "lucide-react";
+
 import { bookLoad } from "./action";
 
 export default async function LoadDetailsPage({
@@ -154,17 +157,31 @@ export default async function LoadDetailsPage({
               </h2>
 
               <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                <DetailBox icon={<Truck />} label="Equipment" value={load.equipmentType} />
-                <DetailBox icon={<Box />} label="Commodity" value={load.commodity || "General Freight"} />
+                <DetailBox
+                  icon={<Truck />}
+                  label="Equipment"
+                  value={load.equipmentType}
+                />
+                <DetailBox
+                  icon={<Box />}
+                  label="Commodity"
+                  value={load.commodity || "General Freight"}
+                />
                 <DetailBox
                   icon={<Weight />}
                   label="Weight"
-                  value={load.weight ? `${load.weight.toLocaleString()} lbs` : "—"}
+                  value={
+                    load.weight ? `${load.weight.toLocaleString()} lbs` : "—"
+                  }
                 />
                 <DetailBox
                   icon={<MapPin />}
                   label="Distance"
-                  value={load.distanceMiles ? `${load.distanceMiles.toLocaleString()} mi` : "—"}
+                  value={
+                    load.distanceMiles
+                      ? `${load.distanceMiles.toLocaleString()} mi`
+                      : "—"
+                  }
                 />
                 <DetailBox
                   icon={<CalendarDays />}
@@ -207,7 +224,10 @@ export default async function LoadDetailsPage({
               )}
 
               <div className="mt-6 space-y-3 border-t border-slate-100 pt-5 text-sm">
-                <SideRow label="Base Rate" value={`$${rate.toLocaleString()}`} />
+                <SideRow
+                  label="Base Rate"
+                  value={`$${rate.toLocaleString()}`}
+                />
                 <SideRow label="Payment Terms" value="Net 30" />
                 <SideRow label="Status" value={formatStatus(load.status)} />
               </div>
@@ -228,9 +248,7 @@ export default async function LoadDetailsPage({
                   <p className="font-semibold text-slate-900">
                     {load.broker?.name || "Broker"}
                   </p>
-                  <p className="text-sm text-slate-500">
-                    {load.broker?.email}
-                  </p>
+                  <p className="text-sm text-slate-500">{load.broker?.email}</p>
                 </div>
               </div>
 
@@ -271,6 +289,21 @@ export default async function LoadDetailsPage({
                   <ShieldAlert size={16} />
                   Report Issue
                 </button>
+                <Link
+                  href={`/dashboard/loads/search/${load.id}/bol`}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-slate-50"
+                >
+                  <FileText size={16} />
+                  Fill BOL
+                </Link>
+                <Link
+                  href={`/dashboard/loads/search/${load.id}/bol/pdf`}
+                  target="_blank"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-slate-50"
+                >
+                  <EyeIcon size={16} />
+                  View BOL
+                </Link>
               </div>
             </div>
           </aside>
@@ -297,7 +330,9 @@ function TimelineItem({
 }) {
   return (
     <div className="grid gap-4 sm:grid-cols-[52px_1fr_auto] sm:items-center">
-      <div className={`flex h-11 w-11 items-center justify-center rounded-full text-white ${color}`}>
+      <div
+        className={`flex h-11 w-11 items-center justify-center rounded-full text-white ${color}`}
+      >
         {icon}
       </div>
 
