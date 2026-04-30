@@ -39,6 +39,13 @@ enum TripStatus {
   CANCELLED
 }
 
+enum DocumentType {
+  RATE_CONFIRMATION
+  BILL_OF_LADING
+  PROOF_OF_DELIVERY
+  INVOICE
+}
+
 model User {
   id              String    @id @default(uuid())
   firstName       String
@@ -127,14 +134,43 @@ model Trip {
 
 model Document {
   id String @id @default(cuid())
+
   loadId String
   load Load @relation(fields: [loadId], references: [id])
+
   userId String
   user User @relation(fields: [userId], references: [id])
-  type String
-  fileUrl String
-  fileName String
-  status String @default("UPLOADED")
+
+  type DocumentType
+  fileUrl String?
+  fileName String?
+  status String @default("DRAFT")
+
+  billOfLading BillOfLading?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BillOfLading {
+  id  String @id @default(cuid())
+  
+  documentId String @unique
+  document Document @relation(fields: [documentId], references: [id])
+
+  shipperName String
+  shipperAddress String
+  consigneeName String
+  consigneeAddress String
+
+  carrierName String?
+  trailerNumber String?
+  sealNumber String?
+
+  commodity String?
+  weight Float?
+  pieces Int?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

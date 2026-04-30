@@ -52,25 +52,64 @@ export async function bookLoad(loadId: string) {
     throw new Error("You already booked this load.");
   }
 
-  // 6. Create the booking AND update the load status together
-  await prisma.$transaction([
-    prisma.booking.create({
-      data: {
-        loadId: load.id,
-        driverId: driver.id,
-        status: BookingStatus.CONFIRMED,
-      },
-    }),
+await prisma.$transaction([
+  // 1. Create booking
+  prisma.booking.create({
+    data: {
+      loadId: load.id,
+      driverId: driver.id,
+      status: BookingStatus.CONFIRMED,
+    },
+  }),
 
-    prisma.load.update({
-      where: {
-        id: load.id,
+  // 2. Update load status
+  prisma.load.update({
+    where: {
+      id: load.id,
+    },
+    data: {
+      status: LoadStatus.BOOKED,
+    },
+  }),
+
+  // 3. Create documents for this load
+  prisma.document.createMany({
+    data: [
+      {
+        loadId: load.id,
+        userId: driver.id,
+        type: "BILL_OF_LADING",
+        fileName: `${load.referenceNumber}-bol`,
+        fileUrl: null,
+        status: "DRAFT",
       },
-      data: {
-        status: LoadStatus.BOOKED,
+      {
+        loadId: load.id,
+        userId: driver.id,
+        type: "RATE_CONFIRMATION",
+        fileName: `${load.referenceNumber}-rate-confirmation`,
+        fileUrl: null,
+        status: "PENDING",
       },
-    }),
-  ]);
+      {
+        loadId: load.id,
+        userId: driver.id,
+        type: "PROOF_OF_DELIVERY",
+        fileName: `${load.referenceNumber}-pod`,
+        fileUrl: null,
+        status: "REQUIRED",
+      },
+      {
+        loadId: load.id,
+        userId: driver.id,
+        type: "INVOICE",
+        fileName: `${load.referenceNumber}-invoice`,
+        fileUrl: null,
+        status: "NOT_STARTED",
+      },
+    ],
+  }),
+]);
 
   // 7. Send user to My Loads
   redirect("/dashboard/loads/myloads?status=BOOKED");

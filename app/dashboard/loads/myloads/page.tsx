@@ -108,6 +108,12 @@ function LoadRow({ load }: { load: any }) {
         >
           View / Track
         </Link>
+                        <Link
+  href={`/dashboard/loads/search/${load.id}/bol`}
+  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+>
+  Fill BOL
+</Link>
 
         {load.status === "BOOKED" && (
           <form action={startTrip.bind(null, load.id)}>

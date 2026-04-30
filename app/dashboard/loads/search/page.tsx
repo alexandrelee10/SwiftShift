@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { requireUser } from "@/lib/requireUser";
 import LoadSearchFilters from "@/app/components/LoadSearchFilters";
 import LoadMap from "@/app/components/LoadMap";
 import Link from "next/link";
@@ -31,7 +32,23 @@ export default async function LoadSearchPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
+  const session = await requireUser();
   const params = await searchParams;
+
+  if (!session.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: {
+      email: session.user.email,
+    },
+  });
+
+  if (!dbUser) {
+    throw new Error("User not found");
+  }
+
   const sort = params.sort || "newest";
 
   const origin = params.origin?.trim() || "";
@@ -56,46 +73,60 @@ export default async function LoadSearchPage({
   const loads = await prisma.load.findMany({
     where: {
       AND: [
+        {
+          status: "POSTED",
+
+          // hides loads this driver already booked
+          bookings: {
+            none: {
+              driverId: dbUser.id,
+            },
+          },
+        },
+
         origin
           ? {
-            OR: [
-              { originCity: { contains: origin, mode: "insensitive" } },
-              { originState: { contains: origin, mode: "insensitive" } },
-            ],
-          }
+              OR: [
+                { originCity: { contains: origin, mode: "insensitive" } },
+                { originState: { contains: origin, mode: "insensitive" } },
+              ],
+            }
           : {},
+
         destination
           ? {
-            OR: [
-              {
-                destinationCity: {
-                  contains: destination,
-                  mode: "insensitive",
+              OR: [
+                {
+                  destinationCity: {
+                    contains: destination,
+                    mode: "insensitive",
+                  },
                 },
-              },
-              {
-                destinationState: {
-                  contains: destination,
-                  mode: "insensitive",
+                {
+                  destinationState: {
+                    contains: destination,
+                    mode: "insensitive",
+                  },
                 },
-              },
-            ],
-          }
+              ],
+            }
           : {},
+
         equipment
           ? {
-            equipmentType: {
-              contains: equipment,
-              mode: "insensitive",
-            },
-          }
+              equipmentType: {
+                contains: equipment,
+                mode: "insensitive",
+              },
+            }
           : {},
+
         minRate
           ? {
-            rate: {
-              gte: minRate,
-            },
-          }
+              rate: {
+                gte: minRate,
+              },
+            }
           : {},
       ],
     },
