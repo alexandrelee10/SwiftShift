@@ -42,21 +42,18 @@ export default async function EarningsPage({
     },
   });
 
-  // Selected load
   const selectedLoad =
     deliveredLoads.find((load) => load.id === params.loadId) ||
     deliveredLoads[0];
 
-// Income
   const grossPay = selectedLoad ? Number(selectedLoad.rate) : 0;
 
   const platformFee = grossPay * 0.05;
   const taxEstimate = grossPay * 0.15;
   const fuelAdvance = grossPay * 0.08;
   const totalDeductions = platformFee + taxEstimate + fuelAdvance;
-
   const netPay = grossPay - totalDeductions;
-  // Chart display deductions
+
   const greenPercent = grossPay ? (netPay / grossPay) * 100 : 0;
   const redPercent = grossPay ? (totalDeductions / grossPay) * 100 : 0;
 
@@ -71,7 +68,7 @@ export default async function EarningsPage({
   const totalNet = totalGross - totalFees - totalTaxEstimate - totalAdvances;
 
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-6 text-slate-900">
+    <main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 sm:px-6">
       <div className="space-y-6">
         {/* HEADER */}
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -90,8 +87,8 @@ export default async function EarningsPage({
           </button>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[300px_1fr_300px]">
-          {/* LEFT: Pay Statements */}
+        <div className="grid gap-5 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+          {/* LEFT */}
           <aside className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div className="border-b border-slate-200 p-4">
               <h2 className="text-sm font-semibold text-slate-900">
@@ -126,7 +123,10 @@ export default async function EarningsPage({
 
                       <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
                         <MiniPay label="Gross" value={`$${gross.toFixed(2)}`} />
-                        <MiniPay label="Take Home" value={`$${net.toFixed(2)}`} />
+                        <MiniPay
+                          label="Take Home"
+                          value={`$${net.toFixed(2)}`}
+                        />
                         <MiniPay label="Load" value={load.referenceNumber} />
                       </div>
                     </Link>
@@ -140,8 +140,8 @@ export default async function EarningsPage({
             </div>
           </aside>
 
-          {/* Center: Chart + Earning History */}
-          <section className="space-y-5">
+          {/* CENTER */}
+          <section className="min-w-0 space-y-5">
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 md:flex-row md:items-center md:justify-between">
                 <div>
@@ -158,7 +158,7 @@ export default async function EarningsPage({
                 {selectedLoad && (
                   <Link
                     href={`/dashboard/loads/search/${selectedLoad.id}`}
-                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-slate-50"
+                    className="w-fit rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-slate-50"
                   >
                     View Load
                   </Link>
@@ -167,10 +167,10 @@ export default async function EarningsPage({
 
               {selectedLoad ? (
                 <>
-                  <div className="grid gap-8 py-7 lg:grid-cols-[240px_1fr] lg:items-center">
+                  <div className="grid gap-8 py-7 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-center">
                     <div>
                       <div
-                        className="mx-auto flex h-52 w-52 items-center justify-center rounded-full"
+                        className="mx-auto flex h-44 w-44 items-center justify-center rounded-full sm:h-52 sm:w-52"
                         style={{
                           background: `conic-gradient(
                             #22c55e 0% ${greenPercent}%,
@@ -181,9 +181,9 @@ export default async function EarningsPage({
                           )`,
                         }}
                       >
-                        <div className="flex h-36 w-36 flex-col items-center justify-center rounded-full bg-white">
+                        <div className="flex h-28 w-28 flex-col items-center justify-center rounded-full bg-white sm:h-36 sm:w-36">
                           <p className="text-xs text-slate-500">Take Home</p>
-                          <p className="text-2xl font-semibold text-green-700">
+                          <p className="text-xl font-semibold text-green-700 sm:text-2xl">
                             ${netPay.toFixed(2)}
                           </p>
                         </div>
@@ -201,9 +201,9 @@ export default async function EarningsPage({
                       </div>
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm text-slate-500">Route</p>
-                      <h3 className="mt-1 text-xl font-semibold text-slate-950">
+                      <h3 className="mt-1 break-words text-lg font-semibold text-slate-950 sm:text-xl">
                         {selectedLoad.originCity}, {selectedLoad.originState} →{" "}
                         {selectedLoad.destinationCity},{" "}
                         {selectedLoad.destinationState}
@@ -358,7 +358,7 @@ export default async function EarningsPage({
             </div>
           </section>
 
-          {/* Right: Earning Summary + Tax Docs */}
+          {/* RIGHT */}
           <aside className="space-y-5">
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <h2 className="text-sm font-semibold text-slate-900">
@@ -411,7 +411,6 @@ export default async function EarningsPage({
   );
 }
 
-// Dynamic Helper Functions
 function MiniPay({ label, value }: { label: string; value: string }) {
   return (
     <div>
@@ -444,10 +443,10 @@ function PayBreakdownRow({
   strong?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3">
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white px-4 py-3">
       <p className="text-sm text-slate-600">{label}</p>
       <p
-        className={`text-sm ${
+        className={`shrink-0 text-sm ${
           strong
             ? "font-semibold text-green-700"
             : negative
@@ -473,10 +472,10 @@ function SummaryRow({
   strong?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between border-b border-slate-100 pb-3 last:border-0">
+    <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3 last:border-0">
       <p className="text-sm text-slate-500">{label}</p>
       <p
-        className={`text-sm ${
+        className={`shrink-0 text-sm ${
           strong
             ? "font-semibold text-green-700"
             : negative
@@ -492,13 +491,13 @@ function SummaryRow({
 
 function TaxRow({ title }: { title: string }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-3">
-      <div className="flex items-center gap-2">
-        <FileText size={16} className="text-blue-600" />
-        <p className="text-sm font-medium text-slate-700">{title}</p>
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-3 py-3">
+      <div className="flex min-w-0 items-center gap-2">
+        <FileText size={16} className="shrink-0 text-blue-600" />
+        <p className="truncate text-sm font-medium text-slate-700">{title}</p>
       </div>
 
-      <Download size={15} className="text-slate-400" />
+      <Download size={15} className="shrink-0 text-slate-400" />
     </div>
   );
 }

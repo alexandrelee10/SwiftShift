@@ -20,6 +20,9 @@ import {
   ChevronRight,
   User,
 } from "lucide-react";
+import prisma from "@/lib/prisma";
+import { requireUser } from "@/lib/requireUser";
+import StatusPage from "./StatusPage";
 
 const sidebarSections = [
   {
@@ -32,7 +35,7 @@ const sidebarSections = [
       // { name: "Messages", href: "dashboard/loads/messages", icon: MessageSquare },
       { name: "Earnings", href: "/dashboard/loads/earnings", icon: Banknote },
       { name: "Fuel Card", href: "/dashboard/loads/fuelcards", icon: CreditCardIcon },
-      { name: "Settings", href: "dashboard/loads/settings", icon: Settings },
+      { name: "Settings", href: "/dashboard/loads/settings", icon: Settings },
     ],
   },
 ];
@@ -43,9 +46,9 @@ type SidebarUser = {
   image?: string | null;
 };
 
-export default function Sidebar({ user }: { user?: SidebarUser }) {
+export default async function Sidebar({ user }: { user?: SidebarUser }) {
   const [isOpen, setIsOpen] = useState(false);
- 
+
 
   return (
     <>
