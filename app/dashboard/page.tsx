@@ -37,6 +37,7 @@ export default async function DashboardPage() {
     },
   });
 
+
   const bookedLoads = await prisma.load.findMany({
     where: {
       status: "BOOKED",
@@ -277,7 +278,7 @@ export default async function DashboardPage() {
                         </Link>
 
                         <Link
-                          href={`/dashboard/loads/myloads`}
+                          href={`/dashboard/loads/search/${activeLoad.id}`}
                           className="rounded-lg border border-zinc-200 px-4 py-2.5 text-center text-sm font-medium text-blue-600 hover:bg-zinc-50"
                         >
                           View Details
@@ -387,7 +388,7 @@ export default async function DashboardPage() {
                   )}
                 </div>
               </div>
-                {/* Convert to earnings card */}
+              {/* Convert to earnings card */}
               <div className="rounded-xl border border-zinc-200 bg-white p-5">
                 <CardHeader title="Notifications" />
 
@@ -446,16 +447,16 @@ function SmallDetail({ label, value }: { label: string; value: string }) {
   );
 }
 
-function CardHeader({ title }: { title: string }) {
+function CardHeader({ title, href }: { title: string; href?: string }) {
   return (
     <div className="mb-4 flex items-center justify-between">
       <h3 className="text-sm font-semibold text-zinc-900">{title}</h3>
-      <Link
-        href={"/dashboard/loads/myloads"}
-        className="text-sm text-blue-600 hover:text-blue-700"
-      >
-        View All
-      </Link>
+
+      {href && (
+        <Link href={href} className="text-sm text-blue-600 hover:text-blue-700">
+          View All
+        </Link>
+      )}
     </div>
   );
 }
@@ -485,7 +486,7 @@ function SearchRow({
 function BookmarkedRow({ route, rate }: { route: string; rate: string }) {
   return (
     <div className="flex items-center justify-between border-b border-zinc-100 pb-3 last:border-0">
-      <p className="text-zinc-600">⭐ {route}</p>
+      <p className="text-zinc-600">{route}</p>
       <p className="font-medium text-zinc-800">{rate}</p>
     </div>
   );

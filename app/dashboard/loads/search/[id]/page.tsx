@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 import { bookLoad } from "./action";
+import BackButton from "@/app/components/BackButton";
 
 export default async function LoadDetailsPage({
   params,
@@ -51,10 +52,10 @@ export default async function LoadDetailsPage({
       <div className="mx-auto max-w-7xl space-y-5">
         <Link
           href="/dashboard/loads/search"
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-950"
+          className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-blue-950"
         >
           <ArrowLeft size={16} />
-          Back to Search
+          <BackButton />
         </Link>
 
         <div className="grid gap-5 xl:grid-cols-[1fr_340px]">
