@@ -20,7 +20,7 @@ import {
     User,
 } from "lucide-react";
 
-import { updatePreferences } from "./action";
+import { updatePreferences, downloadUserData, deleteAccount } from "./action";
 
 export default async function SettingsPage() {
     const session = await requireUser();
@@ -42,6 +42,12 @@ export default async function SettingsPage() {
         throw new Error("User not found");
     }
 
+    const preferences = await prisma.userPreference.findUnique({
+        where: {
+            userId: dbUser.id
+        }
+    })
+
     return (
         <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900">
             <div className="mx-auto max-w-7xl space-y-6">
@@ -61,8 +67,8 @@ export default async function SettingsPage() {
                                 <button
                                     key={tab}
                                     className={`whitespace-nowrap border-b-2 pb-3 ${index === 0
-                                            ? "border-blue-600 text-blue-600"
-                                            : "border-transparent text-slate-500 hover:text-slate-900"
+                                        ? "border-blue-600 text-blue-600"
+                                        : "border-transparent text-slate-500 hover:text-slate-900"
                                         }`}
                                 >
                                     {tab}
@@ -125,7 +131,7 @@ export default async function SettingsPage() {
                                     label="Language"
                                     desc="Choose your preferred language."
                                     name="language"
-                                    defaultValue={dbUser.userPreferences?.language || "English (US)"}
+                                    defaultValue={preferences?.language|| "English (US)"}
                                     options={["English (US)", "Spanish", "French"]}
                                 />
 
@@ -133,7 +139,7 @@ export default async function SettingsPage() {
                                     label="Time Zone"
                                     desc="Set your local time zone."
                                     name="timeZone"
-                                    defaultValue={dbUser.preferences?.timeZone || "Eastern Time"}
+                                    defaultValue={preferences?.timeZone || "Eastern Time"}
                                     options={["Eastern Time", "Central Time", "Mountain Time", "Pacific Time"]}
                                 />
 
@@ -141,7 +147,7 @@ export default async function SettingsPage() {
                                     label="Date Format"
                                     desc="Choose your preferred date format."
                                     name="dateFormat"
-                                    defaultValue={dbUser.preferences?.dateFormat || "MM/DD/YYYY"}
+                                    defaultValue={preferences?.dateFormat || "MM/DD/YYYY"}
                                     options={["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"]}
                                 />
 
@@ -149,7 +155,7 @@ export default async function SettingsPage() {
                                     label="Currency"
                                     desc="Select your preferred currency."
                                     name="currency"
-                                    defaultValue={dbUser.preferences?.currency || "USD"}
+                                    defaultValue={preferences?.currency || "USD"}
                                     options={["USD", "CAD", "EUR"]}
                                 />
 
@@ -246,16 +252,36 @@ export default async function SettingsPage() {
                             </div>
                         </Card>
 
-                        <Card>
-                            <h2 className="text-sm font-semibold">Quick Actions</h2>
+<Card>
+  <h2 className="text-sm font-semibold">Quick Actions</h2>
 
-                            <div className="mt-4 divide-y divide-slate-100">
-                                <QuickAction icon={<Download size={17} />} label="Download My Data" />
-                                <QuickAction icon={<Trash2 size={17} />} label="Delete Account" danger />
-                                <QuickAction icon={<CircleHelp size={17} />} label="Help Center" />
-                                <QuickAction icon={<Mail size={17} />} label="Contact Support" />
-                            </div>
-                        </Card>
+  <div className="mt-4 divide-y divide-slate-100">
+    <QuickAction
+      icon={<Download size={17} />}
+      label="Download My Data"
+      href="/api/user/export"
+    />
+
+    <QuickAction
+      icon={<Trash2 size={17} />}
+      label="Delete Account"
+      danger
+      action={deleteAccount}
+    />
+
+    <QuickAction
+      icon={<CircleHelp size={17} />}
+      label="Help Center"
+      href="/help"
+    />
+
+    <QuickAction
+      icon={<Mail size={17} />}
+      label="Contact Support"
+      href="mailto:support@swiftshift.com"
+    />
+  </div>
+</Card>
 
                         <Card>
                             <h2 className="text-sm font-semibold">Appearance</h2>
@@ -444,26 +470,50 @@ function SummaryRow({
 }
 
 function QuickAction({
-    icon,
-    label,
-    danger,
+  icon,
+  label,
+  danger,
+  action,
+  href,
 }: {
-    icon: React.ReactNode;
-    label: string;
-    danger?: boolean;
+  icon: React.ReactNode;
+  label: string;
+  danger?: boolean;
+  action?: () => Promise<void>;
+  href?: string;
 }) {
+  const content = (
+    <div
+      className={`flex w-full items-center justify-between py-4 ${
+        danger ? "text-red-600" : "text-slate-700"
+      }`}
+    >
+      <div className="flex items-center gap-3 text-sm font-medium">
+        {icon}
+        {label}
+      </div>
+    </div>
+  );
+
+  if (href) {
     return (
-        <button className="flex w-full items-center justify-between py-4 text-left">
-            <div
-                className={`flex items-center gap-3 text-sm font-medium ${danger ? "text-red-600" : "text-slate-700"
-                    }`}
-            >
-                {icon}
-                {label}
-            </div>
-            <ChevronRight size={16} className="text-slate-400" />
-        </button>
+      <a href={href} className="block">
+        {content}
+      </a>
     );
+  }
+
+  if (action) {
+    return (
+      <form action={action}>
+        <button type="submit" className="w-full text-left">
+          {content}
+        </button>
+      </form>
+    );
+  }
+
+  return <div>{content}</div>;
 }
 
 function ThemeOption({
@@ -478,8 +528,8 @@ function ThemeOption({
     return (
         <button
             className={`flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm font-medium ${active
-                    ? "border-blue-500 bg-blue-50 text-blue-700"
-                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                ? "border-blue-500 bg-blue-50 text-blue-700"
+                : "border-slate-200 text-slate-600 hover:bg-slate-50"
                 }`}
         >
             {icon}
@@ -520,36 +570,36 @@ function formatDate(date: Date | string) {
 }
 
 function SelectRow({
-  label,
-  desc,
-  name,
-  defaultValue,
-  options,
+    label,
+    desc,
+    name,
+    defaultValue,
+    options,
 }: {
-  label: string;
-  desc: string;
-  name: string;
-  defaultValue: string;
-  options: string[];
+    label: string;
+    desc: string;
+    name: string;
+    defaultValue: string;
+    options: string[];
 }) {
-  return (
-    <div className="grid gap-3 border-b border-slate-100 pb-4 last:border-0 md:grid-cols-[1fr_260px] md:items-center">
-      <div>
-        <p className="text-sm font-medium text-slate-900">{label}</p>
-        <p className="text-sm text-slate-500">{desc}</p>
-      </div>
+    return (
+        <div className="grid gap-3 border-b border-slate-100 pb-4 last:border-0 md:grid-cols-[1fr_260px] md:items-center">
+            <div>
+                <p className="text-sm font-medium text-slate-900">{label}</p>
+                <p className="text-sm text-slate-500">{desc}</p>
+            </div>
 
-      <select
-        name={name}
-        defaultValue={defaultValue}
-        className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
-      >
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
+            <select
+                name={name}
+                defaultValue={defaultValue}
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
+            >
+                {options.map((option) => (
+                    <option key={option} value={option}>
+                        {option}
+                    </option>
+                ))}
+            </select>
+        </div>
+    );
 }

@@ -63,8 +63,10 @@ model User {
 
   documents Document[]
 
-  preferences UserPreference[]
+
   
+
+  userPreferences UserPreference[]
 }
 
 model Load {
@@ -182,7 +184,7 @@ model UserPreference {
   id         String   @id @default(cuid())
 
   userId     String   @unique
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
 
   language   String   @default("English (US)")
   timeZone   String   @default("Eastern Time")

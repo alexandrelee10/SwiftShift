@@ -46,7 +46,7 @@ type SidebarUser = {
   image?: string | null;
 };
 
-export default async function Sidebar({ user }: { user?: SidebarUser }) {
+export default function Sidebar({ user }: { user?: SidebarUser }) {
   const [isOpen, setIsOpen] = useState(false);
 
 
