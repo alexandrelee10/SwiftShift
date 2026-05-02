@@ -140,6 +140,7 @@ export default async function LoadSearchPage({
     <main className="min-h-screen bg-slate-50 px-5 py-7 text-slate-900">
       <div className="mx-auto max-w-7xl">
         <div className="mb-7 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-slate-950">
               Find Loads
