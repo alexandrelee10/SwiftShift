@@ -86,3 +86,23 @@ export async function deleteAccount() {
     prisma.user.delete({ where: { id: user.id } }),
   ]);
 }
+
+export async function saveSettings(formData: FormData) {
+  const session = await requireUser();
+
+  if (!session.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.user.update({
+    where: { email: session.user.email },
+    data: {
+      firstName: String(formData.get("firstName")),
+      lastName: String(formData.get("lastName")),
+      email: String(formData.get("email")),
+      phoneNum: String(formData.get("phoneNum")),
+    },
+  });
+
+  revalidatePath("/dashboard/loads/settings?success=1");
+}

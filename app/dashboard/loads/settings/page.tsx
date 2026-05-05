@@ -20,9 +20,15 @@ import {
     User,
 } from "lucide-react";
 
-import { updatePreferences, downloadUserData, deleteAccount } from "./action";
+import { updatePreferences, downloadUserData, deleteAccount, saveSettings } from "./action";
+import { SubmitButton } from "@/app/components/SubmitButton";
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ success?: string }>;
+}) {
+    const params = await searchParams;
     const session = await requireUser();
 
     if (!session.user?.email) {
@@ -81,45 +87,54 @@ export default async function SettingsPage() {
                 <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
                     {/* LEFT */}
                     <section className="space-y-6">
-                        {/* PROFILE */}
+                        {/* PROFILE INFORMATION */}
+                        {params.success === "1" && (
+                            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                                Settings saved successfully.
+                            </div>
+                        )}
                         <Card>
                             <SectionHeader
                                 title="Profile Information"
                                 desc="Update your personal information and how it appears on your account."
                             />
 
-                            <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-center">
-                                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-500 text-2xl font-semibold text-white">
-                                    {dbUser.firstName?.[0]}
-                                    {dbUser.lastName?.[0]}
+                            <form action={saveSettings}>
+                                <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-center">
+                                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-500 text-2xl font-semibold text-white">
+                                        {dbUser.firstName?.[0]}
+                                        {dbUser.lastName?.[0]}
+                                    </div>
+
+                                    <div>
+                                        <p className="font-semibold">
+                                            {dbUser.firstName} {dbUser.lastName}
+                                        </p>
+                                        <p className="text-sm text-slate-500">{dbUser.role}</p>
+
+                                        <button
+                                            type="button"
+                                            className="mt-3 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                        >
+                                            Change Photo
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <p className="font-semibold">
-                                        {dbUser.firstName} {dbUser.lastName}
-                                    </p>
-                                    <p className="text-sm text-slate-500">{dbUser.role}</p>
-                                    <button className="mt-3 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                                        Change Photo
-                                    </button>
+                                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                                    <Input name="firstName" label="First Name" defaultValue={dbUser.firstName} />
+                                    <Input name="lastName" label="Last Name" defaultValue={dbUser.lastName} />
+                                    <Input name="email" label="Email" defaultValue={dbUser.email} />
+                                    <Input name="phoneNum" label="Phone Number" defaultValue={dbUser.phoneNum} />
                                 </div>
-                            </div>
 
-                            <div className="mt-6 grid gap-4 md:grid-cols-2">
-                                <Input label="First Name" defaultValue={dbUser.firstName} />
-                                <Input label="Last Name" defaultValue={dbUser.lastName} />
-                                <Input label="Email" defaultValue={dbUser.email} />
-                                <Input label="Phone Number" defaultValue={dbUser.phoneNum} />
-                            </div>
-
-                            <div className="mt-6 flex justify-end">
-                                <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
-                                    Save Changes
-                                </button>
-                            </div>
+                                <div className="mt-6 flex justify-end">
+                                    <SubmitButton />
+                                </div>
+                            </form>
                         </Card>
 
-                        {/* PREFERENCES */}
+                        {/* ACCOUNT PREFERENCES */}
                         <Card>
                             <SectionHeader
                                 title="Account Preferences"
@@ -131,7 +146,7 @@ export default async function SettingsPage() {
                                     label="Language"
                                     desc="Choose your preferred language."
                                     name="language"
-                                    defaultValue={preferences?.language|| "English (US)"}
+                                    defaultValue={preferences?.language || "English (US)"}
                                     options={["English (US)", "Spanish", "French"]}
                                 />
 
@@ -252,36 +267,36 @@ export default async function SettingsPage() {
                             </div>
                         </Card>
 
-<Card>
-  <h2 className="text-sm font-semibold">Quick Actions</h2>
+                        <Card>
+                            <h2 className="text-sm font-semibold">Quick Actions</h2>
 
-  <div className="mt-4 divide-y divide-slate-100">
-    <QuickAction
-      icon={<Download size={17} />}
-      label="Download My Data"
-      href="/api/user/export"
-    />
+                            <div className="mt-4 divide-y divide-slate-100">
+                                <QuickAction
+                                    icon={<Download size={17} />}
+                                    label="Download My Data"
+                                    href="/api/user/export"
+                                />
 
-    <QuickAction
-      icon={<Trash2 size={17} />}
-      label="Delete Account"
-      danger
-      action={deleteAccount}
-    />
+                                <QuickAction
+                                    icon={<Trash2 size={17} />}
+                                    label="Delete Account"
+                                    danger
+                                    action={deleteAccount}
+                                />
 
-    <QuickAction
-      icon={<CircleHelp size={17} />}
-      label="Help Center"
-      href="/help"
-    />
+                                <QuickAction
+                                    icon={<CircleHelp size={17} />}
+                                    label="Help Center"
+                                    href="/help"
+                                />
 
-    <QuickAction
-      icon={<Mail size={17} />}
-      label="Contact Support"
-      href="mailto:support@swiftshift.com"
-    />
-  </div>
-</Card>
+                                <QuickAction
+                                    icon={<Mail size={17} />}
+                                    label="Contact Support"
+                                    href="mailto:support@swiftshift.com"
+                                />
+                            </div>
+                        </Card>
 
                         <Card>
                             <h2 className="text-sm font-semibold">Appearance</h2>
@@ -313,7 +328,7 @@ export default async function SettingsPage() {
                     </aside>
                 </div>
             </div>
-        </main>
+        </main >
     );
 }
 
@@ -338,15 +353,18 @@ function SectionHeader({ title, desc }: { title: string; desc: string }) {
 
 function Input({
     label,
+    name,
     defaultValue,
 }: {
     label: string;
+    name: string;
     defaultValue: string;
 }) {
     return (
         <label>
             <span className="text-sm font-medium text-slate-700">{label}</span>
             <input
+                name={name}
                 defaultValue={defaultValue}
                 className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
             />
@@ -470,50 +488,49 @@ function SummaryRow({
 }
 
 function QuickAction({
-  icon,
-  label,
-  danger,
-  action,
-  href,
+    icon,
+    label,
+    danger,
+    action,
+    href,
 }: {
-  icon: React.ReactNode;
-  label: string;
-  danger?: boolean;
-  action?: () => Promise<void>;
-  href?: string;
+    icon: React.ReactNode;
+    label: string;
+    danger?: boolean;
+    action?: () => Promise<void>;
+    href?: string;
 }) {
-  const content = (
-    <div
-      className={`flex w-full items-center justify-between py-4 ${
-        danger ? "text-red-600" : "text-slate-700"
-      }`}
-    >
-      <div className="flex items-center gap-3 text-sm font-medium">
-        {icon}
-        {label}
-      </div>
-    </div>
-  );
-
-  if (href) {
-    return (
-      <a href={href} className="block">
-        {content}
-      </a>
+    const content = (
+        <div
+            className={`flex w-full items-center justify-between py-4 ${danger ? "text-red-600" : "text-slate-700"
+                }`}
+        >
+            <div className="flex items-center gap-3 text-sm font-medium">
+                {icon}
+                {label}
+            </div>
+        </div>
     );
-  }
 
-  if (action) {
-    return (
-      <form action={action}>
-        <button type="submit" className="w-full text-left">
-          {content}
-        </button>
-      </form>
-    );
-  }
+    if (href) {
+        return (
+            <a href={href} className="block">
+                {content}
+            </a>
+        );
+    }
 
-  return <div>{content}</div>;
+    if (action) {
+        return (
+            <form action={action}>
+                <button type="submit" className="w-full text-left">
+                    {content}
+                </button>
+            </form>
+        );
+    }
+
+    return <div>{content}</div>;
 }
 
 function ThemeOption({

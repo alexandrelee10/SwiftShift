@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { useSession } from "next-auth/react";
+import Link from "next/link"
 import {
   Home,
   TruckIcon,
@@ -20,9 +19,6 @@ import {
   ChevronRight,
   User,
 } from "lucide-react";
-import prisma from "@/lib/prisma";
-import { requireUser } from "@/lib/requireUser";
-import StatusPage from "./StatusPage";
 
 const sidebarSections = [
   {
@@ -48,8 +44,6 @@ type SidebarUser = {
 
 export default function Sidebar({ user }: { user?: SidebarUser }) {
   const [isOpen, setIsOpen] = useState(false);
-
-
   return (
     <>
       {/* Mobile top bar */}
