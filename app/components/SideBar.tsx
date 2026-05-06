@@ -44,6 +44,7 @@ type SidebarUser = {
 
 export default function Sidebar({ user }: { user?: SidebarUser }) {
   const [isOpen, setIsOpen] = useState(false);
+
   return (
     <>
       {/* Mobile top bar */}
@@ -121,7 +122,7 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
 
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{user?.name}</p>
-              <p className="text-xs text-white/45">Driver</p>
+              <p className="text-xs text-white/45">{}</p>
             </div>
 
             <ChevronRight size={16} className="text-white/35" />

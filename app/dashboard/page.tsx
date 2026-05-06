@@ -89,6 +89,11 @@ export default async function DashboardPage() {
     },
   });
 
+  // Earnings 
+  const totalEarnings = deliveredLoads.reduce((total, load) => {
+    return total + Number(load.rate);
+  }, 0);
+
   const upperIcons = [
     {
       name: "Active Loads",
@@ -106,8 +111,8 @@ export default async function DashboardPage() {
     },
     {
       name: "Earnings",
-      content: "$10,956",
-      status: "+8% vs last 30d",
+      content: `$${totalEarnings.toLocaleString()}`,
+      status: deliveredLoads.length > 0 ? `${deliveredLoads.length} delivered loads` : 'No Earnings Yet',
       icon: Landmark,
       color: "bg-purple-100 text-purple-600",
     },
