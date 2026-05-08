@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 import Link from "next/link"
 import {
   Home,
@@ -45,6 +46,7 @@ type SidebarUser = {
 
 export default function Sidebar({ user }: { user?: SidebarUser }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   return (
     <>
@@ -113,11 +115,26 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
         </nav>
 
         {/* Bottom user card */}
-        <div className="border-t border-white/10 p-4">
-          <div className="flex items-center gap-3 rounded-xl p-2 hover:bg-white/10">
+        <div className="relative border-t border-white/10 p-4">
+          {isProfileOpen && (
+            <div className="absolute bottom-20 left-4 right-4 rounded-xl border border-white/10 bg-slate-800 p-2 shadow-xl">
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/sign-in" })}
+                className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-red-200 transition hover:bg-red-500/10 hover:text-red-100"
+              >
+                Sign out
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setIsProfileOpen((prev) => !prev)}
+            className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition hover:bg-white/10"
+          >
             <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
               <User size={22} className="text-white/80" />
-
               <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#071529] bg-green-500" />
             </div>
 
@@ -126,8 +143,12 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
               <p className="text-xs text-white/45">{user?.role}</p>
             </div>
 
-            <ChevronRight size={16} className="text-white/35" />
-          </div>
+            <ChevronRight
+              size={16}
+              className={`text-white/35 transition ${isProfileOpen ? "rotate-90" : ""
+                }`}
+            />
+          </button>
         </div>
       </aside>
     </>

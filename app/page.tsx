@@ -4,8 +4,17 @@ import Image from "next/image";
 import GetStarted from "./components/getStarted";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Search, Truck, MapPin } from "lucide-react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { redirect } from "next/navigation";
 
-const HomePage = () => {
+const HomePage = async () => {
+  const session = await getServerSession(authOptions);
+
+  if (session?.user.email) {
+    redirect("/dashboard")
+  }
+  
   return (
     <div className="min-h-screen bg-white text-zinc-950">
       <NavBar />

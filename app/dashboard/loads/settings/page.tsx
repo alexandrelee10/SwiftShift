@@ -198,7 +198,7 @@ export default async function SettingsPage({
                                     icon={<KeyRound size={18} />}
                                     title="Password"
                                     desc="Update your password regularly."
-                                    action="Change"
+                                    action="Change Password"
                                     href="/dashboard/loads/settings/changePassword"
                                 />
 
