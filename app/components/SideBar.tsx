@@ -40,6 +40,7 @@ type SidebarUser = {
   name?: string | null;
   email?: string | null;
   image?: string | null;
+  role?: string | null;
 };
 
 export default function Sidebar({ user }: { user?: SidebarUser }) {
@@ -122,7 +123,7 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
 
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{user?.name}</p>
-              <p className="text-xs text-white/45">{}</p>
+              <p className="text-xs text-white/45">{user?.role}</p>
             </div>
 
             <ChevronRight size={16} className="text-white/35" />

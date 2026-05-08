@@ -20,7 +20,8 @@ export default async function DashboardLayout({
     <div className="min-h-screen bg-zinc-100 md:flex">
       <Sidebar user={{
         name: `${dbUser?.firstName} ${dbUser?.lastName}`,
-        email: `${dbUser?.email}`
+        email: `${dbUser?.email}`,
+        role: `${dbUser?.role}`
       }} />
 
       <main className="min-h-screen flex-1 bg-zinc-100">

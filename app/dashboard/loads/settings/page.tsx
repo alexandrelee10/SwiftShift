@@ -22,6 +22,7 @@ import {
 
 import { updatePreferences, downloadUserData, deleteAccount, saveSettings } from "./action";
 import { SubmitButton } from "@/app/components/SubmitButton";
+import ChangePasswordPage from "@/app/dashboard/loads/settings/changePassword/page";
 
 export default async function SettingsPage({
     searchParams,
@@ -197,7 +198,8 @@ export default async function SettingsPage({
                                     icon={<KeyRound size={18} />}
                                     title="Password"
                                     desc="Update your password regularly."
-                                    action="Change Password"
+                                    action="Change"
+                                    href="/dashboard/loads/settings/changePassword"
                                 />
 
                                 <ToggleActionRow
@@ -401,32 +403,48 @@ function PreferenceRow({
     );
 }
 
-function ActionRow({
-    icon,
-    title,
-    desc,
-    action,
-}: {
-    icon: React.ReactNode;
-    title: string;
-    desc: string;
-    action: string;
-}) {
-    return (
-        <div className="flex flex-col gap-3 border-b border-slate-100 pb-4 last:border-0 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex gap-3">
-                <div className="mt-1 text-slate-400">{icon}</div>
-                <div>
-                    <p className="text-sm font-medium text-slate-900">{title}</p>
-                    <p className="text-sm text-slate-500">{desc}</p>
-                </div>
-            </div>
+import Link from "next/link";
 
-            <button className="w-fit rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                {action}
-            </button>
+function ActionRow({
+  icon,
+  title,
+  desc,
+  action,
+  href,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  action: string;
+  href?: string;
+  onClick?: () => void;
+}) {
+  const buttonClasses =
+    "w-fit rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50";
+
+  return (
+    <div className="flex flex-col gap-3 border-b border-slate-100 pb-4 last:border-0 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex gap-3">
+        <div className="mt-1 text-slate-400">{icon}</div>
+
+        <div>
+          <p className="text-sm font-medium text-slate-900">{title}</p>
+          <p className="text-sm text-slate-500">{desc}</p>
         </div>
-    );
+      </div>
+
+      {href ? (
+        <Link href={href} className={buttonClasses}>
+          {action}
+        </Link>
+      ) : (
+        <button type="button" onClick={onClick} className={buttonClasses}>
+          {action}
+        </button>
+      )}
+    </div>
+  );
 }
 
 function ToggleActionRow({

@@ -25,3 +25,9 @@ export const searchSchema = z.object({
   equipment: z.string().trim().optional(),
   date: z.string().optional(),
 });
+
+export const changePasswordSchema = z.object({
+  originalPassword: z.string().min(1, "Original Password is required"),
+  newPassword: z.string().min(1, "New password is required"),
+  confirmNewPassword: z.string().min(1, "Confirmed Password must match and is required")
+})
