@@ -16,7 +16,7 @@ import {
   Truck,
   Weight,
 } from "lucide-react";
-import { bookLoad } from "./[id]/action";
+import BookLoadButton from "@/app/components/BookLoadButton";
 
 type SearchParams = {
   origin?: string;
@@ -362,14 +362,7 @@ function LoadRow({ load }: { load: any }) {
       </div>
 
       <div className="flex justify-end gap-2">
-        <form action={bookLoad.bind(null, load.id)}>
-          <button
-            type="submit"
-            className="rounded-md bg-green-600 px-3 py-2 text-xs font-medium text-white hover:bg-green-700"
-          >
-            Book
-          </button>
-        </form>
+        <BookLoadButton loadId={load.id} />
         <Link
           href={`/dashboard/loads/search/${load.id}`}
           className="rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700"

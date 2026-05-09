@@ -638,3 +638,5 @@ function SelectRow({
         </div>
     );
 }
+
+// Fix profile picture to be either the default or the image
