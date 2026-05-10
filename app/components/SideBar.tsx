@@ -1,16 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
-import Link from "next/link"
+import Link from "next/link";
 import {
   Home,
-  TruckIcon,
   Search,
   Package,
-  Map,
-  Radio,
-  MessageSquare,
   Settings,
   FilesIcon,
   CreditCardIcon,
@@ -28,8 +25,6 @@ const sidebarSections = [
       { name: "Find Loads", href: "/dashboard/loads/search", icon: Search },
       { name: "My Loads", href: "/dashboard/loads/myloads", icon: Package },
       { name: "Documents", href: "/dashboard/loads/documents", icon: FilesIcon },
-      // { name: "Dispatch", href: "dashboard/loads/dispatch", icon: Radio },
-      // { name: "Messages", href: "dashboard/loads/messages", icon: MessageSquare },
       { name: "Earnings", href: "/dashboard/loads/earnings", icon: Banknote },
       { name: "Fuel Card", href: "/dashboard/loads/fuelcards", icon: CreditCardIcon },
       { name: "Settings", href: "/dashboard/loads/settings", icon: Settings },
@@ -50,7 +45,6 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
 
   return (
     <>
-      {/* Mobile top bar */}
       <div className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden">
         <h2 className="text-lg font-bold text-slate-950">SwiftShift</h2>
 
@@ -63,7 +57,6 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
         </button>
       </div>
 
-      {/* Mobile overlay */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
@@ -71,7 +64,6 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`
           fixed left-0 top-0 z-50 flex h-screen w-64 flex-col
@@ -80,7 +72,6 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
-        {/* Logo */}
         <div className="flex items-center justify-between px-5 py-5">
           <h2 className="text-xl font-bold tracking-tight">SwiftShift</h2>
 
@@ -93,7 +84,6 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
           </button>
         </div>
 
-        {/* Links */}
         <nav className="flex-1 overflow-y-auto px-3 py-2">
           <div className="space-y-1">
             {sidebarSections[0].links.map((link) => {
@@ -114,7 +104,6 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
           </div>
         </nav>
 
-        {/* Bottom user card */}
         <div className="relative border-t border-white/10 p-4">
           {isProfileOpen && (
             <div className="absolute bottom-20 left-4 right-4 rounded-xl border border-white/10 bg-slate-800 p-2 shadow-xl">
@@ -133,20 +122,34 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
             onClick={() => setIsProfileOpen((prev) => !prev)}
             className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition hover:bg-white/10"
           >
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10">
-              <User size={22} className="text-white/80" />
-              <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#071529] bg-green-500" />
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
+              {user?.image ? (
+                <Image
+                  src={user.image}
+                  alt={user?.name || "User profile photo"}
+                  fill
+                  sizes="40px"
+                  className="object-cover"
+                />
+              ) : (
+                <User size={22} className="text-white/80" />
+              )}
+
+              {/* <span className="absolute bottom-0 right-0 z-10 h-3 w-3 rounded-full border-2 border-slate-900 bg-green-500" /> */}
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{user?.name}</p>
+              <p className="truncate text-sm font-semibold">
+                {user?.name || "User"}
+              </p>
               <p className="text-xs text-white/45">{user?.role}</p>
             </div>
 
             <ChevronRight
               size={16}
-              className={`text-white/35 transition ${isProfileOpen ? "rotate-90" : ""
-                }`}
+              className={`text-white/35 transition ${
+                isProfileOpen ? "rotate-90" : ""
+              }`}
             />
           </button>
         </div>

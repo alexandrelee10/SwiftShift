@@ -8,23 +8,38 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await requireUser();
-  if(!session.user?.email) {throw new Error("Unauthorized")}
+
+  if (!session.user?.email) {
+    throw new Error("Unauthorized");
+  }
 
   const dbUser = await prisma.user.findUnique({
     where: {
-      email: session.user?.email,
-    }
-  })
+      email: session.user.email,
+    },
+    select: {
+      firstName: true,
+      lastName: true,
+      email: true,
+      image: true,
+      role: true,
+    },
+  });
+
+  const sidebarUser = dbUser
+    ? {
+        name: `${dbUser.firstName ?? ""} ${dbUser.lastName ?? ""}`.trim(),
+        email: dbUser.email,
+        image: dbUser.image,
+        role: dbUser.role,
+      }
+    : undefined;
 
   return (
-    <div className="min-h-screen bg-zinc-100 md:flex">
-      <Sidebar user={{
-        name: `${dbUser?.firstName} ${dbUser?.lastName}`,
-        email: `${dbUser?.email}`,
-        role: `${dbUser?.role}`
-      }} />
+    <div className="flex min-h-screen bg-slate-50">
+      <Sidebar user={sidebarUser} />
 
-      <main className="min-h-screen flex-1 bg-zinc-100">
+      <main className="flex-1">
         {children}
       </main>
     </div>
