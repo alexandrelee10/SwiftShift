@@ -10,26 +10,32 @@ export const ourFileRouter = {
       maxFileSize: "4MB",
       maxFileCount: 1,
     },
-  }).onUploadComplete(async ({ file }) => {
-    const session = await requireUser();
+  })
+    .middleware(async () => {
+      const session = await requireUser();
 
-    if (!session.user?.email) {
-      return;
-    }
+      if (!session.user?.email) {
+        throw new Error("Unauthorized");
+      }
 
-    await prisma.user.update({
-      where: {
+      return {
         email: session.user.email,
-      },
-      data: {
-        image: file.url,
-      },
-    });
+      };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      await prisma.user.update({
+        where: {
+          email: metadata.email,
+        },
+        data: {
+          image: file.url,
+        },
+      });
 
-    return {
-      url: file.url,
-    };
-  }),
+      return {
+        url: file.url,
+      };
+    }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

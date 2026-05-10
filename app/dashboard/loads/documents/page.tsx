@@ -30,8 +30,8 @@ export default async function DocumentsPage() {
   });
 
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-8">
-      <div className="mx-auto max-w-7xl space-y-6">
+    <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6">
+      <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-medium text-blue-600">Load paperwork</p>
@@ -62,7 +62,7 @@ export default async function DocumentsPage() {
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-wrap gap-2">
               {["All", "BOL", "Rate Confirmations", "PODs", "Invoices"].map(
                 (tab) => (
@@ -76,14 +76,14 @@ export default async function DocumentsPage() {
               )}
             </div>
 
-            <div className="relative">
+            <div className="relative w-full lg:w-80">
               <Search
                 size={16}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
               />
               <input
                 placeholder="Search documents..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-400 focus:bg-white md:w-80"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-400 focus:bg-white"
               />
             </div>
           </div>
@@ -116,39 +116,41 @@ function DocumentRow({ doc }: { doc: any }) {
   const hasFile = Boolean(doc.fileUrl && doc.fileUrl !== "#");
 
   return (
-    <div className="grid gap-4 border-b border-slate-100 px-5 py-5 last:border-0 md:grid-cols-[1.2fr_220px_150px_auto] md:items-center">
+    <div className="grid gap-4 border-b border-slate-100 px-5 py-5 last:border-0 xl:grid-cols-[1fr_auto] xl:items-center">
       <div className="flex min-w-0 items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-          <FileText size={20} />
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+          <FileText size={18} />
         </div>
 
         <div className="min-w-0">
-          <p className="truncate font-medium text-slate-950">
+          <p className="font-medium text-slate-950">
             {formatDocType(doc.type)}
           </p>
-          <p className="mt-1 truncate text-sm text-slate-500">
-            Load #{load?.referenceNumber || "Unknown"}{" "}
-            {load &&
-              `• ${load.originCity}, ${load.originState} → ${load.destinationCity}, ${load.destinationState}`}
+
+          <p className="mt-1 text-sm text-slate-500">
+            Load #{load?.referenceNumber || "Unknown"}
+          </p>
+
+          {load && (
+            <p className="mt-1 truncate text-sm text-slate-500">
+              {load.originCity}, {load.originState} → {load.destinationCity},{" "}
+              {load.destinationState}
+            </p>
+          )}
+
+          <p className="mt-2 truncate text-xs text-slate-400">
+            {doc.fileName || "No file generated yet"}
           </p>
         </div>
       </div>
 
-      <div>
-        <p className="truncate text-sm font-medium text-slate-900">
-          {doc.fileName || "No file generated yet"}
-        </p>
-        <p className="mt-1 text-xs text-slate-500">File name</p>
-      </div>
+      <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+        <div className="mr-2">
+          <p className="mt-1 text-xs text-slate-400">
+            {formatDate(doc.createdAt)}
+          </p>
+        </div>
 
-      <div>
-        <StatusBadge status={doc.status} />
-        <p className="mt-1 text-xs text-slate-500">
-          {formatDate(doc.createdAt)}
-        </p>
-      </div>
-
-      <div className="flex flex-wrap justify-end gap-2">
         {hasFile && (
           <>
             <a
@@ -247,7 +249,3 @@ function formatDate(date: Date | string) {
     day: "numeric",
   });
 }
-
-
-// Make sure you update the badges based on the status 
-// Also make sure that documents dont save duplicates on the page
