@@ -1,4 +1,4 @@
-import StatusPage from "@/app/components/StatusPage";
+import StatusPage from "@/app/components/shared/StatusPage";
 import { requireUser } from "@/lib/requireUser";
 import {
   AlertTriangle,

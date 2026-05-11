@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import LoadMap from "@/app/components/LoadMap";
+import LoadMap from "@/app/components/loads/LoadMap";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 import { bookLoad } from "./action";
-import BackButton from "@/app/components/BackButton";
+import BackButton from "@/app/components/shared/BackButton";
 
 export default async function LoadDetailsPage({
   params,

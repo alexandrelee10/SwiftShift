@@ -1,7 +1,7 @@
-import NavBar from "./components/LandingNavbar";
+import NavBar from "./components/layout/LandingNavbar";
 import ipads from "../public/assets/homepage/ipads.png";
 import Image from "next/image";
-import GetStarted from "./components/getStarted";
+import GetStarted from "./components/layout/getStarted";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Search, Truck, MapPin } from "lucide-react";
 import { getServerSession } from "next-auth";
@@ -62,7 +62,7 @@ const HomePage = async () => {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-4 shadow-sm">
+        <div className="rounded-3xl ">
           <Image
             src={ipads}
             alt="SwiftShift dashboard preview"
@@ -72,22 +72,7 @@ const HomePage = async () => {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="mx-auto max-w-7xl px-6 md:px-12 lg:px-20">
-        <div className="grid gap-4 rounded-3xl border border-zinc-200 bg-zinc-50 p-4 md:grid-cols-3">
-          {[
-            ["1,200+", "Active loads"],
-            ["340+", "Carriers"],
-            ["48", "States"],
-          ].map(([value, label]) => (
-            <div key={label} className="rounded-2xl bg-white p-6">
-              <p className="text-3xl font-bold">{value}</p>
-              <p className="mt-1 text-sm text-zinc-500">{label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
+      
       {/* Features */}
       <section className="mx-auto max-w-7xl px-6 py-20 md:px-12 lg:px-20">
         <div className="mb-10 max-w-2xl">

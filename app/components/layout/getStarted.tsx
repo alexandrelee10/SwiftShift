@@ -26,7 +26,7 @@ const GetStarted = () => {
   ]
 
   return (
-    <div className='min-h-screen bg-zinc-100'>
+    <div className='min-h-screen'>
       <section className='max-w-7xl mx-auto px-6 py-16'>
         
         <h1 className='text-3xl font-bold mb-10 text-zinc-900'>

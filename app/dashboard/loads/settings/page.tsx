@@ -26,8 +26,8 @@ import {
   deleteAccount,
   saveSettings,
 } from "./action";
-import { SubmitButton } from "@/app/components/SubmitButton";
-import ProfilePhotoChanger from "@/app/components/ProfileImageUpload";
+import { SubmitButton } from "@/app/components/shared/SubmitButton";
+import ProfilePhotoChanger from "@/app/components/profile/ProfileImageUpload";
 
 export default async function SettingsPage({
   searchParams,

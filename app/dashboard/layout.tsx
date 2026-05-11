@@ -1,4 +1,4 @@
-import Sidebar from "@/app/components/SideBar";
+import Sidebar from "@/app/components/layout/SideBar";
 import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
 

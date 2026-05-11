@@ -10,10 +10,10 @@ const LandingNavBar = () => {
   const [isOpen, setOpen] = useState(false);
 
   const navElements = [
-    { name: "Load Board", href: "/loadboard" },
-    { name: "Tracking", href: "/tracking" },
-    { name: "Solutions", href: "/solutions" },
+    {name: "Overview", href: "/overview"},
+    {name: "About Us", href: ""},
     { name: "Contact", href: "/contact" },
+    
   ];
 
   return (
@@ -24,7 +24,7 @@ const LandingNavBar = () => {
         <div className="flex justify-between items-center">
           
           {/* Logo */}
-          <Image src={logo} alt="Logo" height={80} />
+          <h2 className="text-2xl font-bold tracking-tight">SwiftShift</h2>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
