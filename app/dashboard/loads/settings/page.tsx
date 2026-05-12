@@ -2,13 +2,9 @@ import { requireUser } from "@/lib/requireUser";
 import prisma from "@/lib/prisma";
 import {
   Bell,
-  CalendarDays,
-  ChevronRight,
   CircleHelp,
-  Database,
   Download,
   FileText,
-  Globe,
   KeyRound,
   Lock,
   Mail,
@@ -17,24 +13,31 @@ import {
   SlidersHorizontal,
   Sun,
   Trash2,
-  User,
 } from "lucide-react";
 
-import {
-  updatePreferences,
-  downloadUserData,
-  deleteAccount,
-  saveSettings,
-} from "./action";
+import { updatePreferences, deleteAccount, saveSettings } from "./action";
+
+import Link from "next/link";
 import { SubmitButton } from "@/app/components/shared/SubmitButton";
 import ProfilePhotoChanger from "@/app/components/profile/ProfileImageUpload";
+import { Switch, ThemeButton } from "@/app/components/settings/SettingsTabs";
+
+const tabs = [
+  { label: "Account", value: "account" },
+  { label: "Preferences", value: "preferences" },
+  { label: "Notifications", value: "notifications" },
+  { label: "Security", value: "security" },
+  { label: "Integrations", value: "integrations" },
+];
 
 export default async function SettingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ success?: string }>;
+  searchParams: Promise<{ success?: string; tab?: string }>;
 }) {
   const params = await searchParams;
+  const activeTab = params.tab || "account";
+
   const session = await requireUser();
 
   if (!session.user?.email) {
@@ -63,7 +66,6 @@ export default async function SettingsPage({
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900">
       <div className="mx-auto max-w-7xl space-y-6">
-        {/* HEADER */}
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -71,212 +73,268 @@ export default async function SettingsPage({
           </p>
         </div>
 
-        {/* TABS */}
         <div className="border-b border-slate-200">
           <div className="flex gap-6 overflow-x-auto text-sm font-medium">
-            {[
-              "Account",
-              "Preferences",
-              "Notifications",
-              "Security",
-              "Integrations",
-            ].map((tab, index) => (
-              <button
-                key={tab}
-                className={`whitespace-nowrap border-b-2 pb-3 ${
-                  index === 0
+            {tabs.map((tab) => (
+              <Link
+                key={tab.value}
+                href={`/dashboard/loads/settings?tab=${tab.value}`}
+                className={`whitespace-nowrap border-b-2 pb-3 transition ${
+                  activeTab === tab.value
                     ? "border-blue-600 text-blue-600"
                     : "border-transparent text-slate-500 hover:text-slate-900"
                 }`}
               >
-                {tab}
-              </button>
+                {tab.label}
+              </Link>
             ))}
           </div>
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-          {/* LEFT */}
           <section className="space-y-6">
-            {/* PROFILE INFORMATION */}
             {params.success === "1" && (
               <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
                 Settings saved successfully.
               </div>
             )}
-            <Card>
-              <SectionHeader
-                title="Profile Information"
-                desc="Update your personal information and how it appears on your account."
-              />
 
-              <form action={saveSettings}>
-                <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-center">
-                  <ProfilePhotoChanger
-                    image={dbUser.image}
-                    firstName={dbUser.firstName}
-                    lastName={dbUser.lastName}
-                    role={dbUser.role}
+            {activeTab === "account" && (
+              <Card>
+                <SectionHeader
+                  title="Profile Information"
+                  desc="Update your personal information and how it appears on your account."
+                />
+
+                <form action={saveSettings}>
+                  <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-center">
+                    <ProfilePhotoChanger
+                      image={dbUser.image}
+                      firstName={dbUser.firstName}
+                      lastName={dbUser.lastName}
+                      role={dbUser.role}
+                    />
+                  </div>
+
+                  <div className="mt-6 grid gap-4 md:grid-cols-2">
+                    <Input
+                      name="firstName"
+                      label="First Name"
+                      defaultValue={dbUser.firstName}
+                    />
+                    <Input
+                      name="lastName"
+                      label="Last Name"
+                      defaultValue={dbUser.lastName}
+                    />
+                    <Input
+                      name="email"
+                      label="Email"
+                      defaultValue={dbUser.email}
+                    />
+                    <Input
+                      name="phoneNum"
+                      label="Phone Number"
+                      defaultValue={dbUser.phoneNum || ""}
+                    />
+                  </div>
+
+                  <div className="mt-6 flex justify-end">
+                    <SubmitButton />
+                  </div>
+                </form>
+              </Card>
+            )}
+
+            {activeTab === "preferences" && (
+              <Card>
+                <SectionHeader
+                  title="Driver Preferences"
+                  desc="Control how SwiftShift recommends loads and displays your account."
+                />
+
+                <form action={updatePreferences} className="mt-6 space-y-4">
+                  <SelectRow
+                    label="Home Base"
+                    desc="Used for nearby load recommendations."
+                    name="homeBase"
+                    defaultValue="Miami, FL"
+                    options={[
+                      "Miami, FL",
+                      "Orlando, FL",
+                      "Tampa, FL",
+                      "Atlanta, GA",
+                      "Charlotte, NC",
+                    ]}
                   />
 
+                  <SelectRow
+                    label="Preferred Equipment"
+                    desc="Your default equipment type for load searches."
+                    name="preferredEquipment"
+                    defaultValue="Dry Van"
+                    options={[
+                      "Dry Van",
+                      "Reefer",
+                      "Flatbed",
+                      "Power Only",
+                      "Box Truck",
+                    ]}
+                  />
+
+                  <SelectRow
+                    label="Max Deadhead Miles"
+                    desc="How far you are willing to drive empty."
+                    name="maxDeadheadMiles"
+                    defaultValue="100 miles"
+                    options={[
+                      "50 miles",
+                      "100 miles",
+                      "150 miles",
+                      "200 miles",
+                      "Any distance",
+                    ]}
+                  />
+
+                  <SelectRow
+                    label="Minimum Rate Per Mile"
+                    desc="Hide loads below your preferred rate."
+                    name="minimumRatePerMile"
+                    defaultValue="$2.25"
+                    options={["$1.75", "$2.00", "$2.25", "$2.50", "$3.00+"]}
+                  />
+
+                  <SelectRow
+                    label="Default Load Sort"
+                    desc="Choose how loads are sorted by default."
+                    name="defaultLoadSort"
+                    defaultValue="Highest Rate"
+                    options={[
+                      "Highest Rate",
+                      "Closest Pickup",
+                      "Soonest Pickup",
+                      "Best Rate Per Mile",
+                    ]}
+                  />
+
+                  <SelectRow
+                    label="Time Zone"
+                    desc="Set your local time zone."
+                    name="timeZone"
+                    defaultValue={preferences?.timeZone || "Eastern Time"}
+                    options={[
+                      "Eastern Time",
+                      "Central Time",
+                      "Mountain Time",
+                      "Pacific Time",
+                    ]}
+                  />
+
+                  <SelectRow
+                    label="Date Format"
+                    desc="Choose your preferred date format."
+                    name="dateFormat"
+                    defaultValue={preferences?.dateFormat || "MM/DD/YYYY"}
+                    options={["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"]}
+                  />
+
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="submit"
+                      className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                    >
+                      Save Preferences
+                    </button>
+                  </div>
+                </form>
+              </Card>
+            )}
+
+            {activeTab === "notifications" && (
+              <Card>
+                <SectionHeader
+                  title="Notification Preferences"
+                  desc="Choose how you want to be notified."
+                />
+
+                <div className="mt-6 space-y-4">
+                  <ToggleActionRow
+                    icon={<Bell size={18} />}
+                    title="Load Updates"
+                    desc="Get notified about load status changes."
+                    active
+                  />
+                  <ToggleActionRow
+                    icon={<Mail size={18} />}
+                    title="Payment Notifications"
+                    desc="Receive updates about payments and earnings."
+                    active
+                  />
+                  <ToggleActionRow
+                    icon={<FileText size={18} />}
+                    title="Document Alerts"
+                    desc="Get notified about important documents."
+                    active
+                  />
+                  <ToggleActionRow
+                    icon={<Mail size={18} />}
+                    title="Marketing Emails"
+                    desc="Receive news and offers."
+                  />
                 </div>
+              </Card>
+            )}
 
-                <div className="mt-6 grid gap-4 md:grid-cols-2">
-                  <Input
-                    name="firstName"
-                    label="First Name"
-                    defaultValue={dbUser.firstName}
+            {activeTab === "security" && (
+              <Card>
+                <SectionHeader
+                  title="Security"
+                  desc="Manage your password and account security."
+                />
+
+                <div className="mt-6 space-y-4">
+                  <ActionRow
+                    icon={<KeyRound size={18} />}
+                    title="Password"
+                    desc="Update your password regularly."
+                    action="Change Password"
+                    href="/dashboard/loads/settings/changePassword"
                   />
-                  <Input
-                    name="lastName"
-                    label="Last Name"
-                    defaultValue={dbUser.lastName}
+
+                  <ToggleActionRow
+                    icon={<ShieldCheck size={18} />}
+                    title="Two-Factor Authentication"
+                    desc="Add an extra layer of security to your account."
+                    active
                   />
-                  <Input
-                    name="email"
-                    label="Email"
-                    defaultValue={dbUser.email}
-                  />
-                  <Input
-                    name="phoneNum"
-                    label="Phone Number"
-                    defaultValue={dbUser.phoneNum}
+
+                  <ActionRow
+                    icon={<Lock size={18} />}
+                    title="Active Sessions"
+                    desc="Manage devices currently signed into your account."
+                    action="Manage Sessions"
                   />
                 </div>
+              </Card>
+            )}
 
-                <div className="mt-6 flex justify-end">
-                  <SubmitButton />
+            {activeTab === "integrations" && (
+              <Card>
+                <SectionHeader
+                  title="Integrations"
+                  desc="Connect SwiftShift with tools you already use."
+                />
+
+                <div className="mt-4 divide-y divide-slate-100">
+                  <Integration label="ELD Provider" status="Connected" />
+                  <Integration label="Google Calendar" status="Connect" />
+                  <Integration label="IFTA Reporting" status="Connect" />
+                  <Integration label="Dropbox" status="Connect" />
                 </div>
-              </form>
-            </Card>
-
-            {/* ACCOUNT PREFERENCES */}
-            <Card>
-              <SectionHeader
-                title="Account Preferences"
-                desc="Manage your default account preferences."
-              />
-
-              <form action={updatePreferences} className="mt-6 space-y-4">
-                <SelectRow
-                  label="Language"
-                  desc="Choose your preferred language."
-                  name="language"
-                  defaultValue={preferences?.language || "English (US)"}
-                  options={["English (US)", "Spanish", "French"]}
-                />
-
-                <SelectRow
-                  label="Time Zone"
-                  desc="Set your local time zone."
-                  name="timeZone"
-                  defaultValue={preferences?.timeZone || "Eastern Time"}
-                  options={[
-                    "Eastern Time",
-                    "Central Time",
-                    "Mountain Time",
-                    "Pacific Time",
-                  ]}
-                />
-
-                <SelectRow
-                  label="Date Format"
-                  desc="Choose your preferred date format."
-                  name="dateFormat"
-                  defaultValue={preferences?.dateFormat || "MM/DD/YYYY"}
-                  options={["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"]}
-                />
-
-                <SelectRow
-                  label="Currency"
-                  desc="Select your preferred currency."
-                  name="currency"
-                  defaultValue={preferences?.currency || "USD"}
-                  options={["USD", "CAD", "EUR"]}
-                />
-
-                <div className="flex justify-end pt-2">
-                  <button
-                    type="submit"
-                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                  >
-                    Save Preferences
-                  </button>
-                </div>
-              </form>
-            </Card>
-
-            {/* SECURITY */}
-            <Card>
-              <SectionHeader
-                title="Security"
-                desc="Manage your password and account security."
-              />
-
-              <div className="mt-6 space-y-4">
-                <ActionRow
-                  icon={<KeyRound size={18} />}
-                  title="Password"
-                  desc="Update your password regularly."
-                  action="Change Password"
-                  href="/dashboard/loads/settings/changePassword"
-                />
-
-                <ToggleActionRow
-                  icon={<ShieldCheck size={18} />}
-                  title="Two-Factor Authentication"
-                  desc="Add an extra layer of security to your account."
-                  active
-                />
-
-                <ActionRow
-                  icon={<Lock size={18} />}
-                  title="Active Sessions"
-                  desc="Manage devices currently signed into your account."
-                  action="Manage Sessions"
-                />
-              </div>
-            </Card>
-
-            {/* NOTIFICATIONS */}
-            <Card>
-              <SectionHeader
-                title="Notification Preferences"
-                desc="Choose how you want to be notified."
-              />
-
-              <div className="mt-6 space-y-4">
-                <ToggleActionRow
-                  icon={<Bell size={18} />}
-                  title="Load Updates"
-                  desc="Get notified about load status changes."
-                  active
-                />
-
-                <ToggleActionRow
-                  icon={<Mail size={18} />}
-                  title="Payment Notifications"
-                  desc="Receive updates about payments and earnings."
-                  active
-                />
-
-                <ToggleActionRow
-                  icon={<FileText size={18} />}
-                  title="Document Alerts"
-                  desc="Get notified about important documents."
-                  active
-                />
-
-                <ToggleActionRow
-                  icon={<Mail size={18} />}
-                  title="Marketing Emails"
-                  desc="Receive news and offers."
-                />
-              </div>
-            </Card>
+              </Card>
+            )}
           </section>
 
-          {/* RIGHT */}
           <aside className="space-y-6">
             <Card>
               <h2 className="text-sm font-semibold">Account Summary</h2>
@@ -301,20 +359,17 @@ export default async function SettingsPage({
                   label="Download My Data"
                   href="/api/user/export"
                 />
-
                 <QuickAction
                   icon={<Trash2 size={17} />}
                   label="Delete Account"
                   danger
                   action={deleteAccount}
                 />
-
                 <QuickAction
                   icon={<CircleHelp size={17} />}
                   label="Help Center"
                   href="/help"
                 />
-
                 <QuickAction
                   icon={<Mail size={17} />}
                   label="Contact Support"
@@ -333,24 +388,24 @@ export default async function SettingsPage({
                 </p>
 
                 <div className="mt-4 grid grid-cols-3 gap-3">
-                  <ThemeOption icon={<Sun size={20} />} label="Light" active />
-                  <ThemeOption icon={<Moon size={20} />} label="Dark" />
-                  <ThemeOption
+                  <ThemeButton
+                    icon={<Sun size={20} />}
+                    label="Light"
+                    theme="light"
+                  />
+
+                  <ThemeButton
+                    icon={<Moon size={20} />}
+                    label="Dark"
+                    theme="dark"
+                  />
+
+                  <ThemeButton
                     icon={<SlidersHorizontal size={20} />}
                     label="System"
+                    theme="system"
                   />
                 </div>
-              </div>
-            </Card>
-
-            <Card>
-              <h2 className="text-sm font-semibold">Integrations</h2>
-
-              <div className="mt-4 divide-y divide-slate-100">
-                <Integration label="ELD Provider" status="Connected" />
-                <Integration label="Google Calendar" status="Connect" />
-                <Integration label="IFTA Reporting" status="Connect" />
-                <Integration label="Dropbox" status="Connect" />
               </div>
             </Card>
           </aside>
@@ -359,8 +414,6 @@ export default async function SettingsPage({
     </main>
   );
 }
-
-/* COMPONENTS */
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
@@ -400,51 +453,18 @@ function Input({
   );
 }
 
-function PreferenceRow({
-  icon,
-  label,
-  desc,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  desc: string;
-  value: string;
-}) {
-  return (
-    <div className="grid gap-3 border-b border-slate-100 pb-4 last:border-0 md:grid-cols-[1fr_260px] md:items-center">
-      <div className="flex gap-3">
-        <div className="mt-1 text-slate-400">{icon}</div>
-        <div>
-          <p className="text-sm font-medium text-slate-900">{label}</p>
-          <p className="text-sm text-slate-500">{desc}</p>
-        </div>
-      </div>
-
-      <button className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-        {value}
-        <ChevronRight size={16} className="text-slate-400" />
-      </button>
-    </div>
-  );
-}
-
-import Link from "next/link";
-
 function ActionRow({
   icon,
   title,
   desc,
   action,
   href,
-  onClick,
 }: {
   icon: React.ReactNode;
   title: string;
   desc: string;
   action: string;
   href?: string;
-  onClick?: () => void;
 }) {
   const buttonClasses =
     "w-fit rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50";
@@ -453,7 +473,6 @@ function ActionRow({
     <div className="flex flex-col gap-3 border-b border-slate-100 pb-4 last:border-0 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex gap-3">
         <div className="mt-1 text-slate-400">{icon}</div>
-
         <div>
           <p className="text-sm font-medium text-slate-900">{title}</p>
           <p className="text-sm text-slate-500">{desc}</p>
@@ -465,7 +484,7 @@ function ActionRow({
           {action}
         </Link>
       ) : (
-        <button type="button" onClick={onClick} className={buttonClasses}>
+        <button type="button" className={buttonClasses}>
           {action}
         </button>
       )}
@@ -494,17 +513,7 @@ function ToggleActionRow({
         </div>
       </div>
 
-      <div
-        className={`flex h-6 w-11 shrink-0 items-center rounded-full p-1 ${
-          active ? "bg-blue-600" : "bg-slate-300"
-        }`}
-      >
-        <span
-          className={`h-4 w-4 rounded-full bg-white transition ${
-            active ? "translate-x-5" : ""
-          }`}
-        />
-      </div>
+      <Switch defaultActive={active} />
     </div>
   );
 }
@@ -548,9 +557,7 @@ function QuickAction({
 }) {
   const content = (
     <div
-      className={`flex w-full items-center justify-between py-4 ${
-        danger ? "text-red-600" : "text-slate-700"
-      }`}
+      className={`flex w-full items-center justify-between py-4 ${danger ? "text-red-600" : "text-slate-700"}`}
     >
       <div className="flex items-center gap-3 text-sm font-medium">
         {icon}
@@ -559,13 +566,12 @@ function QuickAction({
     </div>
   );
 
-  if (href) {
+  if (href)
     return (
       <a href={href} className="block">
         {content}
       </a>
     );
-  }
 
   if (action) {
     return (
@@ -580,29 +586,6 @@ function QuickAction({
   return <div>{content}</div>;
 }
 
-function ThemeOption({
-  icon,
-  label,
-  active,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  active?: boolean;
-}) {
-  return (
-    <button
-      className={`flex flex-col items-center gap-2 rounded-xl border px-3 py-4 text-sm font-medium ${
-        active
-          ? "border-blue-500 bg-blue-50 text-blue-700"
-          : "border-slate-200 text-slate-600 hover:bg-slate-50"
-      }`}
-    >
-      {icon}
-      {label}
-    </button>
-  );
-}
-
 function Integration({ label, status }: { label: string; status: string }) {
   const connected = status === "Connected";
 
@@ -611,22 +594,12 @@ function Integration({ label, status }: { label: string; status: string }) {
       <p className="text-sm font-medium text-slate-700">{label}</p>
 
       <span
-        className={`text-xs font-medium ${
-          connected ? "text-green-600" : "text-blue-600"
-        }`}
+        className={`text-xs font-medium ${connected ? "text-green-600" : "text-blue-600"}`}
       >
         {status}
       </span>
     </button>
   );
-}
-
-function formatDate(date: Date | string) {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
 }
 
 function SelectRow({
@@ -664,4 +637,10 @@ function SelectRow({
   );
 }
 
-// Fix profile picture to be either the default or the image
+function formatDate(date: Date | string) {
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}

@@ -2,33 +2,33 @@ import StatusPage from "@/app/components/shared/StatusPage";
 import { requireUser } from "@/lib/requireUser";
 import {
   AlertTriangle,
-  Bell,
   ChevronRight,
-  CreditCard,
-  Droplet,
   Eye,
-  Fuel,
-  Lock,
   MapPin,
   Shield,
-  TrendingUp,
 } from "lucide-react";
 
+import TA from "@/public/assets/fuel/TA.svg";
+import loves from "@/public/assets/fuel/love's.png";
+import p from "@/public/assets/fuel/p.png";
+
+import Image, { type StaticImageData } from "next/image";
+
 export default async function FuelCardPage() {
-    
-    const session = await requireUser();
-    if (!session.user?.email) {
-        return (
-            <StatusPage 
-            title="User Unauthorized"
-            message="User is not authorized"
-            ctaLabel="Sign in"
-            ctaHref="/sign-in"
-            />
-        )
-    }
-  
+  const session = await requireUser();
+
+  if (!session.user?.email) {
     return (
+      <StatusPage
+        title="User Unauthorized"
+        message="User is not authorized"
+        ctaLabel="Sign in"
+        ctaHref="/sign-in"
+      />
+    );
+  }
+
+  return (
     <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900">
       <div className="mx-auto max-w-7xl space-y-6">
         <div>
@@ -50,7 +50,7 @@ export default async function FuelCardPage() {
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <h2 className="text-sm font-semibold">Fuel Card</h2>
 
-              <div className="mt-4 w-full max-w-md rounded-2xl bg-slate-950 p-7 text-white shadow-lg">
+              <div className="mt-3 w-full max-w-md rounded-2xl bg-slate-950 p-7 text-white shadow-lg">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold">COMDATA</p>
                   <p className="text-xs uppercase text-slate-300">Fuel Card</p>
@@ -63,7 +63,9 @@ export default async function FuelCardPage() {
                 <div className="mt-8 flex items-end justify-between">
                   <div>
                     <p className="text-xs uppercase text-slate-400">Driver</p>
-                    <p className="mt-1 text-sm font-medium">{session.user.name}</p>
+                    <p className="mt-1 text-sm font-medium">
+                      {session.user.name || "Driver"}
+                    </p>
                   </div>
 
                   <div>
@@ -119,7 +121,9 @@ export default async function FuelCardPage() {
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-200 p-5">
                 <h2 className="text-sm font-semibold">Recent Transactions</h2>
-                <button className="text-sm font-medium text-blue-600">View all</button>
+                <button className="text-sm font-medium text-blue-600">
+                  View all
+                </button>
               </div>
 
               <div className="overflow-x-auto">
@@ -177,11 +181,11 @@ export default async function FuelCardPage() {
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <h2 className="text-sm font-semibold">Accepted At</h2>
 
-              <div className="mt-5 grid grid-cols-2 gap-3 text-center text-sm font-semibold">
-                <LogoBox label="Pilot" />
-                <LogoBox label="Love's" />
-                <LogoBox label="TA" />
-                <LogoBox label="Sapp" />
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <LogoBox label="Pilot" src={p} />
+                <LogoBox label="Love's" src={loves} />
+                <LogoBox label="TA" src={TA} />
+                <LogoBox label="Sapp Bros" />
               </div>
             </div>
 
@@ -303,10 +307,22 @@ function Limit({ label, value, spent, width }: { label: string; value: string; s
   );
 }
 
-function LogoBox({ label }: { label: string }) {
+function LogoBox({ label, src }: { label: string; src?: StaticImageData }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4">
-      {label}
+    <div className="flex h-24 flex-col items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-center text-sm font-semibold">
+      {src ? (
+        <Image
+          src={src}
+          alt={`${label} logo`}
+          className="block inline-flex mb-2 h-8 w-auto object-contain"
+        />
+      ) : (
+        <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-xs text-slate-500">
+          {label.charAt(0)}
+        </div>
+      )}
+
+      <span>{label}</span>
     </div>
   );
 }
