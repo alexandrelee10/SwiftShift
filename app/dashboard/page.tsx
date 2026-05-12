@@ -11,7 +11,6 @@ export default async function DashboardPage() {
     throw new Error("Unauthorized");
   }
 
-  // USER
   const dbUser = await prisma.user.findUnique({
     where: {
       email: session.user.email,
@@ -22,7 +21,6 @@ export default async function DashboardPage() {
     throw new Error("User not found");
   }
 
-  // Loads
   const upcomingLoads = await prisma.load.findMany({
     where: {
       status: "IN_TRANSIT",
@@ -36,7 +34,6 @@ export default async function DashboardPage() {
       pickupDate: "asc",
     },
   });
-
 
   const bookedLoads = await prisma.load.findMany({
     where: {
@@ -85,14 +82,18 @@ export default async function DashboardPage() {
       broker: true,
     },
     orderBy: {
-      pickupDate: "asc",
+      pickupDate: "desc",
     },
   });
 
-  // Earnings 
   const totalEarnings = deliveredLoads.reduce((total, load) => {
     return total + Number(load.rate);
   }, 0);
+
+  const averageRate =
+    deliveredLoads.length > 0 ? totalEarnings / deliveredLoads.length : 0;
+
+  const latestDeliveredLoad = deliveredLoads[0];
 
   const upperIcons = [
     {
@@ -103,21 +104,25 @@ export default async function DashboardPage() {
       color: "bg-blue-100 text-blue-600",
     },
     {
-      name: "Delivered (30d)",
-      content: deliveredLoads ? 1 : 0,
-      status: deliveredLoads ? "Deliveries Completed" : "None Delivered",
+      name: "Delivered",
+      content: deliveredLoads.length,
+      status:
+        deliveredLoads.length > 0 ? "Deliveries Completed" : "None Delivered",
       icon: CircleCheckBig,
       color: "bg-green-100 text-green-600",
     },
     {
       name: "Earnings",
       content: `$${totalEarnings.toLocaleString()}`,
-      status: deliveredLoads.length > 0 ? `${deliveredLoads.length} delivered loads` : 'No Earnings Yet',
+      status:
+        deliveredLoads.length > 0
+          ? `${deliveredLoads.length} delivered loads`
+          : "No Earnings Yet",
       icon: Landmark,
       color: "bg-purple-100 text-purple-600",
     },
     {
-      name: "Fuel Spending (30d)",
+      name: "Fuel Spending",
       content: "$3,123",
       status: "-10% vs last 30d",
       icon: FuelIcon,
@@ -129,7 +134,6 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-zinc-100">
       <main className="min-w-0 p-6">
         <div className="space-y-6">
-          {/* Header */}
           <div>
             <h2 className="text-lg font-semibold text-zinc-800">
               Welcome, {session.user?.name || "Driver"}!
@@ -139,7 +143,6 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          {/* Top Stats */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {upperIcons.map((item) => {
               const Icon = item.icon;
@@ -169,11 +172,8 @@ export default async function DashboardPage() {
             })}
           </div>
 
-          {/* Main Dashboard Grid */}
           <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
-            {/* Left Column */}
             <section className="space-y-5">
-              {/* Active Load Card */}
               <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
                 <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
                   <div className="flex items-center gap-3">
@@ -196,7 +196,6 @@ export default async function DashboardPage() {
 
                 {activeLoad ? (
                   <div className="grid lg:grid-cols-[310px_1fr]">
-                    {/* Load Info */}
                     <div className="p-5">
                       <h3 className="text-lg font-semibold text-zinc-900">
                         Load #{activeLoad.referenceNumber}
@@ -213,7 +212,6 @@ export default async function DashboardPage() {
                         </span>
                       </div>
 
-                      {/* Timeline */}
                       <div className="mt-6 space-y-5">
                         <TimelineItem
                           dotColor="bg-green-500"
@@ -253,7 +251,6 @@ export default async function DashboardPage() {
 
                       <div className="my-5 border-t border-zinc-200" />
 
-                      {/* Details */}
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <SmallDetail
                           label="Equipment"
@@ -273,10 +270,9 @@ export default async function DashboardPage() {
                         />
                       </div>
 
-                      {/* Buttons */}
                       <div className="mt-6 grid grid-cols-2 gap-3">
                         <Link
-                          href={`/dashboard/loads/track`}
+                          href="/dashboard/loads/track"
                           className="rounded-lg bg-blue-600 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-700"
                         >
                           Track Load
@@ -291,7 +287,6 @@ export default async function DashboardPage() {
                       </div>
                     </div>
 
-                    {/* Map */}
                     <div className="h-[420px] border-t border-zinc-200 bg-white lg:border-l lg:border-t-0">
                       <LoadMap
                         loadId={activeLoad.id}
@@ -318,49 +313,133 @@ export default async function DashboardPage() {
                 )}
               </div>
 
-              {/* Lower Cards */}
               <div className="grid gap-5 md:grid-cols-2">
                 <div className="rounded-xl border border-zinc-200 bg-white p-5">
-                  <CardHeader title="Recent Searches" />
+                  <CardHeader title="On-Time Delivery" />
 
-                  <div className="space-y-4 text-sm">
-                    <SearchRow from="Miami, FL" to="Atlanta, GA" count="128" />
-                    <SearchRow
-                      from="Orlando, FL"
-                      to="Charlotte, NC"
-                      count="96"
-                    />
-                    <SearchRow
-                      from="Tampa, FL"
-                      to="Nashville, TN"
-                      count="105"
-                    />
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-3xl font-semibold text-zinc-900">
+                        94%
+                      </p>
+                      <p className="mt-1 text-sm text-zinc-500">
+                        Delivery performance over the last 6 weeks
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <OnTimeBar label="Week 1" value={88} />
+                      <OnTimeBar label="Week 2" value={92} />
+                      <OnTimeBar label="Week 3" value={90} />
+                      <OnTimeBar label="Week 4" value={96} />
+                      <OnTimeBar label="Week 5" value={94} />
+                      <OnTimeBar label="Week 6" value={98} />
+                    </div>
+
+                    <div className="rounded-lg bg-green-50 p-3">
+                      <p className="text-xs font-medium text-green-700">
+                        ↑ 6% improvement from last month
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 <div className="rounded-xl border border-zinc-200 bg-white p-5">
                   <CardHeader title="Booked Loads" />
 
-                  <div className="space-y-4 text-sm">
+                  <div className="space-y-4">
                     {bookedLoads.length > 0 ? (
                       bookedLoads.map((load) => (
-                        <BookmarkedRow
+                        <div
                           key={load.id}
-                          route={`${load.originCity}, ${load.originState} → ${load.destinationCity}, ${load.destinationState}`}
-                          rate={`$${Number(load.rate).toLocaleString()}`}
-                        />
+                          className="rounded-xl border border-zinc-200 p-4 transition hover:border-blue-200 hover:bg-zinc-50"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-semibold text-zinc-900">
+                                {load.originCity}, {load.originState}
+                                <span className="mx-2 text-zinc-400">→</span>
+                                {load.destinationCity}, {load.destinationState}
+                              </p>
+
+                              <p className="mt-1 text-sm text-zinc-500">
+                                Pickup{" "}
+                                {new Date(load.pickupDate).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                  }
+                                )}
+                              </p>
+                            </div>
+
+                            <span className="rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-medium text-blue-700">
+                              BOOKED
+                            </span>
+                          </div>
+
+                          <div className="mt-5 grid grid-cols-3 gap-4">
+                            <SmallDetail
+                              label="Rate"
+                              value={`$${Number(load.rate).toLocaleString()}`}
+                            />
+
+                            <SmallDetail
+                              label="Equipment"
+                              value={load.equipmentType}
+                            />
+
+                            <SmallDetail
+                              label="Weight"
+                              value={
+                                load.weight
+                                  ? `${load.weight.toLocaleString()} lbs`
+                                  : "—"
+                              }
+                            />
+                          </div>
+
+                          <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4">
+                            <div>
+                              <p className="text-xs text-zinc-500">Broker</p>
+                              <p className="text-sm font-medium text-zinc-800">
+                                {load.broker?.firstName || "Unknown Broker"}
+                              </p>
+                            </div>
+
+                            <Link
+                              href={`/dashboard/loads/search/${load.id}`}
+                              className="rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-zinc-100"
+                            >
+                              View Load
+                            </Link>
+                          </div>
+                        </div>
                       ))
                     ) : (
-                      <p className="text-sm text-zinc-500">
-                        No bookmarked loads yet
-                      </p>
+                      <div className="rounded-xl border border-dashed border-zinc-200 p-8 text-center">
+                        <p className="text-sm font-medium text-zinc-900">
+                          No booked loads yet
+                        </p>
+
+                        <p className="mt-1 text-sm text-zinc-500">
+                          Loads you book will appear here.
+                        </p>
+
+                        <Link
+                          href="/dashboard/loads/search"
+                          className="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                        >
+                          Find Loads
+                        </Link>
+                      </div>
                     )}
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* Right Column */}
             <aside className="space-y-5">
               <div className="rounded-xl border border-zinc-200 bg-white p-5">
                 <CardHeader title="Upcoming Loads" />
@@ -393,23 +472,69 @@ export default async function DashboardPage() {
                   )}
                 </div>
               </div>
-              {/* Convert to earnings card */}
-              <div className="rounded-xl border border-zinc-200 bg-white p-5">
-                <CardHeader title="Notifications" />
 
-                <div className="space-y-4 text-sm">
-                  <NotificationRow
-                    title="Payment received"
-                    desc="$2,450 has been paid for Load #48120"
-                  />
-                  <NotificationRow
-                    title="New document"
-                    desc="Rate confirmation uploaded for Load #48291"
-                  />
-                  <NotificationRow
-                    title="Fuel discount"
-                    desc="Save 15¢/gal at Pilot in Georgia"
-                  />
+              <div className="rounded-xl border border-zinc-200 bg-white p-5">
+                <CardHeader title="Earning Summary" />
+
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                      Total Earnings
+                    </p>
+                    <p className="mt-1 text-3xl font-semibold text-zinc-900">
+                      ${totalEarnings.toLocaleString()}
+                    </p>
+                    <p className="mt-1 text-sm text-zinc-500">
+                      Based on delivered loads only
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <EarningSection
+                      label="Delivered Loads"
+                      value={deliveredLoads.length.toString()}
+                      description="Completed"
+                    />
+                    <EarningSection
+                      label="Average Rate"
+                      value={`$${Math.round(averageRate).toLocaleString()}`}
+                      description="Per delivered load"
+                    />
+                  </div>
+
+                  <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                      Latest Payout
+                    </p>
+
+                    {latestDeliveredLoad ? (
+                      <>
+                        <p className="mt-2 text-sm font-semibold text-zinc-900">
+                          ${Number(latestDeliveredLoad.rate).toLocaleString()}
+                        </p>
+                        <p className="mt-1 text-sm text-zinc-500">
+                          Load #{latestDeliveredLoad.referenceNumber}
+                        </p>
+                        <p className="mt-1 text-xs text-zinc-400">
+                          {latestDeliveredLoad.originCity},{" "}
+                          {latestDeliveredLoad.originState} →{" "}
+                          {latestDeliveredLoad.destinationCity},{" "}
+                          {latestDeliveredLoad.destinationState}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="mt-2 text-sm text-zinc-500">
+                        No delivered loads yet.
+                      </p>
+                    )}
+                  </div>
+
+                  <Link
+                    href="/dashboard/loads/myloads?status=DELIVERED"
+                    className="block rounded-lg border border-zinc-200 px-4 py-2.5 text-center text-sm font-medium text-blue-600 hover:bg-zinc-50"
+                  >
+                    View Delivered Loads
+                  </Link>
                 </div>
               </div>
             </aside>
@@ -466,37 +591,6 @@ function CardHeader({ title, href }: { title: string; href?: string }) {
   );
 }
 
-function SearchRow({
-  from,
-  to,
-  count,
-}: {
-  from: string;
-  to: string;
-  count: string;
-}) {
-  return (
-    <div className="flex items-center justify-between border-b border-zinc-100 pb-3 last:border-0">
-      <p className="text-zinc-600">
-        {from} <span className="mx-2 text-zinc-400">→</span> {to}
-      </p>
-
-      <span className="rounded-full bg-zinc-100 px-2 py-1 text-xs text-zinc-500">
-        {count}
-      </span>
-    </div>
-  );
-}
-
-function BookmarkedRow({ route, rate }: { route: string; rate: string }) {
-  return (
-    <div className="flex items-center justify-between border-b border-zinc-100 pb-3 last:border-0">
-      <p className="text-zinc-600">{route}</p>
-      <p className="font-medium text-zinc-800">{rate}</p>
-    </div>
-  );
-}
-
 function PickupRow({
   day,
   month,
@@ -527,11 +621,38 @@ function PickupRow({
   );
 }
 
-function NotificationRow({ title, desc }: { title: string; desc: string }) {
+function EarningSection({
+  label,
+  value,
+  description,
+}: {
+  label: string;
+  value: string;
+  description: string;
+}) {
+  return (
+    <div className="rounded-lg border border-zinc-200 bg-white p-3">
+      <p className="text-xs text-zinc-500">{label}</p>
+      <p className="mt-1 text-lg font-semibold text-zinc-900">{value}</p>
+      <p className="mt-1 text-xs text-zinc-400">{description}</p>
+    </div>
+  );
+}
+
+function OnTimeBar({ label, value }: { label: string; value: number }) {
   return (
     <div>
-      <p className="text-sm font-medium text-zinc-900">{title}</p>
-      <p className="mt-1 text-sm text-zinc-500">{desc}</p>
+      <div className="mb-1 flex items-center justify-between text-xs">
+        <span className="font-medium text-zinc-500">{label}</span>
+        <span className="font-semibold text-zinc-700">{value}%</span>
+      </div>
+
+      <div className="h-2 rounded-full bg-zinc-100">
+        <div
+          className="h-2 rounded-full bg-blue-600"
+          style={{ width: `${value}%` }}
+        />
+      </div>
     </div>
   );
 }
@@ -546,5 +667,3 @@ function formatDate(date: Date | string | null) {
     minute: "2-digit",
   });
 }
-
-// Add document section tha cater to this load.
