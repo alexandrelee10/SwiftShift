@@ -20,7 +20,8 @@ import { updatePreferences, deleteAccount, saveSettings } from "./action";
 import Link from "next/link";
 import { SubmitButton } from "@/app/components/shared/SubmitButton";
 import ProfilePhotoChanger from "@/app/components/profile/ProfileImageUpload";
-import { Switch, ThemeButton } from "@/app/components/settings/SettingsTabs";
+import { ThemeButton } from "@/app/components/settings/SettingsTabs";
+import { Switch } from "@/app/components/shared/Switch";
 
 const tabs = [
   { label: "Account", value: "account" },

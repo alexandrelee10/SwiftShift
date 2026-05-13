@@ -50,7 +50,7 @@ export default async function FuelCardPage() {
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <h2 className="text-sm font-semibold">Fuel Card</h2>
 
-              <div className="mt-3 w-full max-w-md rounded-2xl bg-slate-950 p-7 text-white shadow-lg">
+              <div className="mt-3 w-fit max-w-md rounded-2xl bg-slate-950 p-7 text-white shadow-lg mx-auto">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold">COMDATA</p>
                   <p className="text-xs uppercase text-slate-300">Fuel Card</p>
@@ -75,7 +75,7 @@ export default async function FuelCardPage() {
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="mx-auto w-fit mt-5 grid gap-4 sm:grid-cols-2">
                 <InfoLine label="Card Status" value="Active" badge />
                 <InfoLine label="Card Number" value="•••• 5678" />
               </div>

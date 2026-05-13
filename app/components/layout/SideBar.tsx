@@ -24,9 +24,17 @@ const sidebarSections = [
       { name: "Dashboard", href: "/dashboard", icon: Home },
       { name: "Find Loads", href: "/dashboard/loads/search", icon: Search },
       { name: "My Loads", href: "/dashboard/loads/myloads", icon: Package },
-      { name: "Documents", href: "/dashboard/loads/documents", icon: FilesIcon },
+      {
+        name: "Documents",
+        href: "/dashboard/loads/documents",
+        icon: FilesIcon,
+      },
       { name: "Earnings", href: "/dashboard/loads/earnings", icon: Banknote },
-      { name: "Fuel Card", href: "/dashboard/loads/fuelcards", icon: CreditCardIcon },
+      {
+        name: "Fuel Card",
+        href: "/dashboard/loads/fuelcards",
+        icon: CreditCardIcon,
+      },
       { name: "Settings", href: "/dashboard/loads/settings", icon: Settings },
     ],
   },
@@ -45,7 +53,7 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
 
   return (
     <>
-      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden">
+      <div className="sticky top-0 z-40 flex h-[61px] items-center justify-between border-b border-slate-200 bg-white px-4 md:hidden">
         <h2 className="text-lg font-bold text-slate-950">SwiftShift</h2>
 
         <button
@@ -66,9 +74,9 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
 
       <aside
         className={`
-          fixed left-0 top-0 z-50 flex h-screen w-64 flex-col
-          bg-slate-900 text-white transition-transform duration-300
-          md:sticky md:top-0 md:z-0 md:translate-x-0
+          fixed left-0 top-[61px] z-50 flex h-[calc(100vh-61px)] w-64 flex-col
+        bg-slate-900 text-white transition-transform duration-300
+          md:top-0 md:h-screen md:translate-x-0
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
