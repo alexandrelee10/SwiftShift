@@ -8,9 +8,18 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+
 export const metadata: Metadata = {
-  title: "Swift Shift",
+  title: "SwiftShift",
   description: "Modern load board platform",
+  icons: {
+    icon: [
+      {
+        url: "/favicon.svg",
+        type: "image/svg+xml",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
