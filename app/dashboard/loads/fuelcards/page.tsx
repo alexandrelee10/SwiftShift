@@ -13,6 +13,7 @@ import loves from "@/public/assets/fuel/love's.png";
 import p from "@/public/assets/fuel/p.png";
 
 import Image, { type StaticImageData } from "next/image";
+import { Switch } from "@/app/components/shared/Switch";
 
 export default async function FuelCardPage() {
   const session = await requireUser();
@@ -410,21 +411,24 @@ function Breakdown({
   );
 }
 
-function ToggleRow({ label, active }: { label: string; active?: boolean }) {
+
+
+
+
+function ToggleRow({
+  label,
+  active,
+}: {
+  label: string;
+  active?: boolean;
+}) {
   return (
     <div className="flex items-center justify-between border-b border-slate-100 pb-4 last:border-0 dark:border-slate-800">
-      <p className="text-sm text-slate-600 dark:text-slate-400">{label}</p>
-      <div
-        className={`flex h-6 w-11 items-center rounded-full p-1 ${
-          active ? "bg-green-500" : "bg-slate-300 dark:bg-slate-700"
-        }`}
-      >
-        <span
-          className={`h-4 w-4 rounded-full bg-white transition ${
-            active ? "translate-x-5" : ""
-          }`}
-        />
-      </div>
+      <p className="text-sm text-slate-600 dark:text-slate-400">
+        {label}
+      </p>
+
+      <Switch defaultActive={active} />
     </div>
   );
 }

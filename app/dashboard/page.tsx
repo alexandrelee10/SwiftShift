@@ -50,6 +50,7 @@ export default async function DashboardPage() {
     orderBy: {
       pickupDate: "asc",
     },
+    take: 2,
   });
 
   const activeLoad = await prisma.load.findFirst({
