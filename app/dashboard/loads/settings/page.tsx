@@ -65,16 +65,18 @@ export default async function SettingsPage({
   });
 
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900">
+    <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900 dark:bg-[#0b1120] dark:text-slate-100">
       <div className="mx-auto max-w-7xl space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-950 dark:text-white">
+            Settings
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Manage your account, preferences, notifications, and security.
           </p>
         </div>
 
-        <div className="border-b border-slate-200">
+        <div className="border-b border-slate-200 dark:border-slate-800">
           <div className="flex gap-6 overflow-x-auto text-sm font-medium">
             {tabs.map((tab) => (
               <Link
@@ -82,8 +84,8 @@ export default async function SettingsPage({
                 href={`/dashboard/loads/settings?tab=${tab.value}`}
                 className={`whitespace-nowrap border-b-2 pb-3 transition ${
                   activeTab === tab.value
-                    ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-slate-500 hover:text-slate-900"
+                    ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                    : "border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 }`}
               >
                 {tab.label}
@@ -95,7 +97,7 @@ export default async function SettingsPage({
         <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
           <section className="space-y-6">
             {params.success === "1" && (
-              <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+              <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-900/60 dark:bg-green-950/40 dark:text-green-300">
                 Settings saved successfully.
               </div>
             )}
@@ -242,7 +244,7 @@ export default async function SettingsPage({
                   <div className="flex justify-end pt-2">
                     <button
                       type="submit"
-                      className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                      className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
                     >
                       Save Preferences
                     </button>
@@ -326,7 +328,7 @@ export default async function SettingsPage({
                   desc="Connect SwiftShift with tools you already use."
                 />
 
-                <div className="mt-4 divide-y divide-slate-100">
+                <div className="mt-4 divide-y divide-slate-100 dark:divide-slate-800">
                   <Integration label="ELD Provider" status="Connected" />
                   <Integration label="Google Calendar" status="Connect" />
                   <Integration label="IFTA Reporting" status="Connect" />
@@ -338,7 +340,9 @@ export default async function SettingsPage({
 
           <aside className="space-y-6">
             <Card>
-              <h2 className="text-sm font-semibold">Account Summary</h2>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+                Account Summary
+              </h2>
 
               <div className="mt-5 space-y-4">
                 <SummaryRow label="Account Type" value={dbUser.role} />
@@ -352,9 +356,11 @@ export default async function SettingsPage({
             </Card>
 
             <Card>
-              <h2 className="text-sm font-semibold">Quick Actions</h2>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+                Quick Actions
+              </h2>
 
-              <div className="mt-4 divide-y divide-slate-100">
+              <div className="mt-4 divide-y divide-slate-100 dark:divide-slate-800">
                 <QuickAction
                   icon={<Download size={17} />}
                   label="Download My Data"
@@ -380,11 +386,15 @@ export default async function SettingsPage({
             </Card>
 
             <Card>
-              <h2 className="text-sm font-semibold">Appearance</h2>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+                Appearance
+              </h2>
 
               <div className="mt-5">
-                <p className="text-sm font-medium text-slate-700">Theme</p>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                  Theme
+                </p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   Choose your preferred theme.
                 </p>
 
@@ -418,7 +428,7 @@ export default async function SettingsPage({
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
       {children}
     </div>
   );
@@ -427,8 +437,10 @@ function Card({ children }: { children: React.ReactNode }) {
 function SectionHeader({ title, desc }: { title: string; desc: string }) {
   return (
     <div>
-      <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
-      <p className="mt-1 text-sm text-slate-500">{desc}</p>
+      <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+        {title}
+      </h2>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{desc}</p>
     </div>
   );
 }
@@ -444,11 +456,13 @@ function Input({
 }) {
   return (
     <label>
-      <span className="text-sm font-medium text-slate-700">{label}</span>
+      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+        {label}
+      </span>
       <input
         name={name}
         defaultValue={defaultValue}
-        className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
+        className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500"
       />
     </label>
   );
@@ -468,15 +482,17 @@ function ActionRow({
   href?: string;
 }) {
   const buttonClasses =
-    "w-fit rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50";
+    "w-fit rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800";
 
   return (
-    <div className="flex flex-col gap-3 border-b border-slate-100 pb-4 last:border-0 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 border-b border-slate-100 pb-4 last:border-0 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
       <div className="flex gap-3">
-        <div className="mt-1 text-slate-400">{icon}</div>
+        <div className="mt-1 text-slate-400 dark:text-slate-500">{icon}</div>
         <div>
-          <p className="text-sm font-medium text-slate-900">{title}</p>
-          <p className="text-sm text-slate-500">{desc}</p>
+          <p className="text-sm font-medium text-slate-900 dark:text-white">
+            {title}
+          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{desc}</p>
         </div>
       </div>
 
@@ -505,12 +521,14 @@ function ToggleActionRow({
   active?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-4 last:border-0">
+    <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-4 last:border-0 dark:border-slate-800">
       <div className="flex gap-3">
-        <div className="mt-1 text-slate-400">{icon}</div>
+        <div className="mt-1 text-slate-400 dark:text-slate-500">{icon}</div>
         <div>
-          <p className="text-sm font-medium text-slate-900">{title}</p>
-          <p className="text-sm text-slate-500">{desc}</p>
+          <p className="text-sm font-medium text-slate-900 dark:text-white">
+            {title}
+          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{desc}</p>
         </div>
       </div>
 
@@ -530,14 +548,16 @@ function SummaryRow({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <p className="text-sm text-slate-500">{label}</p>
+      <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
 
       {badge ? (
-        <span className="rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
+        <span className="rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-950/50 dark:text-green-300">
           {value}
         </span>
       ) : (
-        <p className="text-sm font-medium text-slate-900">{value}</p>
+        <p className="text-sm font-medium text-slate-900 dark:text-white">
+          {value}
+        </p>
       )}
     </div>
   );
@@ -558,7 +578,11 @@ function QuickAction({
 }) {
   const content = (
     <div
-      className={`flex w-full items-center justify-between py-4 ${danger ? "text-red-600" : "text-slate-700"}`}
+      className={`flex w-full items-center justify-between py-4 transition ${
+        danger
+          ? "text-red-600 dark:text-red-400"
+          : "text-slate-700 dark:text-slate-200"
+      }`}
     >
       <div className="flex items-center gap-3 text-sm font-medium">
         {icon}
@@ -592,10 +616,16 @@ function Integration({ label, status }: { label: string; status: string }) {
 
   return (
     <button className="flex w-full items-center justify-between py-4 text-left">
-      <p className="text-sm font-medium text-slate-700">{label}</p>
+      <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+        {label}
+      </p>
 
       <span
-        className={`text-xs font-medium ${connected ? "text-green-600" : "text-blue-600"}`}
+        className={`text-xs font-medium ${
+          connected
+            ? "text-green-600 dark:text-green-400"
+            : "text-blue-600 dark:text-blue-400"
+        }`}
       >
         {status}
       </span>
@@ -617,16 +647,18 @@ function SelectRow({
   options: string[];
 }) {
   return (
-    <div className="grid gap-3 border-b border-slate-100 pb-4 last:border-0 md:grid-cols-[1fr_260px] md:items-center">
+    <div className="grid gap-3 border-b border-slate-100 pb-4 last:border-0 md:grid-cols-[1fr_260px] md:items-center dark:border-slate-800">
       <div>
-        <p className="text-sm font-medium text-slate-900">{label}</p>
-        <p className="text-sm text-slate-500">{desc}</p>
+        <p className="text-sm font-medium text-slate-900 dark:text-white">
+          {label}
+        </p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{desc}</p>
       </div>
 
       <select
         name={name}
         defaultValue={defaultValue}
-        className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
+        className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
       >
         {options.map((option) => (
           <option key={option} value={option}>

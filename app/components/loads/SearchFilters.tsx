@@ -81,79 +81,50 @@ export default function SearchFilters() {
     <div className="space-y-6">
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"
+        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
       >
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div className="rounded-md border border-zinc-300 bg-white px-3 py-2">
-            <label className="block text-[11px] font-medium text-zinc-500">
-              Origin
-            </label>
-            <input
-              type="text"
-              name="origin"
-              value={form.origin}
-              onChange={onChange}
-              placeholder="City, state, or ZIP"
-              className="mt-1 w-full bg-transparent text-sm text-zinc-900 outline-none"
-            />
-          </div>
+          <InputBox
+            label="Origin"
+            name="origin"
+            value={form.origin}
+            onChange={onChange}
+            placeholder="City, state, or ZIP"
+          />
 
-          <div className="rounded-md border border-zinc-300 bg-white px-3 py-2">
-            <label className="block text-[11px] font-medium text-zinc-500">
-              Destination
-            </label>
-            <input
-              type="text"
-              name="destination"
-              value={form.destination}
-              onChange={onChange}
-              placeholder="City, state, or ZIP"
-              className="mt-1 w-full bg-transparent text-sm text-zinc-900 outline-none"
-            />
-          </div>
+          <InputBox
+            label="Destination"
+            name="destination"
+            value={form.destination}
+            onChange={onChange}
+            placeholder="City, state, or ZIP"
+          />
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
-          <div className="rounded-md border border-zinc-300 bg-white px-3 py-2">
-            <label className="block text-[11px] font-medium text-zinc-500">
-              Weight lbs
-            </label>
-            <input
-              type="text"
-              name="weight"
-              value={form.weight}
-              onChange={onChange}
-              placeholder="45000"
-              className="mt-1 w-full bg-transparent text-sm text-zinc-900 outline-none"
-            />
-          </div>
+          <InputBox
+            label="Weight lbs"
+            name="weight"
+            value={form.weight}
+            onChange={onChange}
+            placeholder="45000"
+          />
 
-          <div className="rounded-md border border-zinc-300 bg-white px-3 py-2">
-            <label className="block text-[11px] font-medium text-zinc-500">
-              Equipment
-            </label>
-            <input
-              type="text"
-              name="equipmentType"
-              value={form.equipmentType}
-              onChange={onChange}
-              placeholder="Dry Van"
-              className="mt-1 w-full bg-transparent text-sm text-zinc-900 outline-none"
-            />
-          </div>
+          <InputBox
+            label="Equipment"
+            name="equipmentType"
+            value={form.equipmentType}
+            onChange={onChange}
+            placeholder="Dry Van"
+          />
 
-          <div className="rounded-md border border-zinc-300 bg-white px-3 py-2">
-            <label className="block text-[11px] font-medium text-zinc-500">
-              Pickup Date
-            </label>
-            <input
-              type="date"
-              name="pickupDate"
-              value={form.pickupDate}
-              onChange={onChange}
-              className="mt-1 w-full bg-transparent text-sm text-zinc-900 outline-none"
-            />
-          </div>
+          <InputBox
+            label="Pickup Date"
+            name="pickupDate"
+            type="date"
+            value={form.pickupDate}
+            onChange={onChange}
+          />
 
           <div className="flex items-end">
             <button
@@ -167,10 +138,12 @@ export default function SearchFilters() {
         </div>
       </form>
 
-      <p className="text-sm text-zinc-500">Found {results.length} loads</p>
+      <p className="text-sm text-slate-500 dark:text-slate-400">
+        Found {results.length} loads
+      </p>
 
       {error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400">
           {error}
         </div>
       ) : null}
@@ -179,27 +152,62 @@ export default function SearchFilters() {
         {results.map((load) => (
           <div
             key={load.id}
-            className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm"
+            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/60"
           >
-            <h3 className="text-lg font-semibold text-zinc-900">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
               {load.originCity}, {load.originState} → {load.destinationCity},{" "}
               {load.destinationState}
             </h3>
 
-            <p className="mt-1 text-sm text-zinc-600">
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
               Equipment: {load.equipmentType}
             </p>
 
-            <p className="mt-1 text-sm text-zinc-600">Rate: ${load.rate}</p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+              Rate: ${load.rate}
+            </p>
 
             {load.weight ? (
-              <p className="mt-1 text-sm text-zinc-600">
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                 Weight: {load.weight.toLocaleString()} lbs
               </p>
             ) : null}
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function InputBox({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  type?: string;
+}) {
+  return (
+    <div className="rounded-md border border-slate-300 bg-white px-3 py-2 transition focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950">
+      <label className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">
+        {label}
+      </label>
+
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="mt-1 w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
+      />
     </div>
   );
 }

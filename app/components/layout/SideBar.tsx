@@ -7,7 +7,7 @@ import Link from "next/link";
 import {
   Home,
   Search,
-  Package,
+ Package,
   Settings,
   FilesIcon,
   CreditCardIcon,
@@ -53,13 +53,15 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
 
   return (
     <>
-      <div className="sticky top-0 z-40 flex h-[61px] items-center justify-between border-b border-slate-200 bg-white px-4 md:hidden">
-        <h2 className="text-lg font-bold text-slate-950">SwiftShift</h2>
+      <div className="sticky top-0 z-40 flex h-[61px] items-center justify-between border-b border-slate-200 bg-white px-4 md:hidden dark:border-slate-700 dark:bg-slate-900">
+        <h2 className="text-lg font-bold text-slate-950 dark:text-white">
+          SwiftShift
+        </h2>
 
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="rounded-lg border border-slate-200 p-2 text-slate-900"
+          className="rounded-lg border border-slate-200 p-2 text-slate-900 transition hover:bg-slate-50 dark:border-slate-600 dark:text-white dark:hover:bg-slate-800"
         >
           <Menu size={21} />
         </button>
@@ -68,32 +70,42 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
         />
       )}
 
       <aside
         className={`
           fixed left-0 top-[61px] z-50 flex h-[calc(100vh-61px)] w-64 flex-col
-        bg-slate-900 text-white transition-transform duration-300
+          border-r border-slate-700 bg-slate-900 text-white shadow-2xl transition-transform duration-300
           md:top-0 md:h-screen md:translate-x-0
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
-        <div className="flex items-center justify-between px-5 py-5">
-          <h2 className="text-xl font-bold tracking-tight">SwiftShift</h2>
+        <div className="border-b border-slate-700 px-5 py-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold tracking-tight text-white">
+                SwiftShift
+              </h2>
 
-          <button
-            type="button"
-            onClick={() => setIsOpen(false)}
-            className="rounded-lg p-2 text-white/70 hover:bg-white/10 md:hidden"
-          >
-            <X size={21} />
-          </button>
+              <p className="mt-0.5 text-xs text-slate-400">
+                Driver Dashboard
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-white md:hidden"
+            >
+              <X size={21} />
+            </button>
+          </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 py-2">
-          <div className="space-y-1">
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
+          <div className="space-y-1.5">
             {sidebarSections[0].links.map((link) => {
               const Icon = link.icon;
 
@@ -102,9 +114,13 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
                   key={link.name}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-white/75 transition hover:bg-white/10 hover:text-white"
+                  className="group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white"
                 >
-                  <Icon size={19} />
+                  <Icon
+                    size={19}
+                    className="text-slate-400 transition group-hover:text-white"
+                  />
+
                   <span>{link.name}</span>
                 </Link>
               );
@@ -112,13 +128,13 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
           </div>
         </nav>
 
-        <div className="relative border-t border-white/10 p-4">
+        <div className="relative border-t border-slate-700 p-4">
           {isProfileOpen && (
-            <div className="absolute bottom-20 left-4 right-4 rounded-xl border border-white/10 bg-slate-800 p-2 shadow-xl">
+            <div className="absolute bottom-20 left-4 right-4 rounded-2xl border border-slate-700 bg-slate-800 p-2 shadow-2xl">
               <button
                 type="button"
                 onClick={() => signOut({ callbackUrl: "/sign-in" })}
-                className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-red-200 transition hover:bg-red-500/10 hover:text-red-100"
+                className="w-full rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-300 transition hover:bg-red-500/10 hover:text-red-200"
               >
                 Sign out
               </button>
@@ -128,34 +144,37 @@ export default function Sidebar({ user }: { user?: SidebarUser }) {
           <button
             type="button"
             onClick={() => setIsProfileOpen((prev) => !prev)}
-            className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition hover:bg-white/10"
+            className="flex w-full items-center gap-3 rounded-2xl border border-transparent bg-slate-800/60 p-3 text-left transition hover:border-slate-700 hover:bg-slate-800"
           >
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
+            <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-700 ring-1 ring-slate-600">
               {user?.image ? (
                 <Image
                   src={user.image}
                   alt={user?.name || "User profile photo"}
                   fill
-                  sizes="40px"
+                  sizes="44px"
                   className="object-cover"
                 />
               ) : (
-                <User size={22} className="text-white/80" />
+                <User size={22} className="text-slate-300" />
               )}
 
-              {/* <span className="absolute bottom-0 right-0 z-10 h-3 w-3 rounded-full border-2 border-slate-900 bg-green-500" /> */}
+              <span className="absolute bottom-0 right-0 z-10 h-3 w-3 rounded-full border-2 border-slate-900 bg-green-500" />
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">
+              <p className="truncate text-sm font-semibold text-white">
                 {user?.name || "User"}
               </p>
-              <p className="text-xs text-white/45">{user?.role}</p>
+
+              <p className="truncate text-xs text-slate-400">
+                {user?.role || user?.email || "Driver"}
+              </p>
             </div>
 
             <ChevronRight
               size={16}
-              className={`text-white/35 transition ${
+              className={`text-slate-500 transition ${
                 isProfileOpen ? "rotate-90" : ""
               }`}
             />

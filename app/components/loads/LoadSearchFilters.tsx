@@ -57,7 +57,7 @@ export default function LoadSearchFilters() {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div className="grid gap-4 md:grid-cols-4">
         <FilterInput
           label="Origin"
@@ -112,7 +112,7 @@ export default function LoadSearchFilters() {
         <button
           type="button"
           onClick={handleSearch}
-          className="mt-7 inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+          className="mt-7 inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
         >
           <Search size={17} />
           Search Loads
@@ -121,7 +121,7 @@ export default function LoadSearchFilters() {
         <button
           type="button"
           onClick={clearFilters}
-          className="mt-7 text-sm font-medium text-blue-600 hover:text-blue-700"
+          className="mt-7 text-sm font-medium text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
         >
           Clear All
         </button>
@@ -145,23 +145,27 @@ function FilterInput({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-medium text-slate-900">
+      <span className="mb-2 block text-sm font-medium text-slate-900 dark:text-slate-200">
         {label}
       </span>
 
-      <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100">
-        <span className="text-slate-500">{icon}</span>
+      <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:focus-within:border-blue-500 dark:focus-within:ring-blue-500/20">
+        <span className="text-slate-500 dark:text-slate-400">{icon}</span>
 
         <input
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-slate-400"
+          className="min-w-0 flex-1 bg-transparent text-slate-900 outline-none placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
         />
 
         {value && (
-          <button type="button" onClick={() => onChange("")}>
-            <X size={16} className="text-slate-400" />
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="text-slate-400 transition hover:text-slate-600 dark:hover:text-slate-200"
+          >
+            <X size={16} />
           </button>
         )}
       </div>

@@ -41,27 +41,28 @@ export default async function TrackLoadPage() {
 
   if (!activeLoad) {
     return (
-      <main className="min-h-screen bg-slate-50 px-6 py-8">
+      <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900 dark:bg-[#0b1120] dark:text-slate-100">
         <div className="mx-auto max-w-7xl">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900"
+            className="inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
           >
             <ArrowLeft size={16} />
             Back to Dashboard
           </Link>
 
-          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-            <h1 className="text-xl font-semibold text-slate-900">
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
               No active load right now
             </h1>
-            <p className="mt-2 text-sm text-slate-500">
+
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Start a booked trip to track it here.
             </p>
 
             <Link
               href="/dashboard/loads/myloads?status=BOOKED"
-              className="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
             >
               Go to My Loads
             </Link>
@@ -74,51 +75,47 @@ export default async function TrackLoadPage() {
   const rate = Number(activeLoad.rate);
 
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-8">
+    <main className="min-h-screen bg-slate-50 px-6 py-8 text-slate-900 dark:bg-[#0b1120] dark:text-slate-100">
       <div className="mx-auto max-w-7xl space-y-6">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900"
+          className="inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
         >
           <ArrowLeft size={16} />
           Back to Dashboard
         </Link>
 
-        {/* HEADER */}
-        <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900">
           <div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-400 dark:text-slate-500">
               Load #{activeLoad.referenceNumber}
             </p>
 
-            <h1 className="mt-1 text-2xl font-semibold text-slate-900">
+            <h1 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">
               {activeLoad.originCity}, {activeLoad.originState} →{" "}
               {activeLoad.destinationCity}, {activeLoad.destinationState}
             </h1>
 
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Currently in transit
             </p>
           </div>
 
-          <span className="w-fit rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700">
+          <span className="w-fit rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">
             IN TRANSIT
           </span>
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-          {/* LEFT */}
           <section className="space-y-6">
-            {/* MAP */}
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <div className="h-[520px]">
                 <LoadMap loadId={activeLoad.id} className="h-full w-full" />
               </div>
             </div>
 
-            {/* TIMELINE */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h2 className="text-sm font-semibold text-slate-900">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
                 Trip Progress
               </h2>
 
@@ -146,10 +143,9 @@ export default async function TrackLoadPage() {
             </div>
           </section>
 
-          {/* RIGHT */}
           <aside className="space-y-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h2 className="text-sm font-semibold text-slate-900">
+            <Card>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
                 Load Details
               </h2>
 
@@ -186,30 +182,32 @@ export default async function TrackLoadPage() {
                   }
                 />
               </div>
-            </div>
+            </Card>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <p className="text-xs text-slate-400">Rate</p>
-              <p className="mt-1 text-2xl font-semibold text-slate-900">
+            <Card>
+              <p className="text-xs text-slate-400 dark:text-slate-500">Rate</p>
+              <p className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">
                 ${rate.toLocaleString()}
               </p>
-            </div>
+            </Card>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <p className="text-xs text-slate-400">Broker</p>
-              <p className="mt-1 font-medium text-slate-900">
-                {activeLoad.broker?.name || "Broker"}
+            <Card>
+              <p className="text-xs text-slate-400 dark:text-slate-500">
+                Broker
               </p>
-              <p className="text-sm text-slate-500">
+              <p className="mt-1 font-medium text-slate-900 dark:text-white">
+                {activeLoad.broker?.firstName || "Broker"}
+              </p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 {activeLoad.broker?.email}
               </p>
-            </div>
+            </Card>
 
             <div className="space-y-3">
               <form action={markDelivered.bind(null, activeLoad.id)}>
                 <button
                   type="submit"
-                  className="w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700"
+                  className="w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-green-700"
                 >
                   Mark Delivered
                 </button>
@@ -217,7 +215,7 @@ export default async function TrackLoadPage() {
 
               <Link
                 href={`/dashboard/loads/search/${activeLoad.id}`}
-                className="block w-full rounded-lg border border-slate-200 px-4 py-2.5 text-center text-sm font-medium text-slate-700 hover:bg-slate-50"
+                className="block w-full rounded-lg border border-slate-200 px-4 py-2.5 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 View Details
               </Link>
@@ -226,6 +224,14 @@ export default async function TrackLoadPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+function Card({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      {children}
+    </div>
   );
 }
 
@@ -244,13 +250,13 @@ function StepCard({
     <div
       className={`rounded-xl border p-4 ${
         active
-          ? "border-blue-200 bg-blue-50"
-          : "border-slate-200 bg-slate-50"
+          ? "border-blue-200 bg-blue-50 dark:border-blue-900/50 dark:bg-blue-950/30"
+          : "border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950"
       }`}
     >
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-1 font-medium text-slate-900">{title}</p>
-      <p className="mt-1 text-sm text-slate-500">{desc}</p>
+      <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="mt-1 font-medium text-slate-900 dark:text-white">{title}</p>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{desc}</p>
     </div>
   );
 }
@@ -266,12 +272,12 @@ function InfoRow({
 }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <div className="flex items-center gap-2 text-slate-500">
+      <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
         {icon}
         <span>{label}</span>
       </div>
 
-      <p className="font-medium text-slate-900">{value}</p>
+      <p className="font-medium text-slate-900 dark:text-white">{value}</p>
     </div>
   );
 }

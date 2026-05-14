@@ -15,7 +15,7 @@ import {
   Truck,
   Weight,
   EyeIcon,
-  FileText
+  FileText,
 } from "lucide-react";
 
 import { bookLoad } from "./action";
@@ -37,8 +37,8 @@ export default async function LoadDetailsPage({
 
   if (!load) {
     return (
-      <div className="min-h-screen bg-slate-50 p-8">
-        <p className="text-slate-700">Load not found.</p>
+      <div className="min-h-screen bg-slate-50 p-8 dark:bg-[#0b1120]">
+        <p className="text-slate-700 dark:text-slate-300">Load not found.</p>
       </div>
     );
   }
@@ -48,33 +48,31 @@ export default async function LoadDetailsPage({
     rate && load.distanceMiles ? (rate / load.distanceMiles).toFixed(2) : null;
 
   return (
-    <main className="min-h-screen bg-slate-50 px-5 py-7 text-slate-900">
+    <main className="min-h-screen bg-slate-50 px-5 py-7 text-slate-900 dark:bg-[#0b1120] dark:text-slate-100">
       <div className="mx-auto max-w-7xl space-y-5">
         <Link
           href="/dashboard/loads/search"
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-blue-950"
+          className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-blue-950 dark:text-slate-400 dark:hover:text-white"
         >
           <ArrowLeft size={16} />
           <BackButton />
         </Link>
 
         <div className="grid gap-5 xl:grid-cols-[1fr_340px]">
-          {/* LEFT */}
           <section className="space-y-5">
-            {/* HERO CARD */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <div className="mb-4 flex items-start justify-between gap-4">
                 <div>
-                  <span className="rounded-md bg-blue-50 px-2 py-1 text-xs font-bold text-blue-700">
+                  <span className="rounded-md bg-blue-50 px-2 py-1 text-xs font-bold text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">
                     LOAD #{load.referenceNumber || load.id.slice(0, 6)}
                   </span>
 
-                  <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-950">
+                  <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
                     {load.originCity}, {load.originState} →{" "}
                     {load.destinationCity}, {load.destinationState}
                   </h1>
 
-                  <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-600">
+                  <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-400">
                     <span className="inline-flex items-center gap-2">
                       <Truck size={16} />
                       {load.equipmentType}
@@ -92,28 +90,26 @@ export default async function LoadDetailsPage({
                   </div>
                 </div>
 
-                <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700">
+                <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-bold text-green-700 dark:bg-green-950/50 dark:text-green-300">
                   {formatStatus(load.status)}
                 </span>
               </div>
             </div>
 
-            {/* MAP */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-base font-semibold text-slate-900">
+                <h2 className="text-base font-semibold text-slate-900 dark:text-white">
                   Route Overview
                 </h2>
               </div>
 
-              <div className="h-[380px] overflow-hidden rounded-xl border border-slate-200">
+              <div className="h-[380px] overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
                 <LoadMap loadId={id} className="h-full w-full" />
               </div>
             </div>
 
-            {/* TIMELINE */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-base font-semibold text-slate-900">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
                 Load Timeline
               </h2>
 
@@ -151,9 +147,8 @@ export default async function LoadDetailsPage({
               </div>
             </div>
 
-            {/* DETAILS */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-base font-semibold text-slate-900">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
                 Load Details
               </h2>
 
@@ -197,34 +192,33 @@ export default async function LoadDetailsPage({
               </div>
             </div>
 
-            {/* NOTES */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-base font-semibold text-slate-900">Notes</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-600">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                Notes
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
                 {load.notes || "No additional notes provided for this load."}
               </p>
             </div>
           </section>
 
-          {/* RIGHT */}
           <aside className="space-y-5">
-            {/* RATE */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-base font-semibold text-slate-900">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
                 Rate & Payment
               </h2>
 
-              <p className="mt-6 text-3xl font-bold text-green-600">
+              <p className="mt-6 text-3xl font-bold text-green-600 dark:text-green-400">
                 ${rate.toLocaleString()}
               </p>
 
               {ratePerMile && (
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   ${ratePerMile} / mi
                 </p>
               )}
 
-              <div className="mt-6 space-y-3 border-t border-slate-100 pt-5 text-sm">
+              <div className="mt-6 space-y-3 border-t border-slate-100 pt-5 text-sm dark:border-slate-800">
                 <SideRow
                   label="Base Rate"
                   value={`$${rate.toLocaleString()}`}
@@ -234,9 +228,8 @@ export default async function LoadDetailsPage({
               </div>
             </div>
 
-            {/* BROKER */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-base font-semibold text-slate-900">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
                 Broker Information
               </h2>
 
@@ -245,23 +238,24 @@ export default async function LoadDetailsPage({
                   {load.broker?.name?.[0] || "B"}
                 </div>
 
-                <div>
-                  <p className="font-semibold text-slate-900">
+                <div className="min-w-0">
+                  <p className="font-semibold text-slate-900 dark:text-white">
                     {load.broker?.name || "Broker"}
                   </p>
-                  <p className="text-sm text-slate-500">{load.broker?.email}</p>
+                  <p className="truncate text-sm text-slate-500 dark:text-slate-400">
+                    {load.broker?.email}
+                  </p>
                 </div>
               </div>
 
-              <button className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-blue-600 hover:bg-slate-50">
+              <button className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
                 <MessageSquare size={16} />
                 Send Message
               </button>
             </div>
 
-            {/* ACTIONS */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-base font-semibold text-slate-900">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
                 Actions
               </h2>
 
@@ -269,38 +263,40 @@ export default async function LoadDetailsPage({
                 <form action={bookLoad.bind(null, load.id)}>
                   <button
                     type="submit"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500"
                   >
                     <Play size={16} />
                     Book Now
                   </button>
                 </form>
 
-                <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-slate-50">
+                <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
                   <Phone size={16} />
                   Call Broker
                 </button>
 
-                <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-slate-50">
+                <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
                   <Bookmark size={16} />
                   Save Load
                 </button>
 
-                <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-slate-50">
+                <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
                   <ShieldAlert size={16} />
                   Report Issue
                 </button>
+
                 <Link
                   href={`/dashboard/loads/search/${load.id}/bol`}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-slate-50"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800"
                 >
                   <FileText size={16} />
                   Fill BOL
                 </Link>
+
                 <Link
                   href={`/dashboard/loads/search/${load.id}/bol/pdf`}
                   target="_blank"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-slate-50"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800"
                 >
                   <EyeIcon size={16} />
                   View BOL
@@ -326,7 +322,7 @@ function TimelineItem({
   color: string;
   title: string;
   location: string;
-  address: string;
+  address: string | null;
   date: string;
 }) {
   return (
@@ -338,12 +334,16 @@ function TimelineItem({
       </div>
 
       <div>
-        <p className="font-semibold text-slate-900">{title}</p>
-        <p className="text-sm text-slate-700">{location}</p>
-        <p className="text-sm text-slate-500">{address}</p>
+        <p className="font-semibold text-slate-900 dark:text-white">{title}</p>
+        <p className="text-sm text-slate-700 dark:text-slate-300">
+          {location}
+        </p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          {address || "No address provided"}
+        </p>
       </div>
 
-      <div className="rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700">
+      <div className="rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 dark:bg-slate-950 dark:text-slate-300">
         {date}
       </div>
     </div>
@@ -360,10 +360,10 @@ function DetailBox({
   value: string;
 }) {
   return (
-    <div className="border-b border-slate-100 pb-4">
-      <div className="mb-2 text-blue-600">{icon}</div>
-      <p className="text-xs text-slate-400">{label}</p>
-      <p className="font-medium text-slate-900">{value}</p>
+    <div className="border-b border-slate-100 pb-4 dark:border-slate-800">
+      <div className="mb-2 text-blue-600 dark:text-blue-400">{icon}</div>
+      <p className="text-xs text-slate-400 dark:text-slate-500">{label}</p>
+      <p className="font-medium text-slate-900 dark:text-white">{value}</p>
     </div>
   );
 }
@@ -371,8 +371,8 @@ function DetailBox({
 function SideRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <p className="text-slate-500">{label}</p>
-      <p className="font-semibold text-slate-900">{value}</p>
+      <p className="text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="font-semibold text-slate-900 dark:text-white">{value}</p>
     </div>
   );
 }
@@ -393,3 +393,4 @@ function formatStatus(status: string) {
     .replace("_", " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
+

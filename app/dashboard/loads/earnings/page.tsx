@@ -68,34 +68,32 @@ export default async function EarningsPage({
   const totalNet = totalGross - totalFees - totalTaxEstimate - totalAdvances;
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 sm:px-6">
+    <main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 sm:px-6 dark:bg-[#0b1120] dark:text-slate-100">
       <div className="space-y-6">
-        {/* HEADER */}
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-950">
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-950 dark:text-white">
               Earnings
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Track your pay, deductions, and delivered load statements.
             </p>
           </div>
 
-          <button className="inline-flex w-fit items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+          <button className="inline-flex w-fit items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">
             <Download size={16} />
             Export CSV
           </button>
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
-          {/* LEFT */}
-          <aside className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="border-b border-slate-200 p-4">
-              <h2 className="text-sm font-semibold text-slate-900">
+          <aside className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="border-b border-slate-200 p-4 dark:border-slate-800">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
                 Pay Statements
               </h2>
 
-              <button className="mt-3 flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">
+              <button className="mt-3 flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
                 2026
                 <ChevronDown size={16} />
               </button>
@@ -111,13 +109,13 @@ export default async function EarningsPage({
                     <Link
                       key={load.id}
                       href={`/dashboard/loads/earnings?loadId=${load.id}`}
-                      className={`block border-b border-slate-100 p-4 hover:bg-slate-50 ${
+                      className={`block border-b border-slate-100 p-4 transition hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/60 ${
                         selectedLoad?.id === load.id
-                          ? "border-l-4 border-l-blue-600 bg-blue-50"
+                          ? "border-l-4 border-l-blue-600 bg-blue-50 dark:bg-blue-950/30"
                           : ""
                       }`}
                     >
-                      <p className="text-sm font-medium text-slate-900">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {formatDate(load.deliveryDate || load.updatedAt)}
                       </p>
 
@@ -133,22 +131,21 @@ export default async function EarningsPage({
                   );
                 })
               ) : (
-                <div className="p-6 text-sm text-slate-500">
+                <div className="p-6 text-sm text-slate-500 dark:text-slate-400">
                   No delivered loads yet.
                 </div>
               )}
             </div>
           </aside>
 
-          {/* CENTER */}
           <section className="min-w-0 space-y-5">
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 md:flex-row md:items-center md:justify-between">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 md:flex-row md:items-center md:justify-between dark:border-slate-800">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                     Statement Details
                   </p>
-                  <h2 className="mt-1 text-lg font-semibold text-slate-950">
+                  <h2 className="mt-1 text-lg font-semibold text-slate-950 dark:text-white">
                     {selectedLoad
                       ? `Load #${selectedLoad.referenceNumber}`
                       : "No statement selected"}
@@ -158,7 +155,7 @@ export default async function EarningsPage({
                 {selectedLoad && (
                   <Link
                     href={`/dashboard/loads/search/${selectedLoad.id}`}
-                    className="w-fit rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-slate-50"
+                    className="w-fit rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800"
                   >
                     View Load
                   </Link>
@@ -175,21 +172,23 @@ export default async function EarningsPage({
                           background: `conic-gradient(
                             #22c55e 0% ${greenPercent}%,
                             #ef4444 ${greenPercent}% ${
-                            greenPercent + redPercent
-                          }%,
+                              greenPercent + redPercent
+                            }%,
                             #e5e7eb ${greenPercent + redPercent}% 100%
                           )`,
                         }}
                       >
-                        <div className="flex h-28 w-28 flex-col items-center justify-center rounded-full bg-white sm:h-36 sm:w-36">
-                          <p className="text-xs text-slate-500">Take Home</p>
-                          <p className="text-xl font-semibold text-green-700 sm:text-2xl">
+                        <div className="flex h-28 w-28 flex-col items-center justify-center rounded-full bg-white sm:h-36 sm:w-36 dark:bg-slate-950">
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Take Home
+                          </p>
+                          <p className="text-xl font-semibold text-green-700 sm:text-2xl dark:text-green-400">
                             ${netPay.toFixed(2)}
                           </p>
                         </div>
                       </div>
 
-                      <div className="mt-4 flex justify-center gap-5 text-xs text-slate-500">
+                      <div className="mt-4 flex justify-center gap-5 text-xs text-slate-500 dark:text-slate-400">
                         <div className="flex items-center gap-2">
                           <span className="h-2 w-2 rounded-full bg-green-500" />
                           Take Home
@@ -202,8 +201,10 @@ export default async function EarningsPage({
                     </div>
 
                     <div className="min-w-0">
-                      <p className="text-sm text-slate-500">Route</p>
-                      <h3 className="mt-1 break-words text-lg font-semibold text-slate-950 sm:text-xl">
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Route
+                      </p>
+                      <h3 className="mt-1 break-words text-lg font-semibold text-slate-950 sm:text-xl dark:text-white">
                         {selectedLoad.originCity}, {selectedLoad.originState} →{" "}
                         {selectedLoad.destinationCity},{" "}
                         {selectedLoad.destinationState}
@@ -262,33 +263,32 @@ export default async function EarningsPage({
                   </div>
                 </>
               ) : (
-                <div className="p-10 text-center text-sm text-slate-500">
+                <div className="p-10 text-center text-sm text-slate-500 dark:text-slate-400">
                   Delivered loads will appear here once completed.
                 </div>
               )}
             </div>
 
-            {/* HISTORY */}
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="flex flex-col gap-3 border-b border-slate-200 p-4 md:flex-row md:items-center md:justify-between">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <div className="flex flex-col gap-3 border-b border-slate-200 p-4 md:flex-row md:items-center md:justify-between dark:border-slate-800">
                 <div>
-                  <h2 className="text-sm font-semibold text-slate-900">
+                  <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
                     Earnings History
                   </h2>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                     Completed load payouts and payment status.
                   </p>
                 </div>
 
                 <input
                   placeholder="Search loads..."
-                  className="w-full rounded-lg border border-slate-200 py-2 pl-3 pr-3 text-sm outline-none focus:border-blue-400 md:w-72"
+                  className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-3 pr-3 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 md:w-72 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500"
                 />
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[850px] text-left text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+                  <thead className="bg-slate-50 text-xs uppercase text-slate-500 dark:bg-slate-950 dark:text-slate-400">
                     <tr>
                       <th className="px-5 py-3 font-medium">Load #</th>
                       <th className="px-5 py-3 font-medium">Route</th>
@@ -309,33 +309,33 @@ export default async function EarningsPage({
                         return (
                           <tr
                             key={load.id}
-                            className="border-t border-slate-100 hover:bg-slate-50"
+                            className="border-t border-slate-100 transition hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/60"
                           >
-                            <td className="px-5 py-4 font-medium text-slate-900">
+                            <td className="px-5 py-4 font-medium text-slate-900 dark:text-white">
                               {load.referenceNumber}
                             </td>
-                            <td className="px-5 py-4 text-slate-600">
+                            <td className="px-5 py-4 text-slate-600 dark:text-slate-400">
                               {load.originCity}, {load.originState}
                               <br />
-                              <span className="text-xs text-slate-400">
+                              <span className="text-xs text-slate-400 dark:text-slate-500">
                                 → {load.destinationCity},{" "}
                                 {load.destinationState}
                               </span>
                             </td>
-                            <td className="px-5 py-4 text-slate-600">
+                            <td className="px-5 py-4 text-slate-600 dark:text-slate-400">
                               {formatDate(load.pickupDate)}
                             </td>
-                            <td className="px-5 py-4 text-slate-600">
+                            <td className="px-5 py-4 text-slate-600 dark:text-slate-400">
                               {formatDate(load.deliveryDate)}
                             </td>
-                            <td className="px-5 py-4 font-medium">
+                            <td className="px-5 py-4 font-medium text-slate-900 dark:text-white">
                               ${gross.toFixed(2)}
                             </td>
-                            <td className="px-5 py-4 font-medium">
+                            <td className="px-5 py-4 font-medium text-slate-900 dark:text-white">
                               ${net.toFixed(2)}
                             </td>
                             <td className="px-5 py-4">
-                              <span className="rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
+                              <span className="rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-950/50 dark:text-green-300">
                                 PAID
                               </span>
                             </td>
@@ -346,7 +346,7 @@ export default async function EarningsPage({
                       <tr>
                         <td
                           colSpan={7}
-                          className="px-5 py-10 text-center text-slate-500"
+                          className="px-5 py-10 text-center text-slate-500 dark:text-slate-400"
                         >
                           No earnings history yet.
                         </td>
@@ -358,10 +358,9 @@ export default async function EarningsPage({
             </div>
           </section>
 
-          {/* RIGHT */}
           <aside className="space-y-5">
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h2 className="text-sm font-semibold text-slate-900">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
                 Earnings Summary
               </h2>
 
@@ -393,8 +392,8 @@ export default async function EarningsPage({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h2 className="text-sm font-semibold text-slate-900">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
                 Tax Documents
               </h2>
 
@@ -414,17 +413,19 @@ export default async function EarningsPage({
 function MiniPay({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[11px] text-slate-500">{label}</p>
-      <p className="mt-1 truncate font-medium text-slate-900">{value}</p>
+      <p className="text-[11px] text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="mt-1 truncate font-medium text-slate-900 dark:text-white">
+        {value}
+      </p>
     </div>
   );
 }
 
 function InfoCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-1 truncate text-sm font-medium text-slate-900">
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950">
+      <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="mt-1 truncate text-sm font-medium text-slate-900 dark:text-white">
         {value}
       </p>
     </div>
@@ -443,15 +444,15 @@ function PayBreakdownRow({
   strong?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white px-4 py-3">
-      <p className="text-sm text-slate-600">{label}</p>
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-950">
+      <p className="text-sm text-slate-600 dark:text-slate-400">{label}</p>
       <p
         className={`shrink-0 text-sm ${
           strong
-            ? "font-semibold text-green-700"
+            ? "font-semibold text-green-700 dark:text-green-400"
             : negative
-              ? "font-medium text-red-600"
-              : "font-medium text-slate-900"
+              ? "font-medium text-red-600 dark:text-red-400"
+              : "font-medium text-slate-900 dark:text-white"
         }`}
       >
         {value}
@@ -472,15 +473,15 @@ function SummaryRow({
   strong?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3 last:border-0">
-      <p className="text-sm text-slate-500">{label}</p>
+    <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3 last:border-0 dark:border-slate-800">
+      <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
       <p
         className={`shrink-0 text-sm ${
           strong
-            ? "font-semibold text-green-700"
+            ? "font-semibold text-green-700 dark:text-green-400"
             : negative
-              ? "font-medium text-red-600"
-              : "font-medium text-slate-900"
+              ? "font-medium text-red-600 dark:text-red-400"
+              : "font-medium text-slate-900 dark:text-white"
         }`}
       >
         {value}
@@ -491,13 +492,15 @@ function SummaryRow({
 
 function TaxRow({ title }: { title: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-3 py-3">
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-3 py-3 transition hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800">
       <div className="flex min-w-0 items-center gap-2">
-        <FileText size={16} className="shrink-0 text-blue-600" />
-        <p className="truncate text-sm font-medium text-slate-700">{title}</p>
+        <FileText size={16} className="shrink-0 text-blue-600 dark:text-blue-400" />
+        <p className="truncate text-sm font-medium text-slate-700 dark:text-slate-200">
+          {title}
+        </p>
       </div>
 
-      <Download size={15} className="shrink-0 text-slate-400" />
+      <Download size={15} className="shrink-0 text-slate-400 dark:text-slate-500" />
     </div>
   );
 }
