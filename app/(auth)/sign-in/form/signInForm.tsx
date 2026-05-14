@@ -44,61 +44,73 @@ const SignInForm = () => {
   };
 
   return (
-    <div className="min-h-screen grid md:grid-cols-2 bg-white">
+    <div className="grid min-h-screen bg-white md:grid-cols-2">
       {/* LEFT */}
-      <div className="hidden md:flex relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 text-white items-center justify-center p-12">
+      <div className="relative hidden items-center justify-center overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 p-12 text-white md:flex">
         <div className="absolute inset-0 bg-black/10" />
 
         <div className="relative max-w-md text-center">
           <div className="mx-auto mb-8 flex justify-center">
-            <div className="mx-auto mb-8 flex justify-center">
-              <Image
-                src={mini_logo}
-                alt="SwiftShift logo"
-                className="w-28 h-auto object-contain"
-                priority
-              />
-            </div>
+            <Image
+              src={mini_logo}
+              alt="SwiftShift logo"
+              className="h-auto w-28 object-contain"
+              priority
+            />
           </div>
 
           <h2 className="text-4xl font-bold tracking-tight">SwiftShift</h2>
+
           <p className="mt-4 text-base leading-7 text-blue-100">
             Move freight faster with smarter tools built for modern carriers.
           </p>
 
           <div className="mt-10 grid grid-cols-3 gap-3 text-left">
-            <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/15">
+            <div className="rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur-sm">
               <p className="text-sm font-semibold">Live Loads</p>
             </div>
-            <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/15">
+
+            <div className="rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur-sm">
               <p className="text-sm font-semibold">Fast Booking</p>
             </div>
-            <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/15">
+
+            <div className="rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur-sm">
               <p className="text-sm font-semibold">Real Tracking</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Right */}
-      <div className="flex items-center justify-center px-6 py-12 sm:px-10 md:px-14">
+      {/* RIGHT */}
+      <div className="flex items-center justify-center px-6 py-10 sm:px-10 md:px-14">
         <div className="w-full max-w-md">
-          <div className="mb-8 md:hidden flex items-center gap-3">
+          <Link
+            href="/"
+            className="mb-8 inline-flex items-center rounded-full border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-50"
+          >
+            ← Back to Home
+          </Link>
+
+          <div className="mb-8 flex items-center gap-3 md:hidden">
             <Image
               src={mini_logo}
               alt="SwiftShift logo"
-              className="w-10 h-auto object-contain"
+              className="h-auto w-10 object-contain"
               priority
             />
+
+            <p className="text-lg font-bold text-zinc-900">SwiftShift</p>
           </div>
 
           <div className="mb-8">
             <p className="text-sm font-medium uppercase tracking-[0.2em] text-blue-600">
               Welcome back
             </p>
+
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900">
               Sign in to your account
             </h1>
+
             <p className="mt-2 text-sm text-zinc-500">
               Enter your email and password to continue.
             </p>
@@ -109,6 +121,7 @@ const SignInForm = () => {
               <label className="mb-2 block text-sm font-medium text-zinc-700">
                 Email
               </label>
+
               <input
                 type="email"
                 value={form.email}
@@ -124,6 +137,7 @@ const SignInForm = () => {
                 <label className="block text-sm font-medium text-zinc-700">
                   Password
                 </label>
+
                 <Link
                   href="/forgot-password"
                   className="text-sm font-medium text-blue-600 hover:text-blue-700"
@@ -159,11 +173,13 @@ const SignInForm = () => {
           </form>
 
           <div className="my-8 flex items-center gap-4">
-            <div className="h-px flex-1 bg-zinc-200"></div>
+            <div className="h-px flex-1 bg-zinc-200" />
+
             <p className="whitespace-nowrap text-sm text-zinc-500">
               New to SwiftShift?
             </p>
-            <div className="h-px flex-1 bg-zinc-200"></div>
+
+            <div className="h-px flex-1 bg-zinc-200" />
           </div>
 
           <Link

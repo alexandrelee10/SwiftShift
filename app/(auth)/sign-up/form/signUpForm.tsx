@@ -80,9 +80,9 @@ const SignUpForm = () => {
   };
 
   return (
-    <div className="min-h-screen grid md:grid-cols-2 bg-white">
+    <div className="grid min-h-screen bg-white md:grid-cols-2">
       {/* LEFT */}
-      <div className="hidden md:flex relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 text-white items-center justify-center p-12">
+      <div className="relative hidden items-center justify-center overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 p-12 text-white md:flex">
         <div className="absolute inset-0 bg-black/10" />
 
         <div className="relative max-w-md text-center">
@@ -90,12 +90,13 @@ const SignUpForm = () => {
             <Image
               src={mini_logo}
               alt="SwiftShift logo"
-              className="w-28 h-auto object-contain"
+              className="h-auto w-28 object-contain"
               priority
             />
           </div>
 
           <h2 className="text-4xl font-bold tracking-tight">SwiftShift</h2>
+
           <p className="mt-4 text-base leading-7 text-blue-100">
             Create your account and start moving freight with smarter tools built
             for modern carriers.
@@ -105,9 +106,11 @@ const SignUpForm = () => {
             <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/15">
               <p className="text-sm font-semibold">Live Loads</p>
             </div>
+
             <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/15">
               <p className="text-sm font-semibold">Fast Booking</p>
             </div>
+
             <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/15">
               <p className="text-sm font-semibold">Real Tracking</p>
             </div>
@@ -116,39 +119,51 @@ const SignUpForm = () => {
       </div>
 
       {/* RIGHT */}
-      <div className="flex items-center justify-center px-6 py-12 sm:px-10 md:px-14">
+      <div className="flex items-center justify-center px-6 py-10 sm:px-10 md:px-14">
         <div className="w-full max-w-md">
-          <div className="mb-8 md:hidden flex items-center gap-3">
+          {/* Back button */}
+          <Link
+            href="/"
+            className="mb-8 inline-flex items-center rounded-full border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-50"
+          >
+            ← Back to Home
+          </Link>
+
+          {/* Mobile logo */}
+          <div className="mb-8 flex items-center gap-3 md:hidden">
             <Image
               src={mini_logo}
               alt="SwiftShift logo"
-              className="w-10 h-auto object-contain"
+              className="h-auto w-10 object-contain"
               priority
             />
+
+            <p className="text-lg font-bold text-zinc-900">SwiftShift</p>
           </div>
-          
-          {/* Left */}
 
           {/* Top */}
           <div className="mb-8">
             <p className="text-sm font-medium uppercase tracking-[0.2em] text-blue-600">
               Get started
             </p>
+
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900">
               Create your account
             </h1>
+
             <p className="mt-2 text-sm text-zinc-500">
               Enter your details below to create your SwiftShift account.
             </p>
           </div>
-          
-          {/* Left Bottom */}
+
+          {/* Form */}
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm font-medium text-zinc-700">
                   First Name
                 </label>
+
                 <input
                   name="firstName"
                   value={form.firstName}
@@ -161,6 +176,7 @@ const SignUpForm = () => {
                   }`}
                   required
                 />
+
                 {fieldErrors.firstName && (
                   <p className="mt-1 text-sm text-red-500">
                     {fieldErrors.firstName}
@@ -172,6 +188,7 @@ const SignUpForm = () => {
                 <label className="mb-2 block text-sm font-medium text-zinc-700">
                   Last Name
                 </label>
+
                 <input
                   name="lastName"
                   value={form.lastName}
@@ -184,6 +201,7 @@ const SignUpForm = () => {
                   }`}
                   required
                 />
+
                 {fieldErrors.lastName && (
                   <p className="mt-1 text-sm text-red-500">
                     {fieldErrors.lastName}
@@ -196,6 +214,7 @@ const SignUpForm = () => {
               <label className="mb-2 block text-sm font-medium text-zinc-700">
                 Email
               </label>
+
               <input
                 name="email"
                 type="email"
@@ -209,8 +228,11 @@ const SignUpForm = () => {
                 }`}
                 required
               />
+
               {fieldErrors.email && (
-                <p className="mt-1 text-sm text-red-500">{fieldErrors.email}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {fieldErrors.email}
+                </p>
               )}
             </div>
 
@@ -218,6 +240,7 @@ const SignUpForm = () => {
               <label className="mb-2 block text-sm font-medium text-zinc-700">
                 Phone Number
               </label>
+
               <input
                 name="phoneNum"
                 value={form.phoneNum}
@@ -230,6 +253,7 @@ const SignUpForm = () => {
                 }`}
                 required
               />
+
               {fieldErrors.phoneNum && (
                 <p className="mt-1 text-sm text-red-500">
                   {fieldErrors.phoneNum}
@@ -241,6 +265,7 @@ const SignUpForm = () => {
               <label className="mb-2 block text-sm font-medium text-zinc-700">
                 Password
               </label>
+
               <input
                 name="password"
                 type="password"
@@ -254,6 +279,7 @@ const SignUpForm = () => {
                 }`}
                 required
               />
+
               {fieldErrors.password && (
                 <p className="mt-1 text-sm text-red-500">
                   {fieldErrors.password}
@@ -279,9 +305,11 @@ const SignUpForm = () => {
 
           <div className="my-8 flex items-center gap-4">
             <div className="h-px flex-1 bg-zinc-200"></div>
+
             <p className="whitespace-nowrap text-sm text-zinc-500">
               Already have an account?
             </p>
+
             <div className="h-px flex-1 bg-zinc-200"></div>
           </div>
 
