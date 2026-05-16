@@ -42,8 +42,8 @@ export default function LandingFooter() {
               <Link href="/products/authority-program" className="transition hover:text-white">
                 Authority Program
               </Link>
-              <Link href="/products/tracking" className="transition hover:text-white">
-                Tracking
+              <Link href="/products/product-review" className="transition hover:text-white">
+                Product Reviews
               </Link>
               <Link href="/products/documents" className="transition hover:text-white">
                 Documents
