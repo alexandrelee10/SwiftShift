@@ -1,56 +1,10 @@
 import Link from "next/link";
-import Image from "next/image"
-import LightLogo from "@/public/assets/main-logo/logoLight.svg"
-import {
-  ArrowRight,
-  BarChart3,
-  CreditCard,
-  MapPinned,
-  PackageSearch,
-  ShieldCheck,
-  Truck,
-} from "lucide-react";
+import { ArrowRight, CreditCard, MapPinned, PackageSearch, ShieldCheck, Truck } from "lucide-react";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-white text-slate-950">
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Image
-            src={LightLogo}
-            alt="SwiftShift logo"
-            width={215}
-            height={56}
-            priority
-            className="h-auto w-[215px] object-contain"
-          />
-
-          <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-700 md:flex">
-            <Link href="#">Products</Link>
-            <Link href="#">Solutions</Link>
-            <Link href="#">Resources</Link>
-            <Link href="#">Contact</Link>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/sign-in"
-              className="hidden text-sm font-semibold text-slate-700 md:block"
-            >
-              Login
-            </Link>
-
-            <Link
-              href="/sign-up"
-              className="rounded-full bg-blue-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-blue-800"
-            >
-              Sign up
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <section className="bg-[#061b3a] text-white">
+    <>
+      <section id="home" className="scroll-mt-24 bg-[#061b3a] text-white">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-20 lg:grid-cols-2 lg:py-28">
           <div>
             <p className="mb-5 inline-flex rounded-full bg-blue-500/20 px-4 py-2 text-sm font-bold text-blue-200">
@@ -74,12 +28,12 @@ export default function HomePage() {
                 Get started <ArrowRight size={18} />
               </Link>
 
-              <Link
-                href="/dashboard/loads/search"
+              <a
+                href="#load-board"
                 className="inline-flex items-center justify-center rounded-full border border-white/25 px-7 py-3.5 text-sm font-black text-white transition hover:bg-white/10"
               >
                 View load board
-              </Link>
+              </a>
             </div>
           </div>
 
@@ -131,7 +85,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-6 py-16 md:grid-cols-3">
+      <section
+        id="solutions"
+        className="mx-auto grid max-w-7xl scroll-mt-24 gap-5 px-6 py-16 md:grid-cols-3"
+      >
         {[
           {
             role: "Carrier",
@@ -162,6 +119,7 @@ export default function HomePage() {
               </p>
               <h3 className="mt-2 text-3xl font-black">{card.role}</h3>
               <p className="mt-4 leading-7 text-slate-600">{card.text}</p>
+
               <Link
                 href="/sign-up"
                 className="mt-6 inline-flex items-center gap-2 font-black text-blue-700"
@@ -190,7 +148,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-20">
+      <section
+        id="load-board"
+        className="mx-auto max-w-7xl scroll-mt-24 px-6 py-20"
+      >
         <div className="max-w-2xl">
           <p className="font-black uppercase tracking-wide text-blue-700">
             End-to-end tools
@@ -245,13 +206,6 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
-
-      <footer className="bg-slate-950 px-6 py-10 text-slate-400">
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 md:flex-row">
-          <p className="font-black text-white">SwiftShift</p>
-          <p className="text-sm">© 2026 SwiftShift. Built for freight teams.</p>
-        </div>
-      </footer>
-    </main>
+    </>
   );
 }
