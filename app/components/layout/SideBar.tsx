@@ -197,7 +197,7 @@ export default function Sidebar({
                 onClick={() =>
                   signOut({
                     callbackUrl:
-                      "/sign-in",
+                      "/",
                   })
                 }
                 className="w-full rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-300 transition hover:bg-red-500/10 hover:text-red-200"
