@@ -32,11 +32,32 @@ export default function LandingFooter() {
 
           <div>
             <h3 className="text-sm font-black uppercase tracking-wide text-white">
+              About Us
+            </h3>
+
+            <div className="mt-5 flex flex-col gap-3 text-sm">
+              <Link href="/about-us/history" className="transition hover:text-white">
+                History
+              </Link>
+              <Link href="/about-us/careers" className="transition hover:text-white">
+                Careers
+              </Link>
+              <Link href="/solutions/dispatchers" className="transition hover:text-white">
+                Leadership
+              </Link>
+              <Link href="/about-us/become-a-partner" className="transition hover:text-white">
+                Become a partner
+              </Link>
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-sm font-black uppercase tracking-wide text-white">
               Product
             </h3>
 
             <div className="mt-5 flex flex-col gap-3 text-sm">
-              <Link href="/products/load-board" className="transition hover:text-white">
+              <Link href="/" className="transition hover:text-white">
                 Load Board
               </Link>
               <Link href="/products/authority-program" className="transition hover:text-white">
@@ -45,32 +66,13 @@ export default function LandingFooter() {
               <Link href="/products/product-review" className="transition hover:text-white">
                 Product Reviews
               </Link>
-              <Link href="/products/documents" className="transition hover:text-white">
-                Documents
+              <Link href="/products/quickpay" className="transition hover:text-white">
+                QuickPay
               </Link>
             </div>
           </div>
 
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-wide text-white">
-              Solutions
-            </h3>
 
-            <div className="mt-5 flex flex-col gap-3 text-sm">
-              <Link href="/solutions/carriers" className="transition hover:text-white">
-                Carriers
-              </Link>
-              <Link href="/solutions/brokers" className="transition hover:text-white">
-                Brokers
-              </Link>
-              <Link href="/solutions/dispatchers" className="transition hover:text-white">
-                Dispatchers
-              </Link>
-              <Link href="/solutions/owner-operators" className="transition hover:text-white">
-                Owner Operators
-              </Link>
-            </div>
-          </div>
 
           <div>
             <h3 className="text-sm font-black uppercase tracking-wide text-white">
