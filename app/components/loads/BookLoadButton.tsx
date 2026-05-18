@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { bookLoad } from "@/app/dashboard/loads/search/[id]/action";
+import { bookLoad } from "@/app/(driver)/dashboard/loads/search/[id]/action";
 
 export default function BookLoadButton({ loadId }: { loadId: string }) {
   const [isPending, startTransition] = useTransition();
