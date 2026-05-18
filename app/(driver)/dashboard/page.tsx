@@ -3,8 +3,9 @@ import prisma from "@/lib/prisma";
 import { Truck, CircleCheckBig, Landmark, FuelIcon } from "lucide-react";
 import LoadMap from "../../components/loads/LoadMap";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default async function DashboardPage() {
+export default async function DriverDashboardPage() {
   const session = await requireUser();
 
   if (!session.user?.email) {
@@ -20,6 +21,10 @@ export default async function DashboardPage() {
   if (!dbUser) {
     throw new Error("User not found");
   }
+
+  if (session.user.role !== "DRIVER") {
+  redirect("/unauthorized");
+}
 
   const upcomingLoads = await prisma.load.findMany({
     where: {

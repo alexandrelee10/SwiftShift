@@ -15,6 +15,7 @@ enum UserRole {
   ADMIN
   BROKER
   DRIVER
+  DISPATCH
 }
 
 enum LoadStatus {

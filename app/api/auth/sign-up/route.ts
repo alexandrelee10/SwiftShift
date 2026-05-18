@@ -14,7 +14,7 @@ export async function POST (req: Request) {
         );
     };
 
-    const { firstName, lastName, email, phoneNum, password} = validation.data
+    const { firstName, lastName, email, phoneNum, password, role} = validation.data
 
     const existingUser = await prisma.user.findUnique({
         where: { email }
@@ -36,7 +36,7 @@ export async function POST (req: Request) {
             email: email,
             phoneNum: phoneNum,
             password: hashed,
-            role: "DRIVER" // fix later
+            role, 
         },
     });
 
