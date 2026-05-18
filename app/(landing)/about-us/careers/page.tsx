@@ -290,7 +290,7 @@ export default function CareersPage() {
                     </div>
 
                     <Link
-                      href="/company/contact"
+                      href="/contact"
                       className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-700 px-6 py-3 text-sm font-black text-white transition hover:bg-blue-800"
                     >
                       Apply now <ArrowRight size={17} />
@@ -332,7 +332,7 @@ export default function CareersPage() {
           </div>
 
           <Link
-            href="/company/contact"
+            href="/contact"
             className="rounded-full bg-white px-7 py-3.5 text-sm font-black text-blue-700 transition hover:bg-slate-100"
           >
             Contact us

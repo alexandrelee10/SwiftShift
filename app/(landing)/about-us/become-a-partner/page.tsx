@@ -80,7 +80,7 @@ export default function BecomePartnerPage() {
 
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <Link
-                href="/company/contact"
+                href="/contact"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-700 px-7 py-3.5 text-sm font-black text-white transition hover:bg-blue-800"
               >
                 Start partnership <ArrowRight size={18} />
@@ -249,7 +249,7 @@ export default function BecomePartnerPage() {
             </p>
 
             <Link
-              href="/company/contact"
+              href="/contact"
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-black text-blue-700 transition hover:bg-slate-100"
             >
               Contact partnerships <ArrowRight size={18} />

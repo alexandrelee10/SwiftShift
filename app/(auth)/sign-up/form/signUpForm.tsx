@@ -3,8 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
-import mini_logo from "@/public/assets/main-logo/mini-logo.svg";
 import Link from "next/link";
+
+import DarkLogo from "@/public/assets/main-logo/logoDark.svg"
 
 const SignUpForm = () => {
   const router = useRouter();
@@ -88,14 +89,12 @@ const SignUpForm = () => {
         <div className="relative max-w-md text-center">
           <div className="mx-auto mb-8 flex justify-center">
             <Image
-              src={mini_logo}
+              src={DarkLogo}
               alt="SwiftShift logo"
-              className="h-auto w-28 object-contain"
+              className="object-contain"
               priority
             />
           </div>
-
-          <h2 className="text-4xl font-bold tracking-tight">SwiftShift</h2>
 
           <p className="mt-4 text-base leading-7 text-blue-100">
             Create your account and start moving freight with smarter tools built
@@ -132,7 +131,7 @@ const SignUpForm = () => {
           {/* Mobile logo */}
           <div className="mb-8 flex items-center gap-3 md:hidden">
             <Image
-              src={mini_logo}
+              src={DarkLogo}
               alt="SwiftShift logo"
               className="h-auto w-10 object-contain"
               priority

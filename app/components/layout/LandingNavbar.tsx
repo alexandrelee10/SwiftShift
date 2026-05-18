@@ -14,7 +14,7 @@ export default function LandingNavbar() {
     {
       label: "Products",
       items: [
-        { name: "Load Board", href: "/products/load-board" },
+        { name: "Load Board", href: "/" },
         { name: "Authority Program", href: "/products/authority-program" },
         { name: "Product Reviews", href: "/products/product-review" },
         { name: "QuickPay", href: "/products/quickpay" },
@@ -32,9 +32,9 @@ export default function LandingNavbar() {
     {
       label: "Resources",
       items: [
-        { name: "Safety & Compliance", href: "/resources/safety-compliance" },
-        { name: "Broker Verification", href: "/resources/broker-verification" },
-        { name: "Rate Guide", href: "/resources/rate-guide" },
+        { name: "Safety & Compliance", href: "/resources/safety" },
+        { name: "FAQ", href: "/resources/faq" },
+        { name: "Blog", href: "/resources/blog" },
         { name: "Help Center", href: "/resources/help-center" },
       ],
     },
@@ -86,7 +86,7 @@ export default function LandingNavbar() {
           ))}
 
           <Link
-            href="/company/contact"
+            href="/contact"
             className="transition hover:text-blue-700"
           >
             Contact

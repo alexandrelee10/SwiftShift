@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
 import mini_logo from "@/public/assets/main-logo/mini-logo.svg";
+import DarkLogo from "@/public/assets/main-logo/logoDark.svg"
 import Link from "next/link";
 
 const SignInForm = () => {
@@ -52,14 +53,13 @@ const SignInForm = () => {
         <div className="relative max-w-md text-center">
           <div className="mx-auto mb-8 flex justify-center">
             <Image
-              src={mini_logo}
+              src={DarkLogo}
               alt="SwiftShift logo"
-              className="h-auto w-28 object-contain"
+              className="object-contain"
               priority
             />
           </div>
 
-          <h2 className="text-4xl font-bold tracking-tight">SwiftShift</h2>
 
           <p className="mt-4 text-base leading-7 text-blue-100">
             Move freight faster with smarter tools built for modern carriers.
@@ -93,13 +93,12 @@ const SignInForm = () => {
 
           <div className="mb-8 flex items-center gap-3 md:hidden">
             <Image
-              src={mini_logo}
+              src={DarkLogo}
               alt="SwiftShift logo"
               className="h-auto w-10 object-contain"
               priority
             />
 
-            <p className="text-lg font-bold text-zinc-900">SwiftShift</p>
           </div>
 
           <div className="mb-8">

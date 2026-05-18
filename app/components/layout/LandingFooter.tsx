@@ -42,7 +42,7 @@ export default function LandingFooter() {
               <Link href="/about-us/careers" className="transition hover:text-white">
                 Careers
               </Link>
-              <Link href="/solutions/dispatchers" className="transition hover:text-white">
+              <Link href="/about-us/leadership" className="transition hover:text-white">
                 Leadership
               </Link>
               <Link href="/about-us/become-a-partner" className="transition hover:text-white">
@@ -80,14 +80,14 @@ export default function LandingFooter() {
             </h3>
 
             <div className="mt-5 flex flex-col gap-3 text-sm">
-              <Link href="/resources/safety-compliance" className="transition hover:text-white">
+              <Link href="/resources/safety" className="transition hover:text-white">
                 Safety & Compliance
               </Link>
-              <Link href="/resources/broker-verification" className="transition hover:text-white">
-                Broker Verification
+              <Link href="/resources/faq" className="transition hover:text-white">
+                FAQ
               </Link>
-              <Link href="/resources/rate-guide" className="transition hover:text-white">
-                Rate Guide
+              <Link href="/resources/blog" className="transition hover:text-white">
+                Blog
               </Link>
               <Link href="/resources/help-center" className="transition hover:text-white">
                 Help Center
@@ -108,7 +108,7 @@ export default function LandingFooter() {
             <Link href="/company/privacy" className="transition hover:text-white">
               Privacy
             </Link>
-            <Link href="/company/contact" className="transition hover:text-white">
+            <Link href="/contact" className="transition hover:text-white">
               Contact
             </Link>
           </div>
