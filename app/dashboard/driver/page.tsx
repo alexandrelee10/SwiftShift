@@ -1,7 +1,7 @@
 import { requireUser } from "@/lib/requireUser";
 import prisma from "@/lib/prisma";
 import { Truck, CircleCheckBig, Landmark, FuelIcon } from "lucide-react";
-import LoadMap from "../../components/loads/LoadMap";
+import LoadMap from "../../components/driver/loads/LoadMap";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 

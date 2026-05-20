@@ -24,27 +24,27 @@ import DarkLogo from "@/public/assets/main-logo/logoDark.svg";
 const sidebarSections = [
   {
     links: [
-      { name: "Dashboard", href: "/dashboard", icon: Home },
-      { name: "Find Loads", href: "/dashboard/loads/search", icon: Search },
-      { name: "My Loads", href: "/dashboard/loads/myloads", icon: Package },
+      { name: "Dashboard", href: "/dashboard/driver", icon: Home },
+      { name: "Find Loads", href: "/dashboard/driver/loads/search", icon: Search },
+      { name: "My Loads", href: "/dashboard/driver/loads/myloads", icon: Package },
       {
         name: "Documents",
-        href: "/dashboard/loads/documents",
+        href: "/dashboard/driver/loads/documents",
         icon: FilesIcon,
       },
       {
         name: "Earnings",
-        href: "/dashboard/loads/earnings",
+        href: "/dashboard/driver/loads/earnings",
         icon: Banknote,
       },
       {
         name: "Fuel Card",
-        href: "/dashboard/loads/fuelcards",
+        href: "/dashboard/driver/loads/fuelcards",
         icon: CreditCardIcon,
       },
       {
         name: "Settings",
-        href: "/dashboard/loads/settings",
+        href: "/dashboard/driver/loads/settings",
         icon: Settings,
       },
     ],

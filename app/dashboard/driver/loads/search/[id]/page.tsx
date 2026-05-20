@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import LoadMap from "@/app/components/loads/LoadMap";
+import LoadMap from "@/app/components/driver/loads/LoadMap";
 import Link from "next/link";
 import {
   ArrowLeft,

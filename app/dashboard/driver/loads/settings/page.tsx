@@ -19,8 +19,8 @@ import { updatePreferences, deleteAccount, saveSettings } from "./action";
 
 import Link from "next/link";
 import { SubmitButton } from "@/app/components/shared/SubmitButton";
-import ProfilePhotoChanger from "@/app/components/profile/ProfileImageUpload";
-import { ThemeButton } from "@/app/components/settings/SettingsTabs";
+import ProfilePhotoChanger from "@/app/components/driver/profile/ProfileImageUpload";
+import { ThemeButton } from "@/app/components/driver/settings/SettingsTabs";
 import { Switch } from "@/app/components/shared/Switch";
 
 const tabs = [
@@ -81,7 +81,7 @@ export default async function SettingsPage({
             {tabs.map((tab) => (
               <Link
                 key={tab.value}
-                href={`/dashboard/loads/settings?tab=${tab.value}`}
+                href={`/dashboard/driver/loads/settings?tab=${tab.value}`}
                 className={`whitespace-nowrap border-b-2 pb-3 transition ${
                   activeTab === tab.value
                     ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"

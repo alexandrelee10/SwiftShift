@@ -1,6 +1,6 @@
 import { requireUser } from "@/lib/requireUser";
 import prisma from "@/lib/prisma";
-import LoadMap from "@/app/components/loads/LoadMap";
+import LoadMap from "@/app/components/driver/loads/LoadMap";
 import Link from "next/link";
 import { ArrowLeft, Box, MapPin, Truck, Weight } from "lucide-react";
 import { markDelivered } from "../myloads/action";

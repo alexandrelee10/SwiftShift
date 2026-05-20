@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
-import LoadSearchFilters from "@/app/components/loads/LoadSearchFilters";
-import LoadMap from "@/app/components/loads/LoadMap";
+import LoadSearchFilters from "@/app/components/driver/loads/LoadSearchFilters";
+import LoadMap from "@/app/components/driver/loads/LoadMap";
 import Link from "next/link";
 import {
   Bookmark,
@@ -16,7 +16,7 @@ import {
   Truck,
   Weight,
 } from "lucide-react";
-import BookLoadButton from "@/app/components/loads/BookLoadButton";
+import BookLoadButton from "@/app/components/driver/loads/BookLoadButton";
 
 type SearchParams = {
   origin?: string;
