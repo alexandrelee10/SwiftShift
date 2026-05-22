@@ -17,6 +17,11 @@ import {
   X,
   ChevronRight,
   User,
+  Users2Icon,
+  TruckIcon,
+  ChartLine,
+  LandmarkIcon
+  
 } from "lucide-react";
 
 import DarkLogo from "@/public/assets/main-logo/logoDark.svg";
@@ -26,42 +31,42 @@ const sidebarSections = [
     links: [
       { 
         name: "Dashboard", 
-        href: "/dashboard/driver", 
+        href: "/dashboard", 
         icon: Home 
       },
       { 
-        name: "Loads", 
-        href: "/dashboard/broker/loads", 
-        icon: Search 
+        name: "Load", 
+        href: "/dashboard/broker/loads/load", 
+        icon: Package
       },
       { 
         name: "Drivers", 
-        href: "/dashboard/broker/driver", 
-        icon: Package 
+        href: "/dashboard/broker/loads/driver", 
+        icon: User 
       },
       { 
         name: "Dispatch", 
-        href: "/dashboard/broker/driver", 
-        icon: Package 
+        href: "/dashboard/broker/loads/dispatch", 
+        icon: Users2Icon 
       },
       {
         name: "Tracking",
-        href: "/dashboard/broker/tracking",
-        icon: FilesIcon,
+        href: "/dashboard/broker/loads/tracking",
+        icon: ChartLine,
       },
       {
         name: "Revenue",
-        href: "/dashboard/driver/loads/earnings",
-        icon: Banknote,
+        href: "/dashboard/broker/loads/revenues",
+        icon: LandmarkIcon,
       },
       {
-        name: "Fuel Card",
-        href: "/dashboard/driver/loads/fuelcards",
+        name: "Analytics",
+        href: "/dashboard/broker/loads/analytics",
         icon: CreditCardIcon,
       },
       {
         name: "Settings",
-        href: "/dashboard/driver/loads/settings",
+        href: "/dashboard/broker/loads/settings",
         icon: Settings,
       },
     ],
