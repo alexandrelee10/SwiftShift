@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 
 import BackButton from "@/app/components/shared/BackButton";
+import CancelLoadButton from "@/app/components/broker/loads/CancelLoadButton";
 
 export default async function LoadDetailsPage({
   params,
@@ -243,10 +244,7 @@ export default async function LoadDetailsPage({
                   Edit Load
                 </Link>
 
-                <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
-                  <Ban size={16} />
-                  Cancel Load
-                </button>
+                <CancelLoadButton loadId={load.id}/>
 
                 <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
                   <EyeClosed size={16} />

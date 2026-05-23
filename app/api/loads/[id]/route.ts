@@ -71,3 +71,34 @@ export async function PATCH(
   });
   return NextResponse.json(updatedLoad);
 }
+
+// Delete 
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await requireUser();
+
+  if (session.user.role !== "BROKER") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  const load = await prisma.load.findUnique({
+    where: { id },
+  });
+
+  if (!load) {
+    return NextResponse.json({ error: "Load not found" }, { status: 404 });
+  }
+
+  const cancelledLoad = await prisma.load.update({
+    where: { id },
+    data: {
+      status: "CANCELLED",
+    },
+  });
+
+  return NextResponse.json(cancelledLoad);
+}
