@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { requireUser } from "@/lib/requireUser";
 
 export async function GET(
   _req: NextRequest,
@@ -22,4 +23,51 @@ export async function GET(
   }
 
   return NextResponse.json(load);
+}
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string}> }
+) {
+  const session = await requireUser();
+
+  if (session.user.role !== "BROKER") {
+    return NextResponse.json({ error: "Unauthorized"}, { status: 401 });
+  }
+
+  const { id } = await params;
+  const body = await req.json();
+
+  const existingLoad = await prisma.load.findUnique({
+    where: { id }
+  });
+
+  if(!existingLoad) {
+    return NextResponse.json({ error: "Load not found" }, { status: 404 });
+  }
+
+  const updatedLoad = await prisma.load.update({
+    where: { id },
+    data: {
+      referenceNumber: body.referenceNumber,
+      originAddress: body.originAddress,
+      originCity: body.originCity,
+      originState: body.originState,
+      destinationAddress: body.destinationAddress,
+      destinationCity: body.destinationCity,
+      destinationState: body.destinationState,
+      equipmentType: body.equipmentType,
+
+      commodity: body.commodity || null,
+      notes: body.notes || null,
+
+      weight: body.weight ? Number(body.weight) : null,
+      rate: body.rate ? Number(body.rate) : existingLoad.rate,
+      distanceMiles: body.distanceMiles ? Number(body.distanceMiles) : null,
+
+      pickupDate: body.pickupDate ? new Date(body.pickupDate) : existingLoad.pickupDate,
+      deliveryDate: body.deliveryDate ? new Date(body.deliveryDate) : null
+    }
+  });
+  return NextResponse.json(updatedLoad);
 }

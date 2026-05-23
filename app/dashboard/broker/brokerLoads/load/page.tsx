@@ -16,6 +16,7 @@ import {
   Truck,
   Weight,
 } from "lucide-react";
+import EditLoadButton from "@/app/components/broker/loads/EditLoadButton";
 
 
 type SearchParams = {
@@ -365,9 +366,9 @@ function LoadRow({ load }: { load: any }) {
       </div>
 
       <div className="flex justify-end gap-2">
-        <BookLoadButton loadId={load.id} />
+        <EditLoadButton loadId={load.id} />
         <Link
-          href={`/dashboard/loads/search/${load.id}`}
+          href={`/dashboard/broker/brokerLoads/load/${load.id}`}
           className="rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-blue-700"
         >
           View

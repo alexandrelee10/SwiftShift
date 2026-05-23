@@ -7,18 +7,14 @@ import Link from "next/link";
 
 import {
   Home,
-  Search,
   Package,
   Settings,
-  FilesIcon,
   CreditCardIcon,
-  Banknote,
   Menu,
   X,
   ChevronRight,
   User,
   Users2Icon,
-  TruckIcon,
   ChartLine,
   LandmarkIcon
   
@@ -36,7 +32,7 @@ const sidebarSections = [
       },
       { 
         name: "Load", 
-        href: "/dashboard/broker/loads/load", 
+        href: "/dashboard/broker/brokerLoads/load", 
         icon: Package
       },
       { 

@@ -3,22 +3,22 @@ import LoadMap from "@/app/components/driver/loads/LoadMap";
 import Link from "next/link";
 import {
   ArrowLeft,
-  Bookmark,
   Box,
   CalendarDays,
   MapPin,
-  MessageSquare,
   Package,
-  Phone,
-  Play,
-  ShieldAlert,
   Truck,
   Weight,
   EyeIcon,
   FileText,
+  FilePen,
+  Ban,
+  Eye,
+  MapPinCheck,
+  User,
+  EyeClosed
 } from "lucide-react";
 
-import { bookLoad } from "./action";
 import BackButton from "@/app/components/shared/BackButton";
 
 export default async function LoadDetailsPage({
@@ -228,62 +228,48 @@ export default async function LoadDetailsPage({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-                Broker Information
-              </h2>
-
-              <div className="mt-5 flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 font-bold text-white">
-                  {load.broker?.firstName?.[0] || "B"}
-                </div>
-
-                <div className="min-w-0">
-                  <p className="font-semibold text-slate-900 dark:text-white">
-                    {load.broker?.firstName || "Broker"}
-                  </p>
-                  <p className="truncate text-sm text-slate-500 dark:text-slate-400">
-                    {load.broker?.email}
-                  </p>
-                </div>
-              </div>
-
-              <button className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
-                <MessageSquare size={16} />
-                Send Message
-              </button>
-            </div>
-
+            {/* Actions Section */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <h2 className="text-base font-semibold text-slate-900 dark:text-white">
                 Actions
               </h2>
 
               <div className="mt-5 space-y-3">
-                <form action={bookLoad.bind(null, load.id)}>
-                  <button
-                    type="submit"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500"
-                  >
-                    <Play size={16} />
-                    Book Now
-                  </button>
-                </form>
+
+                <Link
+                href={`/dashboard/broker/brokerLoads/load/${load.id}/edit`}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
+                  <FilePen size={16} />
+                  Edit Load
+                </Link>
 
                 <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
-                  <Phone size={16} />
-                  Call Broker
+                  <Ban size={16} />
+                  Cancel Load
                 </button>
 
                 <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
-                  <Bookmark size={16} />
-                  Save Load
+                  <EyeClosed size={16} />
+                  Hide Load
                 </button>
 
                 <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
-                  <ShieldAlert size={16} />
-                  Report Issue
+                  <Eye size={16} />
+                  View Applicants
                 </button>
+                <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
+                  <User size={16} />
+                  Assign Driver
+                </button>
+                <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
+                  <MapPin size={16} />
+                  Mark as In Transit
+                </button>
+                <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
+                  <MapPinCheck size={16} />
+                  Mark as Delivered
+                </button>
+                
 
                 <Link
                   href={`/dashboard/loads/search/${load.id}/bol`}
