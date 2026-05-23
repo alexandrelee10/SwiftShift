@@ -1,5 +1,5 @@
-import LandingNavbar from "../components/driver/layout/LandingNavbar";
-import LandingFooter from "../components/driver/layout/LandingFooter";
+import LandingNavbar from "../components/landingPage/LandingNavbar";
+import LandingFooter from "../components/landingPage/LandingFooter";
 
 export default function LandingLayout({
   children,
