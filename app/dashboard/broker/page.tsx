@@ -1,9 +1,10 @@
 import StatusPage from "@/app/components/shared/StatusPage";
+import BrokerLoadMap from "@/app/components/broker/loads/LoadMap";
 import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
 import { redirect } from "next/navigation";
-import { Truck, Calendar, Landmark, Users, ClockCheck } from "lucide-react";
 import Link from "next/link";
+import { Truck, Calendar, Landmark, Users, ClockCheck } from "lucide-react";
 
 export default async function BrokerDashboardPage() {
   const session = await requireUser();
@@ -68,17 +69,18 @@ export default async function BrokerDashboardPage() {
     },
   });
 
-  // Earnings
-  const totalEarnings = deliveredLoads.reduce((total, load) => {
-    return total + Number(load.rate);
-  }, 0);
-
-
   const availableDrivers = await prisma.user.findMany({
     where: {
       role: "DRIVER",
     },
+    take: 5,
   });
+
+  const totalEarnings = deliveredLoads.reduce((total, load) => {
+    return total + Number(load.rate);
+  }, 0);
+
+  const selectedMapLoad = activeLoads[0] ?? pendingLoads[0] ?? deliveredLoads[0];
 
   const upperIcons = [
     {
@@ -103,7 +105,7 @@ export default async function BrokerDashboardPage() {
       status:
         deliveredLoads.length > 0
           ? `${deliveredLoads.length} delivered loads`
-          : "No Earnings Yet",
+          : "No earnings yet",
       icon: Landmark,
       color:
         "bg-green-100 text-green-600 dark:bg-green-950/50 dark:text-green-300",
@@ -113,7 +115,7 @@ export default async function BrokerDashboardPage() {
       content: availableDrivers.length,
       status:
         availableDrivers.length > 0
-          ? "Ready to book"
+          ? "Drivers on platform"
           : "No drivers available",
       icon: Users,
       color:
@@ -124,19 +126,19 @@ export default async function BrokerDashboardPage() {
       content: "90%",
       status: "Based on last 30 deliveries",
       icon: ClockCheck,
-      color: "bg-blue-100 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300"
-    }
+      color:
+        "bg-cyan-100 text-cyan-600 dark:bg-cyan-950/50 dark:text-cyan-300",
+    },
   ];
 
   return (
     <div className="min-h-screen bg-zinc-100 text-zinc-900 dark:bg-slate-950 dark:text-slate-100">
       <main className="min-w-0 p-6">
         <div className="space-y-6">
-          {/* HEADER */}
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-slate-100">
-                Good morning, {session.user?.name || "Broker"}
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Good morning, {session.user?.name || "Broker"} 👋
               </h2>
               <p className="mt-1 text-sm text-zinc-500 dark:text-slate-400">
                 Here&apos;s what&apos;s happening with your brokerage today.
@@ -157,7 +159,6 @@ export default async function BrokerDashboardPage() {
             </div>
           </div>
 
-          {/* KPI CARDS */}
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             {upperIcons.map((item) => {
               const Icon = item.icon;
@@ -177,9 +178,7 @@ export default async function BrokerDashboardPage() {
                     <p className="text-xs font-medium text-zinc-500 dark:text-slate-400">
                       {item.name}
                     </p>
-                    <p className="text-xl font-semibold text-zinc-900 dark:text-slate-100">
-                      {item.content}
-                    </p>
+                    <p className="text-xl font-semibold">{item.content}</p>
                     <p className="text-xs text-zinc-400 dark:text-slate-500">
                       {item.status}
                     </p>
@@ -189,9 +188,7 @@ export default async function BrokerDashboardPage() {
             })}
           </div>
 
-          {/* MAIN GRID */}
           <div className="grid gap-5 xl:grid-cols-[1.15fr_1fr]">
-            {/* DISPATCH BOARD */}
             <section className="rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-slate-800">
                 <h3 className="font-semibold">Dispatch Board</h3>
@@ -204,14 +201,25 @@ export default async function BrokerDashboardPage() {
               </div>
 
               <div className="grid gap-3 p-4 md:grid-cols-4">
-                <LoadColumn title="Posted" count={pendingLoads.length} loads={pendingLoads.slice(0, 3)} />
+                <LoadColumn
+                  title="Posted"
+                  count={pendingLoads.length}
+                  loads={pendingLoads.slice(0, 3)}
+                />
                 <LoadColumn title="Booked" count={0} loads={[]} />
-                <LoadColumn title="In Transit" count={activeLoads.length} loads={activeLoads.slice(0, 3)} />
-                <LoadColumn title="Delivered" count={deliveredLoads.length} loads={deliveredLoads.slice(0, 3)} />
+                <LoadColumn
+                  title="In Transit"
+                  count={activeLoads.length}
+                  loads={activeLoads.slice(0, 3)}
+                />
+                <LoadColumn
+                  title="Delivered"
+                  count={deliveredLoads.length}
+                  loads={deliveredLoads.slice(0, 3)}
+                />
               </div>
             </section>
 
-            {/* MAP PLACEHOLDER */}
             <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-slate-800">
                 <h3 className="font-semibold">Live Tracking</h3>
@@ -223,52 +231,56 @@ export default async function BrokerDashboardPage() {
                 </Link>
               </div>
 
-              <div className="flex h-[365px] items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
-                <div className="text-center">
-                  <Truck className="mx-auto h-10 w-10 text-blue-600" />
-                  <p className="mt-3 text-sm font-medium">Live map area</p>
-                  <p className="text-xs text-zinc-500 dark:text-slate-400">
-                    Plug in your LoadMap component here later.
-                  </p>
-                </div>
+              <div className="h-[365px]">
+                <BrokerLoadMap
+                  loadId={selectedMapLoad?.id}
+                  className="h-full w-full rounded-none border-0"
+                />
               </div>
             </section>
           </div>
 
-          {/* BOTTOM GRID */}
           <div className="grid gap-5 xl:grid-cols-3">
             <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <CardTitle title="Recent Bookings" href="/dashboard/broker/bookings" />
+              <CardTitle
+                title="Recent Bookings"
+                href="/dashboard/broker/bookings"
+              />
 
               <div className="space-y-3">
-                {[...activeLoads, ...pendingLoads].slice(0, 5).map((load) => (
-                  <div
-                    key={load.id}
-                    className="flex items-center justify-between border-b border-zinc-100 pb-3 last:border-0 dark:border-slate-800"
-                  >
-                    <div>
-                      <p className="text-sm font-medium">
-                        {load.originCity}, {load.originState} →{" "}
-                        {load.destinationCity}, {load.destinationState}
-                      </p>
-                      <p className="text-xs text-zinc-500 dark:text-slate-400">
-                        Load #{load.referenceNumber}
+                {[...activeLoads, ...pendingLoads, ...deliveredLoads]
+                  .slice(0, 5)
+                  .map((load) => (
+                    <div
+                      key={load.id}
+                      className="flex items-center justify-between border-b border-zinc-100 pb-3 last:border-0 dark:border-slate-800"
+                    >
+                      <div>
+                        <p className="text-sm font-medium">
+                          {load.originCity}, {load.originState} →{" "}
+                          {load.destinationCity}, {load.destinationState}
+                        </p>
+                        <p className="text-xs text-zinc-500 dark:text-slate-400">
+                          Load #{load.referenceNumber}
+                        </p>
+                      </div>
+
+                      <p className="text-sm font-semibold">
+                        ${Number(load.rate).toLocaleString()}
                       </p>
                     </div>
-
-                    <p className="text-sm font-semibold">
-                      ${Number(load.rate).toLocaleString()}
-                    </p>
-                  </div>
-                ))}
+                  ))}
               </div>
             </section>
 
             <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <CardTitle title="Driver Availability" href="/dashboard/broker/drivers" />
+              <CardTitle
+                title="Driver Availability"
+                href="/dashboard/broker/drivers"
+              />
 
               <div className="space-y-3">
-                {availableDrivers.slice(0, 5).map((driver) => (
+                {availableDrivers.map((driver) => (
                   <div
                     key={driver.id}
                     className="flex items-center justify-between border-b border-zinc-100 pb-3 last:border-0 dark:border-slate-800"
@@ -294,10 +306,23 @@ export default async function BrokerDashboardPage() {
               <CardTitle title="Load Performance" />
 
               <div className="space-y-4">
-                <StatRow label="Total Loads" value={(activeLoads.length + pendingLoads.length + deliveredLoads.length).toString()} />
-                <StatRow label="Delivered" value={deliveredLoads.length.toString()} />
+                <StatRow
+                  label="Total Loads"
+                  value={(
+                    activeLoads.length +
+                    pendingLoads.length +
+                    deliveredLoads.length
+                  ).toString()}
+                />
+                <StatRow
+                  label="Delivered"
+                  value={deliveredLoads.length.toString()}
+                />
                 <StatRow label="On-Time" value="90%" />
-                <StatRow label="Revenue" value={`$${totalEarnings.toLocaleString()}`} />
+                <StatRow
+                  label="Revenue"
+                  value={`$${totalEarnings.toLocaleString()}`}
+                />
 
                 <div className="mt-4 h-28 rounded-xl bg-zinc-100 dark:bg-slate-800" />
               </div>
