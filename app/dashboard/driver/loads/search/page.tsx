@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
 import LoadSearchFilters from "@/app/components/driver/loads/LoadSearchFilters";
 import LoadMap from "@/app/components/driver/loads/LoadMap";
+import RequestButton from "@/app/components/driver/loads/RequestLoadButton"
 import Link from "next/link";
 import {
   Bookmark,
@@ -16,7 +17,6 @@ import {
   Truck,
   Weight,
 } from "lucide-react";
-import BookLoadButton from "@/app/components/driver/loads/BookLoadButton";
 
 type SearchParams = {
   origin?: string;
@@ -364,15 +364,33 @@ function LoadRow({ load }: { load: any }) {
         {load.distanceMiles ? load.distanceMiles.toLocaleString() : "—"} mi
       </div>
 
-      <div className="flex justify-end gap-2">
-        <BookLoadButton loadId={load.id} />
-        <Link
-          href={`/dashboard/loads/search/${load.id}`}
-          className="rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-blue-700"
-        >
-          View
-        </Link>
-      </div>
+<div className="flex items-center justify-end gap-2">
+  <Link
+    href={`/dashboard/loads/search/${load.id}`}
+    className="
+      inline-flex
+      items-center
+      justify-center
+      rounded-md
+      border
+      border-slate-200
+      px-3
+      py-2
+      text-xs
+      font-medium
+      text-slate-700
+      transition
+      hover:bg-slate-50
+      dark:border-slate-700
+      dark:text-slate-300
+      dark:hover:bg-slate-800
+    "
+  >
+    View
+  </Link>
+
+  <RequestButton loadId={load.id} />
+</div>
     </div>
   );
 }

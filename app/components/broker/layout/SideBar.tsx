@@ -39,7 +39,7 @@ const sidebarSections = [
             href: "/dashboard/broker/brokerLoads/load/new",
           },
           {
-            name: "Cancel Loads",
+            name: "Find Loads",
             href: "/dashboard/broker/brokerLoads/load?status=CANCELLED",
           },
           {
