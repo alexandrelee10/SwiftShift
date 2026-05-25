@@ -54,7 +54,7 @@ export async function downloadUserData() {
     where: { email: session.user.email },
     include: {
       userPreferences: true,
-      bookings: true,
+      driverBookings: true,
       driverTrips: true,
     },
   });
