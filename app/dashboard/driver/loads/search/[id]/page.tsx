@@ -20,7 +20,6 @@ import {
 
 import { bookLoad } from "./action";
 import BackButton from "@/app/components/shared/BackButton";
-import BookLoadButton from "@/app/components/driver/loads/BookLoadButton";
 import RequestLoadButton from "@/app/components/driver/loads/RequestLoadButton";
 
 export default async function LoadDetailsPage({
