@@ -53,7 +53,7 @@ export async function downloadUserData() {
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
     include: {
-      preferences: true,
+      userPreferences: true,
       bookings: true,
       driverTrips: true,
     },
