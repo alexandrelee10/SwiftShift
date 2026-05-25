@@ -41,7 +41,7 @@ export default function LandingNavbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-999 border-b border-slate-200 bg-white/90 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         {/* Logo */}
         <Link href="/">
@@ -122,43 +122,55 @@ export default function LandingNavbar() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-slate-200 bg-white lg:hidden">
-          <div className="space-y-8 px-6 py-6">
-            {navDropdowns.map((nav) => (
-              <div key={nav.label}>
-                <h3 className="text-sm font-black uppercase tracking-wide text-slate-400">
-                  {nav.label}
-                </h3>
+        <div className="absolute left-0 right-0 top-full z-[9999] border-t border-slate-200 bg-white shadow-xl lg:hidden">
+          <div className="max-h-[calc(100vh-88px)] overflow-y-auto px-6 py-6 pb-24">
+            <div className="space-y-8">
+              {navDropdowns.map((nav) => (
+                <div key={nav.label}>
+                  <h3 className="text-sm font-black uppercase tracking-wide text-slate-400">
+                    {nav.label}
+                  </h3>
 
-                <div className="mt-3 flex flex-col">
-                  {nav.items.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="rounded-xl px-3 py-3 text-base font-semibold text-slate-700 transition hover:bg-slate-100"
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+                  <div className="mt-3 flex flex-col">
+                    {nav.items.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="rounded-xl px-3 py-4 text-base font-semibold text-slate-700 transition hover:bg-slate-100"
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
+              ))}
+
+              <Link
+                href="/contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block rounded-xl px-3 py-4 text-base font-semibold text-slate-700"
+              >
+                Contact
+              </Link>
+
+              <div className="flex flex-col gap-3 pt-4">
+                <Link
+                  href="/sign-in"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-full border border-slate-200 px-5 py-3 text-center font-bold text-slate-700"
+                >
+                  Login
+                </Link>
+
+                <Link
+                  href="/sign-up"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-full bg-blue-700 px-5 py-3 text-center font-bold text-white"
+                >
+                  Sign up
+                </Link>
               </div>
-            ))}
-
-            <div className="flex flex-col gap-3 pt-4">
-              <Link
-                href="/sign-in"
-                className="rounded-full border border-slate-200 px-5 py-3 text-center font-bold text-slate-700"
-              >
-                Login
-              </Link>
-
-              <Link
-                href="/sign-up"
-                className="rounded-full bg-blue-700 px-5 py-3 text-center font-bold text-white"
-              >
-                Sign up
-              </Link>
             </div>
           </div>
         </div>

@@ -23,8 +23,8 @@ export default async function DriverDashboardPage() {
   }
 
   if (session.user.role !== "DRIVER") {
-  redirect("/unauthorized");
-}
+    redirect("/unauthorized");
+  }
 
   const upcomingLoads = await prisma.load.findMany({
     where: {
@@ -40,7 +40,7 @@ export default async function DriverDashboardPage() {
     },
   });
 
-  const bookedLoads = await prisma.load.findMany({
+  const approvedLoads = await prisma.load.findMany({
     where: {
       status: "BOOKED",
       bookings: {
@@ -314,11 +314,11 @@ export default async function DriverDashboardPage() {
                       No active load right now
                     </p>
                     <p className="mt-1 text-sm text-zinc-500 dark:text-slate-400">
-                      Book a load and start the trip to see it here.
+                      Approved loads will appear below until you start the trip.
                     </p>
 
                     <Link
-                      href="/dashboard/loads/search"
+                      href="/dashboard/driver/loads/search"
                       className="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                     >
                       Find Loads
@@ -359,14 +359,17 @@ export default async function DriverDashboardPage() {
                 </div>
 
                 <div className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-                  <CardHeader title="Booked Loads" />
+                  <CardHeader
+                    title="Approved Loads"
+                    href="/dashboard/myloads?status=BOOKED"
+                  />
 
                   <div className="space-y-4">
-                    {bookedLoads.length > 0 ? (
-                      bookedLoads.map((load) => (
+                    {approvedLoads.length > 0 ? (
+                      approvedLoads.map((load) => (
                         <div
                           key={load.id}
-                          className="rounded-xl border border-zinc-200 p-4 transition hover:border-blue-200 hover:bg-zinc-50 dark:border-slate-800 dark:hover:border-blue-900 dark:hover:bg-slate-800/70"
+                          className="rounded-xl border border-zinc-200 p-4 transition hover:border-green-200 hover:bg-zinc-50 dark:border-slate-800 dark:hover:border-green-900 dark:hover:bg-slate-800/70"
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div>
@@ -390,8 +393,8 @@ export default async function DriverDashboardPage() {
                               </p>
                             </div>
 
-                            <span className="rounded-full bg-blue-100 px-2.5 py-1 text-[11px] font-medium text-blue-700 dark:bg-blue-950/50 dark:text-blue-300">
-                              BOOKED
+                            <span className="rounded-full bg-green-100 px-2.5 py-1 text-[11px] font-medium text-green-700 dark:bg-green-950/50 dark:text-green-300">
+                              APPROVED
                             </span>
                           </div>
 
@@ -438,15 +441,15 @@ export default async function DriverDashboardPage() {
                     ) : (
                       <div className="rounded-xl border border-dashed border-zinc-200 p-8 text-center dark:border-slate-700">
                         <p className="text-sm font-medium text-zinc-900 dark:text-slate-100">
-                          No booked loads yet
+                          No approved loads yet
                         </p>
 
                         <p className="mt-1 text-sm text-zinc-500 dark:text-slate-400">
-                          Loads you book will appear here.
+                          Once a broker approves your request, it will show here.
                         </p>
 
                         <Link
-                          href="/dashboard/loads/search"
+                          href="/dashboard/driver/loads/search"
                           className="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                         >
                           Find Loads
@@ -550,7 +553,7 @@ export default async function DriverDashboardPage() {
                   </div>
 
                   <Link
-                    href="/dashboard/loads/myloads?status=DELIVERED"
+                    href="/dashboard/myloads?status=DELIVERED"
                     className="block rounded-lg border border-zinc-200 px-4 py-2.5 text-center text-sm font-medium text-blue-600 hover:bg-zinc-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800"
                   >
                     View Delivered Loads
@@ -581,7 +584,13 @@ function TimelineItem({
       <span className={`mt-1.5 h-2.5 w-2.5 rounded-full ${dotColor}`} />
 
       <div className="grid flex-1 grid-cols-2 gap-3 text-sm">
-        <p className={active ? "text-blue-600 dark:text-blue-400" : "text-zinc-600 dark:text-slate-300"}>
+        <p
+          className={
+            active
+              ? "text-blue-600 dark:text-blue-400"
+              : "text-zinc-600 dark:text-slate-300"
+          }
+        >
           {title}
         </p>
         <p className="text-zinc-500 dark:text-slate-400">{detail}</p>

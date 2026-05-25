@@ -135,7 +135,7 @@ const SignInForm = () => {
                 name="email"
                 onChange={onChange}
                 placeholder="Enter your email"
-                className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-700 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-700 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                 required
               />
             </div>

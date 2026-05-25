@@ -17,6 +17,7 @@ import {
   Users2Icon,
   ChartLine,
   LandmarkIcon,
+  File
 } from "lucide-react";
 
 import DarkLogo from "@/public/assets/main-logo/logoDark.svg";
@@ -44,7 +45,7 @@ const sidebarSections = [
           },
           {
             name: "Approve Loads",
-            href: "/dashboard/broker/brokerLoads/bookings",
+            href: "/dashboard/broker/brokerLoads/approvals",
           },
           {
             name: "Assign Loads",
@@ -71,6 +72,11 @@ const sidebarSections = [
         name: "Revenue",
         href: "/dashboard/broker/loads/revenues",
         icon: LandmarkIcon,
+      },
+      {
+        name: "Documents",
+        href: "/dashboard/broker/brokerLoads/bol",
+        icon: File
       },
       {
         name: "Analytics",

@@ -10,7 +10,7 @@ export default function LandingLayout({
     <main className="min-h-screen scroll-smooth bg-white text-slate-950">
       <LandingNavbar />
 
-      {children}
+      <main>{children}</main> 
 
       <LandingFooter />
     </main>

@@ -200,24 +200,33 @@ export default async function BrokerDashboardPage() {
                 </Link>
               </div>
 
-              <div className="grid gap-3 p-4 md:grid-cols-4">
-                <LoadColumn
-                  title="Posted"
-                  count={pendingLoads.length}
-                  loads={pendingLoads.slice(0, 3)}
-                />
-                <LoadColumn title="Booked" count={0} loads={[]} />
-                <LoadColumn
-                  title="In Transit"
-                  count={activeLoads.length}
-                  loads={activeLoads.slice(0, 3)}
-                />
-                <LoadColumn
-                  title="Delivered"
-                  count={deliveredLoads.length}
-                  loads={deliveredLoads.slice(0, 3)}
-                />
-              </div>
+{/* Inside the Dispatch Board <section> — replace the inner grid div */}
+<div className="grid gap-3 p-4 grid-cols-2 md:grid-cols-4">
+  <LoadColumn
+    title="Posted"
+    count={pendingLoads.length}
+    loads={pendingLoads.slice(0, 3)}
+    status="posted"
+  />
+  <LoadColumn
+    title="Booked"
+    count={0}
+    loads={[]}
+    status="booked"
+  />
+  <LoadColumn
+    title="In Transit"
+    count={activeLoads.length}
+    loads={activeLoads.slice(0, 3)}
+    status="transit"
+  />
+  <LoadColumn
+    title="Delivered"
+    count={deliveredLoads.length}
+    loads={deliveredLoads.slice(0, 3)}
+    status="delivered"
+  />
+</div>
             </section>
 
             <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -347,45 +356,106 @@ function CardTitle({ title, href }: { title: string; href?: string }) {
   );
 }
 
+// Replace the LoadColumn component and the Dispatch Board section
+
 function LoadColumn({
   title,
   count,
   loads,
+  status,
 }: {
   title: string;
   count: number;
   loads: any[];
+  status: "posted" | "booked" | "transit" | "delivered";
 }) {
+  const topBorder = {
+    posted: "border-t-2 border-t-zinc-400",
+    booked: "border-t-2 border-t-blue-500",
+    transit: "border-t-2 border-t-amber-500",
+    delivered: "border-t-2 border-t-green-600",
+  }[status];
+
+  const labelColor = {
+    posted: "text-zinc-500 dark:text-zinc-400",
+    booked: "text-blue-600 dark:text-blue-400",
+    transit: "text-amber-600 dark:text-amber-400",
+    delivered: "text-green-700 dark:text-green-400",
+  }[status];
+
+  const dotColor = {
+    posted: "bg-zinc-400",
+    booked: "bg-blue-500",
+    transit: "bg-amber-500",
+    delivered: "bg-green-600",
+  }[status];
+
+  const statusLabel = {
+    posted: null,
+    booked: null,
+    transit: "En route",
+    delivered: "Delivered",
+  }[status];
+
+  const statusTextColor = {
+    transit: "text-amber-600 dark:text-amber-400",
+    delivered: "text-green-700 dark:text-green-400",
+  }[status as "transit" | "delivered"];
+
   return (
-    <div className="rounded-xl bg-zinc-50 p-3 dark:bg-slate-950">
-      <div className="mb-3 flex items-center justify-between">
-        <p className="text-sm font-semibold">{title}</p>
-        <span className="rounded-full bg-white px-2 py-0.5 text-xs dark:bg-slate-800">
+    <div
+      className={`flex flex-col gap-2 rounded-xl bg-zinc-50 p-3 dark:bg-slate-950 ${topBorder}`}
+    >
+      <div className="flex items-center justify-between mb-1">
+        <p className={`flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide ${labelColor}`}>
+          <span className={`inline-block h-1.5 w-1.5 rounded-full ${dotColor}`} />
+          {title}
+        </p>
+        <span className="rounded-full border border-zinc-200 bg-white px-2 py-0.5 text-xs dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
           {count}
         </span>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-2">
         {loads.length > 0 ? (
           loads.map((load) => (
             <div
               key={load.id}
-              className="rounded-xl border border-zinc-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900"
+              className="rounded-lg border border-zinc-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900 hover:border-zinc-300 dark:hover:border-slate-700 transition-colors cursor-pointer"
             >
-              <p className="text-xs font-semibold">
-                {load.originCity}, {load.originState} → {load.destinationCity},{" "}
-                {load.destinationState}
+              <p className="text-xs text-zinc-400 dark:text-slate-500 mb-1">
+                #{load.referenceNumber}
               </p>
-              <p className="mt-1 text-xs text-zinc-500 dark:text-slate-400">
+              <p className="text-xs font-semibold leading-snug">
+                {load.originCity}, {load.originState} →{" "}
+                {load.destinationCity}, {load.destinationState}
+              </p>
+              <p className="mt-1 text-xs text-zinc-400 dark:text-slate-500 truncate">
                 {load.commodity || "General freight"}
               </p>
-              <p className="mt-2 text-sm font-semibold">
-                ${Number(load.rate).toLocaleString()}
-              </p>
+              <div className="mt-2 flex items-center justify-between">
+                <p className="text-sm font-semibold">
+                  ${Number(load.rate).toLocaleString()}
+                </p>
+                {statusLabel ? (
+                  <span className={`text-xs ${statusTextColor}`}>
+                    {statusLabel}
+                  </span>
+                ) : (
+                  <span className="text-xs text-zinc-400 dark:text-slate-500">
+                    {new Date(load.pickupDate).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+                )}
+              </div>
             </div>
           ))
         ) : (
-          <p className="text-xs text-zinc-400">No loads</p>
+          <p className="py-5 text-center text-xs text-zinc-400 dark:text-slate-600">
+            No loads
+          </p>
         )}
       </div>
     </div>
