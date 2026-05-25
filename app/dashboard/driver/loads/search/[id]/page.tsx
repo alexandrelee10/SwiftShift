@@ -20,6 +20,8 @@ import {
 
 import { bookLoad } from "./action";
 import BackButton from "@/app/components/shared/BackButton";
+import BookLoadButton from "@/app/components/driver/loads/BookLoadButton";
+import RequestLoadButton from "@/app/components/driver/loads/RequestLoadButton";
 
 export default async function LoadDetailsPage({
   params,
@@ -260,16 +262,14 @@ export default async function LoadDetailsPage({
               </h2>
 
               <div className="mt-5 space-y-3">
-                <form action={bookLoad.bind(null, load.id)}>
-                  <button
-                    type="submit"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500"
-                  >
-                    <Play size={16} />
-                    Book Now
-                  </button>
-                </form>
-
+                <div className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold bg-blue-700 text-white transition hover:bg-blue-600 dark:border-slate-700 dark:text-white dark:hover:bg-blue-600">
+                  <RequestLoadButton 
+                  loadId={load.id} 
+                  loadingMessage="Requesting..."
+                  successMessage="Request Sent!"
+                  label="Request Load"
+                  />
+                </div>
                 <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
                   <Phone size={16} />
                   Call Broker
