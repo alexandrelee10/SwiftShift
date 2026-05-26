@@ -1,53 +1,47 @@
-"use server";
-
 import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
-import { revalidatePath } from "next/cache";
 
-export async function deleteDocument(documentId: string) {
+export async function getDriverDocuments() {
   const session = await requireUser();
 
-  if (!session.user?.email) {
-    throw new Error("Unauthorized");
-  }
+  if (!session.user?.email) throw new Error("Unauthorized");
 
-  const user = await prisma.user.findUnique({
+  const dbUser = await prisma.user.findUnique({
+    where: { email: session.user.email },
+  });
+
+  if (!dbUser) throw new Error("User not found");
+  if (dbUser.role !== "DRIVER") throw new Error("Forbidden");
+
+  const bolDocuments = await prisma.document.findMany({
     where: {
-      email: session.user.email,
+      userId: dbUser.id,
+      type: "BILL_OF_LADING",
+    },
+    include: {
+      load: true,
+      billOfLading: true,
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  const document = await prisma.document.findUnique({
+  const podDocuments = await prisma.document.findMany({
     where: {
-      id: documentId,
+      userId: dbUser.id,
+      type: "PROOF_OF_DELIVERY",
+    },
+    include: {
+      load: true,
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 
-  if (!document) {
-    throw new Error("Document not found");
-  }
-
-  if (document.userId !== user.id) {
-    throw new Error("Not allowed");
-  }
-
-  await prisma.$transaction([
-    prisma.billOfLading.deleteMany({
-      where: {
-        documentId,
-      },
-    }),
-
-    prisma.document.delete({
-      where: {
-        id: documentId,
-      },
-    }),
-  ]);
-
-  revalidatePath("/dashboard/loads/documents");
+  return {
+    bols: bolDocuments,
+    pods: podDocuments,
+  };
 }

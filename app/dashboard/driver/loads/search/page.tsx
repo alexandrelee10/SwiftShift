@@ -400,9 +400,9 @@ function LoadRow({ load }: { load: any }) {
       py-2
       text-xs
       font-medium
-      text-slate-700
+      text-white
       transition
-      hover:bg-slate-50
+      hover:bg-blue-500
       dark:border-slate-700
       dark:text-slate-300
       dark:hover:bg-blue-600

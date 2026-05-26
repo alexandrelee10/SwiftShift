@@ -1,5 +1,3 @@
-// app/api/documents/[id]/bol/route.tsx
-
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import {
@@ -13,7 +11,7 @@ import {
 
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
 
@@ -29,20 +27,21 @@ export async function GET(
     return NextResponse.json({ error: "Document not found" }, { status: 404 });
   }
 
+  const bol = document.billOfLading;
+
   if (!document.billOfLading) {
     return NextResponse.json({ error: "BOL not found" }, { status: 404 });
   }
 
-  const load = document.load;
-  const bol = document.billOfLading;
-
-  const pdfBuffer = await renderToBuffer(<BolPdf load={load} bol={bol} />);
+  const pdfBuffer = await renderToBuffer(
+    <BolPdf load={document.load} bol={document.billOfLading} />,
+  );
 
   return new NextResponse(new Uint8Array(pdfBuffer), {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${load.referenceNumber}-bol.pdf"`,
+      "Content-Disposition": `inline; filename="${document.load.referenceNumber}-bol.pdf"`,
     },
   });
 }
@@ -59,9 +58,7 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
             <Text style={styles.headerSmall}>
               Date: {formatPdfDate(bol.createdAt)}
             </Text>
-
             <Text style={styles.title}>BILL OF LADING</Text>
-
             <Text style={styles.headerSmall}>Page 1 of ____</Text>
           </View>
 
@@ -73,6 +70,11 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
                 rows={[
                   ["Name:", bol.shipperName],
                   ["Address:", bol.shipperAddress],
+                  [
+                    "City/State/Zip:",
+                    `${load.originCity}, ${load.originState}`,
+                  ],
+                  ["SID#:", ""],
                 ]}
                 fob
               />
@@ -83,20 +85,23 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
                 rows={[
                   ["Name:", bol.consigneeName],
                   ["Address:", bol.consigneeAddress],
+                  [
+                    "City/State/Zip:",
+                    `${load.destinationCity}, ${load.destinationState}`,
+                  ],
+                  ["CID#:", ""],
                 ]}
+                extraTopRight="Location #: ________"
                 fob
               />
 
-              <SectionBar title="LOAD INFORMATION" />
+              <SectionBar title="THIRD PARTY FREIGHT CHARGES BILL TO:" />
 
               <InfoBlock
                 rows={[
-                  ["Reference #:", load.referenceNumber],
-                  ["Origin:", `${load.originCity}, ${load.originState}`],
-                  [
-                    "Destination:",
-                    `${load.destinationCity}, ${load.destinationState}`,
-                  ],
+                  ["Name:", ""],
+                  ["Address:", ""],
+                  ["City/State/Zip:", ""],
                 ]}
               />
 
@@ -117,25 +122,19 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
 
               <View style={styles.carrierBox}>
                 <Text style={styles.bold}>
-                  CARRIER NAME: {bol.carrierName || "________________"}
+                  carrierName: {bol.carrierName || "________________"}
                 </Text>
 
-                <Text style={styles.bold}>
-                  Trailer number: {bol.trailerNumber || "NOT PROVIDED"}
+                <Text>
+                  trailerNumber: {bol.trailerNumber || "________________"}
                 </Text>
 
-                <Text style={styles.bold}>
-                  Seal number(s): {bol.sealNumber || "NOT PROVIDED"}
-                </Text>
+                <Text>sealNumber: {bol.sealNumber || "________________"}</Text>
               </View>
 
               <View style={styles.carrierBox}>
-                <Text style={styles.bold}>
-                  Equipment Type: {load.equipmentType || ""}
-                </Text>
-
-                <Text style={styles.bold}>Load Status: {load.status || ""}</Text>
-
+                <Text style={styles.bold}>SCAC:</Text>
+                <Text style={styles.bold}>Pro number:</Text>
                 <Text style={styles.barcode}>BAR CODE SPACE</Text>
               </View>
 
@@ -198,10 +197,7 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
           ))}
 
           <View style={styles.totalRow}>
-            <Text style={styles.bold}>
-              GRAND TOTAL {bol.pieces ? `PKGS: ${bol.pieces}` : ""}{" "}
-              {bol.weight ? `WEIGHT: ${bol.weight}` : ""}
-            </Text>
+            <Text style={styles.bold}>GRAND TOTAL</Text>
           </View>
 
           <SectionBar title="CARRIER INFORMATION" />
@@ -257,19 +253,16 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
           ))}
 
           <View style={styles.bottomTotal}>
-            <Text style={styles.bold}>
-              GRAND TOTAL {bol.weight ? `${bol.weight} lbs` : ""}
-            </Text>
+            <Text style={styles.bold}>GRAND TOTAL</Text>
           </View>
 
           <View style={styles.codRow}>
             <View style={{ flex: 1 }}>
               <Text style={styles.tinyText}>
                 Where the rate is dependent on value, shippers are required to
-                state specifically in writing the agreed or declared value of the
-                property.
+                state specifically in writing the agreed or declared value of
+                the property.
               </Text>
-
               <Text style={styles.tinyText}>
                 The agreed or declared value of the property is specifically
                 stated by the shipper to be not exceeding __________ per
@@ -294,11 +287,10 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
           <View style={styles.signatureGrid}>
             <View style={styles.signatureBox}>
               <Text style={styles.bold}>SHIPPER SIGNATURE / DATE</Text>
-
               <Text style={styles.tinyText}>
                 This is to certify that the above named materials are properly
                 classified, packaged, marked and labeled, and are in proper
-                condition for transportation.
+                condition.
               </Text>
             </View>
 
@@ -317,7 +309,6 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
 
             <View style={styles.signatureBox}>
               <Text style={styles.bold}>CARRIER SIGNATURE / PICKUP DATE</Text>
-
               <Text style={styles.tinyText}>
                 Carrier acknowledges receipt of packages and required placards.
                 Property described above is received in good order, except as
@@ -394,12 +385,10 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
     color: "#000",
   },
-
   outerBox: {
     borderWidth: 1,
     borderColor: "#000",
   },
-
   header: {
     height: 24,
     flexDirection: "row",
@@ -407,34 +396,28 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#000",
   },
-
   headerSmall: {
     flex: 1,
     paddingHorizontal: 4,
     fontSize: 9,
   },
-
   title: {
     flex: 2,
     textAlign: "center",
     fontSize: 18,
     fontWeight: "bold",
   },
-
   topGrid: {
     flexDirection: "row",
   },
-
   leftCol: {
     flex: 1.35,
     borderRightWidth: 1,
     borderColor: "#000",
   },
-
   rightCol: {
     flex: 1,
   },
-
   sectionBar: {
     backgroundColor: "#000",
     color: "#fff",
@@ -443,39 +426,33 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     paddingVertical: 2,
   },
-
   infoBlock: {
     minHeight: 58,
     padding: 4,
     position: "relative",
   },
-
   extraRight: {
     position: "absolute",
     right: 4,
     top: 4,
   },
-
   fob: {
     position: "absolute",
     right: 4,
     bottom: 4,
   },
-
   instructions: {
     height: 42,
     padding: 4,
     borderTopWidth: 1,
     borderColor: "#000",
   },
-
   bolNumberBox: {
     height: 78,
     padding: 6,
     borderBottomWidth: 1,
     borderColor: "#000",
   },
-
   barcode: {
     marginTop: 20,
     textAlign: "center",
@@ -484,40 +461,33 @@ const styles = StyleSheet.create({
     letterSpacing: 4,
     fontWeight: "bold",
   },
-
   carrierBox: {
     minHeight: 45,
     padding: 5,
     borderBottomWidth: 1,
     borderColor: "#000",
   },
-
   freightTerms: {
     minHeight: 54,
     padding: 5,
   },
-
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 6,
   },
-
   customerHeader: {
     flexDirection: "row",
     minHeight: 18,
   },
-
   carrierHeader: {
     flexDirection: "row",
     minHeight: 28,
   },
-
   tableRow: {
     flexDirection: "row",
     minHeight: 17,
   },
-
   cell: {
     borderTopWidth: 1,
     borderRightWidth: 1,
@@ -526,14 +496,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     textAlign: "center",
   },
-
   totalRow: {
     height: 18,
     borderTopWidth: 1,
     borderColor: "#000",
     padding: 4,
   },
-
   bottomTotal: {
     height: 20,
     borderTopWidth: 1,
@@ -541,53 +509,44 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
   codRow: {
     flexDirection: "row",
     borderTopWidth: 1,
     borderColor: "#000",
   },
-
   codBox: {
     width: 230,
     padding: 5,
     borderLeftWidth: 2,
     borderColor: "#000",
   },
-
   noteRow: {
     padding: 4,
     borderTopWidth: 1,
     borderColor: "#000",
   },
-
   signatureGrid: {
     flexDirection: "row",
     borderTopWidth: 1,
     borderColor: "#000",
     minHeight: 58,
   },
-
   signatureBox: {
     flex: 1,
     padding: 4,
     borderRightWidth: 1,
     borderColor: "#000",
   },
-
   bold: {
     fontWeight: "bold",
   },
-
   italic: {
     fontStyle: "italic",
   },
-
   smallText: {
     fontSize: 7,
     marginTop: 5,
   },
-
   tinyText: {
     fontSize: 6,
     lineHeight: 1.25,

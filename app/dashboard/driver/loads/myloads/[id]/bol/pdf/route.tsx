@@ -1,5 +1,3 @@
-// app/api/documents/[id]/bol/route.tsx
-
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import {
@@ -17,26 +15,39 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  const document = await prisma.document.findUnique({
+  const load = await prisma.load.findUnique({
     where: { id },
     include: {
-      load: true,
-      billOfLading: true,
+      documents: {
+        where: {
+          type: "BILL_OF_LADING",
+        },
+        include: {
+          billOfLading: true,
+        },
+      },
     },
   });
 
-  if (!document) {
-    return NextResponse.json({ error: "Document not found" }, { status: 404 });
+  if (!load) {
+    return NextResponse.json(
+      { error: "Load not found" },
+      { status: 404 }
+    );
   }
 
-  if (!document.billOfLading) {
-    return NextResponse.json({ error: "BOL not found" }, { status: 404 });
+  const bol = load.documents[0]?.billOfLading;
+
+  if (!bol) {
+    return NextResponse.json(
+      { error: "BOL not found" },
+      { status: 404 }
+    );
   }
 
-  const load = document.load;
-  const bol = document.billOfLading;
-
-  const pdfBuffer = await renderToBuffer(<BolPdf load={load} bol={bol} />);
+  const pdfBuffer = await renderToBuffer(
+    <BolPdf load={load} bol={bol} />
+  );
 
   return new NextResponse(new Uint8Array(pdfBuffer), {
     status: 200,
@@ -47,7 +58,13 @@ export async function GET(
   });
 }
 
-function BolPdf({ load, bol }: { load: any; bol: any }) {
+function BolPdf({
+  load,
+  bol,
+}: {
+  load: any;
+  bol: any;
+}) {
   const blankRows = Array.from({ length: 8 });
   const carrierRows = Array.from({ length: 9 });
 
@@ -55,17 +72,22 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.outerBox}>
+          {/* HEADER */}
           <View style={styles.header}>
-            <Text style={styles.headerSmall}>
-              Date: {formatPdfDate(bol.createdAt)}
+            <Text style={styles.headerSmall}>Date:</Text>
+
+            <Text style={styles.title}>
+              BILL OF LADING
             </Text>
 
-            <Text style={styles.title}>BILL OF LADING</Text>
-
-            <Text style={styles.headerSmall}>Page 1 of ____</Text>
+            <Text style={styles.headerSmall}>
+              Page 1 of ____
+            </Text>
           </View>
 
+          {/* TOP SECTION */}
           <View style={styles.topGrid}>
+            {/* LEFT */}
             <View style={styles.leftCol}>
               <SectionBar title="SHIP FROM" />
 
@@ -73,6 +95,11 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
                 rows={[
                   ["Name:", bol.shipperName],
                   ["Address:", bol.shipperAddress],
+                  [
+                    "City/State/Zip:",
+                    bol.shipperCityStateZip,
+                  ],
+                  ["SID#:", bol.sid],
                 ]}
                 fob
               />
@@ -83,115 +110,172 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
                 rows={[
                   ["Name:", bol.consigneeName],
                   ["Address:", bol.consigneeAddress],
+                  [
+                    "City/State/Zip:",
+                    bol.consigneeCityStateZip,
+                  ],
+                  ["CID#:", bol.cid],
                 ]}
+                extraTopRight={`Location #: ${
+                  bol.locationNumber || "________"
+                }`}
                 fob
               />
 
-              <SectionBar title="LOAD INFORMATION" />
+              <SectionBar title="THIRD PARTY FREIGHT CHARGES BILL TO:" />
 
               <InfoBlock
                 rows={[
-                  ["Reference #:", load.referenceNumber],
-                  ["Origin:", `${load.originCity}, ${load.originState}`],
+                  ["Name:", bol.thirdPartyName],
+                  ["Address:", bol.thirdPartyAddress],
                   [
-                    "Destination:",
-                    `${load.destinationCity}, ${load.destinationState}`,
+                    "City/State/Zip:",
+                    bol.thirdPartyCityStateZip,
                   ],
                 ]}
               />
 
               <View style={styles.instructions}>
                 <Text>SPECIAL INSTRUCTIONS:</Text>
-                <Text>{load.notes || ""}</Text>
+
+                <Text>
+                  {bol.specialInstructions || ""}
+                </Text>
               </View>
             </View>
 
+            {/* RIGHT */}
             <View style={styles.rightCol}>
               <View style={styles.bolNumberBox}>
                 <Text style={styles.bold}>
-                  Bill of Lading Number: {load.referenceNumber}
+                  Bill of Lading Number:{" "}
+                  {bol.bolNumber ||
+                    load.referenceNumber}
                 </Text>
 
-                <Text style={styles.barcode}>BAR CODE SPACE</Text>
-              </View>
-
-              <View style={styles.carrierBox}>
-                <Text style={styles.bold}>
-                  CARRIER NAME: {bol.carrierName || "________________"}
-                </Text>
-
-                <Text style={styles.bold}>
-                  Trailer number: {bol.trailerNumber || "NOT PROVIDED"}
-                </Text>
-
-                <Text style={styles.bold}>
-                  Seal number(s): {bol.sealNumber || "NOT PROVIDED"}
+                <Text style={styles.barcode}>
+                  BAR CODE SPACE
                 </Text>
               </View>
 
               <View style={styles.carrierBox}>
                 <Text style={styles.bold}>
-                  Equipment Type: {load.equipmentType || ""}
+                  CARRIER NAME:{" "}
+                  {bol.carrierName ||
+                    "________________"}
                 </Text>
 
-                <Text style={styles.bold}>Load Status: {load.status || ""}</Text>
+                <Text>
+                  Trailer number:{" "}
+                  {bol.trailerNumber || ""}
+                </Text>
 
-                <Text style={styles.barcode}>BAR CODE SPACE</Text>
+                <Text>
+                  Seal number(s):{" "}
+                  {bol.sealNumber || ""}
+                </Text>
+              </View>
+
+              <View style={styles.carrierBox}>
+                <Text style={styles.bold}>
+                  SCAC: {bol.scac || ""}
+                </Text>
+
+                <Text style={styles.bold}>
+                  Pro number:{" "}
+                  {bol.proNumber || ""}
+                </Text>
+
+                <Text style={styles.barcode}>
+                  BAR CODE SPACE
+                </Text>
               </View>
 
               <View style={styles.freightTerms}>
                 <Text style={styles.bold}>
                   Freight Charge Terms:{" "}
                   <Text style={styles.italic}>
-                    freight charges are prepaid unless marked otherwise
+                    freight charges are prepaid
+                    unless marked otherwise
                   </Text>
                 </Text>
 
                 <View style={styles.row}>
                   <Text>Prepaid ______</Text>
+
                   <Text>Collect ______</Text>
+
                   <Text>3rd Party ______</Text>
                 </View>
 
                 <Text style={styles.smallText}>
-                  ☐ Master Bill of Lading: with attached underlying Bills of
-                  Lading
+                  ☐ Master Bill of Lading:
+                  with attached underlying Bills
+                  of Lading
                 </Text>
               </View>
             </View>
           </View>
 
+          {/* CUSTOMER ORDER INFO */}
           <SectionBar title="CUSTOMER ORDER INFORMATION" />
 
           <View style={styles.customerHeader}>
             <Cell flex={3} bold>
               CUSTOMER ORDER NUMBER
             </Cell>
+
             <Cell flex={1} bold>
               # PKGS
             </Cell>
+
             <Cell flex={1} bold>
               WEIGHT
             </Cell>
+
             <Cell flex={1.3} bold>
               PALLET/SLIP
             </Cell>
+
             <Cell flex={4} bold>
               ADDITIONAL SHIPPER INFO
             </Cell>
           </View>
 
           {blankRows.map((_, i) => (
-            <View key={i} style={styles.tableRow}>
-              <Cell flex={3}>{i === 0 ? load.referenceNumber : ""}</Cell>
-              <Cell flex={1}>{i === 0 ? bol.pieces || "" : ""}</Cell>
-              <Cell flex={1}>
-                {i === 0 ? bol.weight || load.weight || "" : ""}
+            <View
+              key={i}
+              style={styles.tableRow}
+            >
+              <Cell flex={3}>
+                {i === 0
+                  ? bol.customerOrderNumber ||
+                    ""
+                  : ""}
               </Cell>
-              <Cell flex={1.3}>Y N</Cell>
+
+              <Cell flex={1}>
+                {i === 0
+                  ? bol.pieces || ""
+                  : ""}
+              </Cell>
+
+              <Cell flex={1}>
+                {i === 0
+                  ? bol.weight ||
+                    load.weight ||
+                    ""
+                  : ""}
+              </Cell>
+
+              <Cell flex={1.3}>
+                Y     N
+              </Cell>
+
               <Cell flex={4}>
                 {i === 0
-                  ? bol.commodity || load.commodity || "General Freight"
+                  ? bol.additionalShipperInfo ||
+                    ""
                   : ""}
               </Cell>
             </View>
@@ -199,129 +283,235 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
 
           <View style={styles.totalRow}>
             <Text style={styles.bold}>
-              GRAND TOTAL {bol.pieces ? `PKGS: ${bol.pieces}` : ""}{" "}
-              {bol.weight ? `WEIGHT: ${bol.weight}` : ""}
+              GRAND TOTAL
             </Text>
           </View>
 
+          {/* CARRIER INFORMATION */}
           <SectionBar title="CARRIER INFORMATION" />
 
           <View style={styles.carrierHeader}>
             <Cell flex={1.1} bold>
               HANDLING UNIT{"\n"}QTY
             </Cell>
+
             <Cell flex={1.1} bold>
               TYPE
             </Cell>
+
             <Cell flex={1.1} bold>
               PACKAGE{"\n"}QTY
             </Cell>
+
             <Cell flex={1.1} bold>
               TYPE
             </Cell>
+
             <Cell flex={1.4} bold>
               WEIGHT
             </Cell>
+
             <Cell flex={0.9} bold>
               H.M.{"\n"}(X)
             </Cell>
+
             <Cell flex={4.5} bold>
               COMMODITY DESCRIPTION
             </Cell>
+
             <Cell flex={1.4} bold>
               NMFC #
             </Cell>
+
             <Cell flex={1.2} bold>
               CLASS
             </Cell>
           </View>
 
           {carrierRows.map((_, i) => (
-            <View key={i} style={styles.tableRow}>
-              <Cell flex={1.1}>{i === 0 ? bol.pieces || "" : ""}</Cell>
-              <Cell flex={1.1}>{i === 0 ? "PCS" : ""}</Cell>
-              <Cell flex={1.1}>{i === 0 ? bol.pieces || "" : ""}</Cell>
-              <Cell flex={1.1}>{i === 0 ? "Package" : ""}</Cell>
-              <Cell flex={1.4}>
-                {i === 0 ? bol.weight || load.weight || "" : ""}
-              </Cell>
-              <Cell flex={0.9}></Cell>
-              <Cell flex={4.5}>
+            <View
+              key={i}
+              style={styles.tableRow}
+            >
+              <Cell flex={1.1}>
                 {i === 0
-                  ? bol.commodity || load.commodity || "General Freight"
+                  ? bol.handlingQty || ""
                   : ""}
               </Cell>
-              <Cell flex={1.4}></Cell>
-              <Cell flex={1.2}></Cell>
+
+              <Cell flex={1.1}>
+                {i === 0
+                  ? bol.handlingType || ""
+                  : ""}
+              </Cell>
+
+              <Cell flex={1.1}>
+                {i === 0
+                  ? bol.pieces || ""
+                  : ""}
+              </Cell>
+
+              <Cell flex={1.1}>
+                {i === 0
+                  ? bol.packageType || ""
+                  : ""}
+              </Cell>
+
+              <Cell flex={1.4}>
+                {i === 0
+                  ? bol.weight ||
+                    load.weight ||
+                    ""
+                  : ""}
+              </Cell>
+
+              <Cell flex={0.9}>
+                {i === 0 &&
+                bol.hazardous
+                  ? "X"
+                  : ""}
+              </Cell>
+
+              <Cell flex={4.5}>
+                {i === 0
+                  ? bol.commodity ||
+                    load.commodity ||
+                    "General Freight"
+                  : ""}
+              </Cell>
+
+              <Cell flex={1.4}>
+                {i === 0
+                  ? bol.nmfc || ""
+                  : ""}
+              </Cell>
+
+              <Cell flex={1.2}>
+                {i === 0
+                  ? bol.class || ""
+                  : ""}
+              </Cell>
             </View>
           ))}
 
           <View style={styles.bottomTotal}>
             <Text style={styles.bold}>
-              GRAND TOTAL {bol.weight ? `${bol.weight} lbs` : ""}
+              GRAND TOTAL
             </Text>
           </View>
 
+          {/* COD */}
           <View style={styles.codRow}>
             <View style={{ flex: 1 }}>
               <Text style={styles.tinyText}>
-                Where the rate is dependent on value, shippers are required to
-                state specifically in writing the agreed or declared value of the
-                property.
+                Where the rate is dependent
+                on value, shippers are
+                required to state
+                specifically in writing the
+                agreed or declared value of
+                the property.
               </Text>
 
               <Text style={styles.tinyText}>
-                The agreed or declared value of the property is specifically
-                stated by the shipper to be not exceeding __________ per
-                __________.
+                The agreed or declared
+                value of the property is
+                specifically stated by the
+                shipper to be not exceeding
+                __________ per __________.
               </Text>
             </View>
 
             <View style={styles.codBox}>
-              <Text style={styles.bold}>COD Amount: $ __________________</Text>
-              <Text>Fee Terms: Collect: ☐ Prepaid: ☐</Text>
-              <Text>Customer check acceptable: ☐</Text>
+              <Text style={styles.bold}>
+                COD Amount: $
+                __________________
+              </Text>
+
+              <Text>
+                Fee Terms: Collect: ☐
+                Prepaid: ☐
+              </Text>
+
+              <Text>
+                Customer check acceptable:
+                ☐
+              </Text>
             </View>
           </View>
 
+          {/* NOTE */}
           <View style={styles.noteRow}>
             <Text style={styles.bold}>
-              NOTE Liability Limitation for loss or damage in this shipment may
-              be applicable.
+              NOTE Liability Limitation
+              for loss or damage in this
+              shipment may be applicable.
             </Text>
           </View>
 
+          {/* SIGNATURES */}
           <View style={styles.signatureGrid}>
             <View style={styles.signatureBox}>
-              <Text style={styles.bold}>SHIPPER SIGNATURE / DATE</Text>
+              <Text style={styles.bold}>
+                SHIPPER SIGNATURE / DATE
+              </Text>
 
               <Text style={styles.tinyText}>
-                This is to certify that the above named materials are properly
-                classified, packaged, marked and labeled, and are in proper
-                condition for transportation.
+                This is to certify that
+                the above named materials
+                are properly classified,
+                packaged, marked and
+                labeled, and are in proper
+                condition for
+                transportation.
               </Text>
             </View>
 
             <View style={styles.signatureBox}>
-              <Text>Trailer Loaded:</Text>
-              <Text>☐ By Shipper</Text>
-              <Text>☐ By Driver</Text>
+              <Text>
+                Trailer Loaded:
+              </Text>
+
+              <Text>
+                ☐ By Shipper
+              </Text>
+
+              <Text>
+                ☐ By Driver
+              </Text>
             </View>
 
             <View style={styles.signatureBox}>
-              <Text>Freight Counted:</Text>
-              <Text>☐ By Shipper</Text>
-              <Text>☐ By Driver/pallets said to contain</Text>
-              <Text>☐ By Driver/Pieces</Text>
+              <Text>
+                Freight Counted:
+              </Text>
+
+              <Text>
+                ☐ By Shipper
+              </Text>
+
+              <Text>
+                ☐ By Driver/pallets said
+                to contain
+              </Text>
+
+              <Text>
+                ☐ By Driver/Pieces
+              </Text>
             </View>
 
             <View style={styles.signatureBox}>
-              <Text style={styles.bold}>CARRIER SIGNATURE / PICKUP DATE</Text>
+              <Text style={styles.bold}>
+                CARRIER SIGNATURE /
+                PICKUP DATE
+              </Text>
 
               <Text style={styles.tinyText}>
-                Carrier acknowledges receipt of packages and required placards.
-                Property described above is received in good order, except as
-                noted.
+                Carrier acknowledges
+                receipt of packages and
+                required placards.
+                Property described above
+                is received in good order,
+                except as noted.
               </Text>
             </View>
           </View>
@@ -331,7 +521,11 @@ function BolPdf({ load, bol }: { load: any; bol: any }) {
   );
 }
 
-function SectionBar({ title }: { title: string }) {
+function SectionBar({
+  title,
+}: {
+  title: string;
+}) {
   return (
     <View style={styles.sectionBar}>
       <Text>{title}</Text>
@@ -350,7 +544,11 @@ function InfoBlock({
 }) {
   return (
     <View style={styles.infoBlock}>
-      {extraTopRight && <Text style={styles.extraRight}>{extraTopRight}</Text>}
+      {extraTopRight && (
+        <Text style={styles.extraRight}>
+          {extraTopRight}
+        </Text>
+      )}
 
       {rows.map(([label, value]) => (
         <Text key={label}>
@@ -358,7 +556,11 @@ function InfoBlock({
         </Text>
       ))}
 
-      {fob && <Text style={styles.fob}>FOB: ☐</Text>}
+      {fob && (
+        <Text style={styles.fob}>
+          FOB: ☐
+        </Text>
+      )}
     </View>
   );
 }
@@ -373,18 +575,18 @@ function Cell({
   bold?: boolean;
 }) {
   return (
-    <View style={[styles.cell, { flex }]}>
-      <Text style={bold ? styles.bold : undefined}>{children}</Text>
+    <View
+      style={[styles.cell, { flex }]}
+    >
+      <Text
+        style={
+          bold ? styles.bold : undefined
+        }
+      >
+        {children}
+      </Text>
     </View>
   );
-}
-
-function formatPdfDate(date: Date | string) {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "2-digit",
-    day: "2-digit",
-    year: "numeric",
-  });
 }
 
 const styles = StyleSheet.create({

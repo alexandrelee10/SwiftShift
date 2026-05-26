@@ -137,7 +137,7 @@ function LoadRow({ load }: { load: any }) {
 
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap md:justify-end">
         <Link
-          href={`/dashboard/loads/search/${load.id}`}
+          href={`/dashboard/driver/loads/myloads/${load.id}`}
           className="rounded-lg border border-slate-200 px-4 py-2 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
         >
           View

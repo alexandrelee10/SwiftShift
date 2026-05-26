@@ -286,14 +286,14 @@ export default async function DriverDashboardPage() {
 
                       <div className="mt-6 grid grid-cols-2 gap-3">
                         <Link
-                          href="/dashboard/loads/track"
+                          href="/dashboard/driver/loads/track"
                           className="rounded-lg bg-blue-600 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                         >
                           Track Load
                         </Link>
 
                         <Link
-                          href={`/dashboard/loads/search/${activeLoad.id}`}
+                          href={`/dashboard/driver/loads/search/${activeLoad.id}`}
                           className="rounded-lg border border-zinc-200 px-4 py-2.5 text-center text-sm font-medium text-blue-600 hover:bg-zinc-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800"
                         >
                           View Details
