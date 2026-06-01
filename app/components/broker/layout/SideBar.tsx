@@ -55,12 +55,12 @@ const sidebarSections = [
       },
       {
         name: "Drivers",
-        href: "/dashboard/broker/loads/driver",
+        href: "/dashboard/broker/brokerLoads/drivers",
         icon: User,
       },
       {
         name: "Dispatch",
-        href: "/dashboard/broker/loads/dispatch",
+        href: "/dashboard/broker/brokerLoads/dispatch",
         icon: Users2Icon,
       },
       {
