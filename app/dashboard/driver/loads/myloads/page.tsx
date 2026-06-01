@@ -55,25 +55,31 @@ export default async function MyLoadsPage({
       bookings: {
         some: {
           driverId: dbUser.id,
+
           ...(status === "REQUESTED"
             ? {
-                status: {
-                  in: [
-                    BookingStatus.PENDING,
-                    BookingStatus.APPROVED,
-                    BookingStatus.REJECTED,
-                  ],
-                },
+              status: {
+                in: [
+                  BookingStatus.PENDING,
+                  BookingStatus.REJECTED,
+                ],
+              },
+            }
+            : status === LoadStatus.BOOKED
+              ? {
+                status: BookingStatus.APPROVED,
               }
-            : {}),
+              : {}),
         },
       },
+
       ...(status !== "REQUESTED"
         ? {
-            status: status,
-          }
+          status,
+        }
         : {}),
     },
+
     include: {
       bookings: {
         where: {
@@ -84,6 +90,7 @@ export default async function MyLoadsPage({
         },
       },
     },
+
     orderBy: {
       pickupDate: "asc",
     },
@@ -106,11 +113,10 @@ export default async function MyLoadsPage({
             <Link
               key={tab.value}
               href={`?status=${tab.value}`}
-              className={`shrink-0 rounded-lg px-4 py-2 text-sm transition ${
-                status === tab.value
+              className={`shrink-0 rounded-lg px-4 py-2 text-sm transition ${status === tab.value
                   ? "bg-blue-50 font-medium text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
                   : "text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
-              }`}
+                }`}
             >
               {tab.label}
             </Link>
@@ -260,10 +266,9 @@ function StatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={`w-fit rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${
-        styles[status] ||
+      className={`w-fit rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${styles[status] ||
         "bg-slate-100 text-slate-600 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700"
-      }`}
+        }`}
     >
       {status === LoadStatus.BOOKED ? "Approved" : formatStatus(status)}
     </span>

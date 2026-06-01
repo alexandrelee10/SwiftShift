@@ -1,9 +1,11 @@
 import StatusPage from "@/app/components/shared/StatusPage";
 import BrokerLoadMap from "@/app/components/broker/loads/LoadMap";
+import PostLoadModal from "@/app/components/broker/loads/PostLoadModal";
 import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { LoadStatus, UserRole } from "@prisma/client";
 import { Truck, Calendar, Landmark, Users, ClockCheck } from "lucide-react";
 
 export default async function BrokerDashboardPage() {
@@ -20,7 +22,7 @@ export default async function BrokerDashboardPage() {
     );
   }
 
-  if (session.user.role !== "BROKER") {
+  if (session.user.role !== UserRole.BROKER) {
     redirect("/unauthorized");
   }
 
@@ -42,7 +44,7 @@ export default async function BrokerDashboardPage() {
   const activeLoads = await prisma.load.findMany({
     where: {
       brokerId: dbUser.id,
-      status: "IN_TRANSIT",
+      status: LoadStatus.IN_TRANSIT,
     },
     orderBy: {
       pickupDate: "asc",
@@ -52,7 +54,17 @@ export default async function BrokerDashboardPage() {
   const pendingLoads = await prisma.load.findMany({
     where: {
       brokerId: dbUser.id,
-      status: "POSTED",
+      status: LoadStatus.POSTED,
+    },
+    orderBy: {
+      pickupDate: "asc",
+    },
+  });
+
+  const bookedLoads = await prisma.load.findMany({
+    where: {
+      brokerId: dbUser.id,
+      status: LoadStatus.BOOKED,
     },
     orderBy: {
       pickupDate: "asc",
@@ -62,7 +74,7 @@ export default async function BrokerDashboardPage() {
   const deliveredLoads = await prisma.load.findMany({
     where: {
       brokerId: dbUser.id,
-      status: "DELIVERED",
+      status: LoadStatus.DELIVERED,
     },
     orderBy: {
       pickupDate: "desc",
@@ -71,7 +83,7 @@ export default async function BrokerDashboardPage() {
 
   const availableDrivers = await prisma.user.findMany({
     where: {
-      role: "DRIVER",
+      role: UserRole.DRIVER,
     },
     take: 5,
   });
@@ -80,7 +92,8 @@ export default async function BrokerDashboardPage() {
     return total + Number(load.rate);
   }, 0);
 
-  const selectedMapLoad = activeLoads[0] ?? pendingLoads[0] ?? deliveredLoads[0];
+  const selectedMapLoad =
+    activeLoads[0] ?? bookedLoads[0] ?? pendingLoads[0] ?? deliveredLoads[0];
 
   const upperIcons = [
     {
@@ -149,12 +162,8 @@ export default async function BrokerDashboardPage() {
               <div className="hidden w-80 items-center rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-400 dark:border-slate-800 dark:bg-slate-900 md:flex">
                 Search loads, drivers, trucks...
               </div>
-              <Link
-                href="/dashboard/broker/brokerLoads/postLoads"
-                className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
-              >
-                + Post New Load
-              </Link>
+
+              <PostLoadModal />
             </div>
           </div>
 
@@ -192,33 +201,35 @@ export default async function BrokerDashboardPage() {
               <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-slate-800">
                 <h3 className="font-semibold">Dispatch Board</h3>
                 <Link
-                  href="/dashboard/broker/loads"
+                  href="/dashboard/broker/brokerLoads"
                   className="text-sm text-blue-600 dark:text-blue-400"
                 >
                   View All
                 </Link>
               </div>
 
-              {/* Inside the Dispatch Board <section> — replace the inner grid div */}
-              <div className="grid gap-3 p-4 grid-cols-2 md:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 p-4 md:grid-cols-4">
                 <LoadColumn
                   title="Posted"
                   count={pendingLoads.length}
                   loads={pendingLoads.slice(0, 3)}
                   status="posted"
                 />
+
                 <LoadColumn
                   title="Booked"
-                  count={0}
-                  loads={[]}
+                  count={bookedLoads.length}
+                  loads={bookedLoads.slice(0, 3)}
                   status="booked"
                 />
+
                 <LoadColumn
                   title="In Transit"
                   count={activeLoads.length}
                   loads={activeLoads.slice(0, 3)}
                   status="transit"
                 />
+
                 <LoadColumn
                   title="Delivered"
                   count={deliveredLoads.length}
@@ -232,7 +243,7 @@ export default async function BrokerDashboardPage() {
               <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-slate-800">
                 <h3 className="font-semibold">Live Tracking</h3>
                 <Link
-                  href="/dashboard/broker/tracking"
+                  href="/dashboard/broker/brokerLoads/tracking"
                   className="text-sm text-blue-600 dark:text-blue-400"
                 >
                   View Full Map
@@ -252,11 +263,11 @@ export default async function BrokerDashboardPage() {
             <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <CardTitle
                 title="Recent Bookings"
-                href="/dashboard/broker/bookings"
+                href="/dashboard/broker/brokerLoads/assign?tab=assigned"
               />
 
               <div className="space-y-3">
-                {[...activeLoads, ...pendingLoads, ...deliveredLoads]
+                {[...activeLoads, ...bookedLoads, ...pendingLoads, ...deliveredLoads]
                   .slice(0, 5)
                   .map((load) => (
                     <div
@@ -318,15 +329,19 @@ export default async function BrokerDashboardPage() {
                   label="Total Loads"
                   value={(
                     activeLoads.length +
+                    bookedLoads.length +
                     pendingLoads.length +
                     deliveredLoads.length
                   ).toString()}
                 />
+
                 <StatRow
                   label="Delivered"
                   value={deliveredLoads.length.toString()}
                 />
+
                 <StatRow label="On-Time" value="90%" />
+
                 <StatRow
                   label="Revenue"
                   value={`$${totalEarnings.toLocaleString()}`}
@@ -346,6 +361,7 @@ function CardTitle({ title, href }: { title: string; href?: string }) {
   return (
     <div className="mb-4 flex items-center justify-between">
       <h3 className="font-semibold">{title}</h3>
+
       {href && (
         <Link href={href} className="text-sm text-blue-600 dark:text-blue-400">
           View All
@@ -354,8 +370,6 @@ function CardTitle({ title, href }: { title: string; href?: string }) {
     </div>
   );
 }
-
-// Replace the LoadColumn component and the Dispatch Board section
 
 function LoadColumn({
   title,
@@ -391,25 +405,32 @@ function LoadColumn({
 
   const statusLabel = {
     posted: null,
-    booked: null,
+    booked: "Booked",
     transit: "En route",
     delivered: "Delivered",
   }[status];
 
   const statusTextColor = {
+    posted: "text-zinc-500 dark:text-zinc-400",
+    booked: "text-blue-600 dark:text-blue-400",
     transit: "text-amber-600 dark:text-amber-400",
     delivered: "text-green-700 dark:text-green-400",
-  }[status as "transit" | "delivered"];
+  }[status];
 
   return (
     <div
       className={`flex flex-col gap-2 rounded-xl bg-zinc-50 p-3 dark:bg-slate-950 ${topBorder}`}
     >
-      <div className="flex items-center justify-between mb-1">
-        <p className={`flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide ${labelColor}`}>
-          <span className={`inline-block h-1.5 w-1.5 rounded-full ${dotColor}`} />
+      <div className="mb-1 flex items-center justify-between">
+        <p
+          className={`flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide ${labelColor}`}
+        >
+          <span
+            className={`inline-block h-1.5 w-1.5 rounded-full ${dotColor}`}
+          />
           {title}
         </p>
+
         <span className="rounded-full border border-zinc-200 bg-white px-2 py-0.5 text-xs dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
           {count}
         </span>
@@ -420,22 +441,26 @@ function LoadColumn({
           loads.map((load) => (
             <div
               key={load.id}
-              className="rounded-lg border border-zinc-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900 hover:border-zinc-300 dark:hover:border-slate-700 transition-colors cursor-pointer"
+              className="cursor-pointer rounded-lg border border-zinc-200 bg-white p-3 transition-colors hover:border-zinc-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
             >
-              <p className="text-xs text-zinc-400 dark:text-slate-500 mb-1">
+              <p className="mb-1 text-xs text-zinc-400 dark:text-slate-500">
                 #{load.referenceNumber}
               </p>
+
               <p className="text-xs font-semibold leading-snug">
                 {load.originCity}, {load.originState} →{" "}
                 {load.destinationCity}, {load.destinationState}
               </p>
-              <p className="mt-1 text-xs text-zinc-400 dark:text-slate-500 truncate">
+
+              <p className="mt-1 truncate text-xs text-zinc-400 dark:text-slate-500">
                 {load.commodity || "General freight"}
               </p>
+
               <div className="mt-2 flex items-center justify-between">
                 <p className="text-sm font-semibold">
                   ${Number(load.rate).toLocaleString()}
                 </p>
+
                 {statusLabel ? (
                   <span className={`text-xs ${statusTextColor}`}>
                     {statusLabel}

@@ -36,12 +36,12 @@ const sidebarSections = [
         icon: Package,
         items: [
           {
-            name: "Add Loads",
-            href: "/dashboard/broker/brokerLoads/load/new",
+            name: "Find Loads",
+            href: "/dashboard/broker/brokerLoads/load",
           },
           {
-            name: "Find Loads",
-            href: "/dashboard/broker/brokerLoads/load?status=CANCELLED",
+            name: "Post Loads",
+            href: "/dashboard/broker/brokerLoads/postLoads"
           },
           {
             name: "Approve Loads",
@@ -65,12 +65,12 @@ const sidebarSections = [
       },
       {
         name: "Tracking",
-        href: "/dashboard/broker/loads/tracking",
+        href: "/dashboard/broker/brokerLoads/tracking",
         icon: ChartLine,
       },
       {
         name: "Revenue",
-        href: "/dashboard/broker/loads/revenues",
+        href: "/dashboard/broker/brokerLoads/revenues",
         icon: LandmarkIcon,
       },
       {
@@ -80,12 +80,12 @@ const sidebarSections = [
       },
       {
         name: "Analytics",
-        href: "/dashboard/broker/loads/analytics",
+        href: "/dashboard/broker/brokerLoads/analytics",
         icon: CreditCardIcon,
       },
       {
         name: "Settings",
-        href: "/dashboard/broker/loads/settings",
+        href: "/dashboard/broker/brokerLoads/settings",
         icon: Settings,
       },
     ],

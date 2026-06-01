@@ -2,12 +2,12 @@ import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { UserRole, LoadStatus } from "@prisma/client";
 import {
   ClipboardList,
   Mail,
   Phone,
   Plus,
-  RadioTower,
   Route,
   Truck,
   UserRound,
@@ -31,13 +31,13 @@ export default async function BrokerDispatchPage() {
     throw new Error("User not found");
   }
 
-  if (broker.role !== "BROKER") {
+  if (broker.role !== UserRole.BROKER) {
     redirect("/unauthorized");
   }
 
   const dispatchers = await prisma.user.findMany({
     where: {
-      role: "DISPATCH",
+      role: UserRole.DISPATCH,
     },
     orderBy: {
       firstName: "asc",
@@ -48,7 +48,7 @@ export default async function BrokerDispatchPage() {
     where: {
       brokerId: broker.id,
       status: {
-        in: ["BOOKED", "IN_TRANSIT"],
+        in: [LoadStatus.BOOKED, LoadStatus.IN_TRANSIT],
       },
     },
     include: {
@@ -63,31 +63,10 @@ export default async function BrokerDispatchPage() {
     },
   });
 
-  const postedLoads = await prisma.load.count({
-    where: {
-      brokerId: broker.id,
-      status: "POSTED",
-    },
-  });
-
-  const bookedLoads = await prisma.load.count({
-    where: {
-      brokerId: broker.id,
-      status: "BOOKED",
-    },
-  });
-
-  const inTransitLoads = await prisma.load.count({
-    where: {
-      brokerId: broker.id,
-      status: "IN_TRANSIT",
-    },
-  });
-
   const deliveredLoads = await prisma.load.count({
     where: {
       brokerId: broker.id,
-      status: "DELIVERED",
+      status: LoadStatus.DELIVERED,
     },
   });
 
@@ -146,13 +125,8 @@ export default async function BrokerDispatchPage() {
                   size={38}
                   className="mx-auto mb-3 text-slate-300 dark:text-slate-600"
                 />
-
                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
                   No dispatchers found.
-                </p>
-
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  Dispatch users will appear here once they sign up.
                 </p>
               </div>
             ) : (
@@ -171,7 +145,6 @@ export default async function BrokerDispatchPage() {
                         <p className="font-semibold text-slate-950 dark:text-white">
                           {dispatcher.firstName} {dispatcher.lastName}
                         </p>
-
                         <p className="text-xs text-slate-500 dark:text-slate-400">
                           Dispatcher ID: {dispatcher.id.slice(0, 8)}
                         </p>
@@ -211,13 +184,8 @@ export default async function BrokerDispatchPage() {
                   size={38}
                   className="mx-auto mb-3 text-slate-300 dark:text-slate-600"
                 />
-
                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
                   No active loads.
-                </p>
-
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  Booked and in-transit loads will show here.
                 </p>
               </div>
             ) : (
@@ -232,21 +200,9 @@ export default async function BrokerDispatchPage() {
                     >
                       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
                         <div>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <p className="font-semibold text-slate-950 dark:text-white">
-                              Load #{load.referenceNumber}
-                            </p>
-
-                            <span
-                              className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                                load.status === "IN_TRANSIT"
-                                  ? "bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300"
-                                  : "bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300"
-                              }`}
-                            >
-                              {formatStatus(load.status)}
-                            </span>
-                          </div>
+                          <p className="font-semibold text-slate-950 dark:text-white">
+                            Load #{load.referenceNumber}
+                          </p>
 
                           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
                             {load.originCity}, {load.originState} →{" "}
@@ -320,8 +276,6 @@ export default async function BrokerDispatchPage() {
   );
 }
 
-
-
 function ActionCard({
   title,
   description,
@@ -349,11 +303,4 @@ function ActionCard({
       </p>
     </Link>
   );
-}
-
-function formatStatus(status: string) {
-  return status
-    .toLowerCase()
-    .replace("_", " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }

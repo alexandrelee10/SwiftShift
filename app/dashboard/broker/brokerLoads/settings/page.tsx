@@ -81,7 +81,7 @@ export default async function SettingsPage({
             {tabs.map((tab) => (
               <Link
                 key={tab.value}
-                href={`/dashboard/driver/loads/settings?tab=${tab.value}`}
+                href={`/dashboard/broker/brokerLoads/settings?tab=${tab.value}`}
                 className={`whitespace-nowrap border-b-2 pb-3 transition ${
                   activeTab === tab.value
                     ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
