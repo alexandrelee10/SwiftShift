@@ -10,17 +10,32 @@ export default async function AssignLoadsPage({
   searchParams: Promise<{ tab?: string }>;
 }) {
   const params = await searchParams;
+
+  if (!params.tab) {
+    redirect("/dashboard/broker/brokerLoads/assign?tab=available");
+  }
+
   const activeTab = params.tab === "assigned" ? "assigned" : "available";
 
   const session = await requireUser();
-  if (!session.user?.email) throw new Error("Unauthorized");
+
+  if (!session.user?.email) {
+    throw new Error("Unauthorized");
+  }
 
   const broker = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: {
+      email: session.user.email,
+    },
   });
 
-  if (!broker) throw new Error("User not found");
-  if (broker.role !== "BROKER") redirect("/unauthorized");
+  if (!broker) {
+    throw new Error("User not found");
+  }
+
+  if (broker.role !== "BROKER") {
+    redirect("/unauthorized");
+  }
 
   const loads = await prisma.load.findMany({
     where: {
@@ -57,7 +72,7 @@ export default async function AssignLoadsPage({
         <div className="border-b border-slate-200 dark:border-slate-800">
           <div className="flex gap-6 text-sm font-medium">
             <Link
-              href="/dashboard/broker/loads/assign?tab=available"
+              href="/dashboard/broker/brokerLoads/assign?tab=available"
               className={`flex items-center gap-2 whitespace-nowrap border-b-2 pb-3 transition ${
                 activeTab === "available"
                   ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
@@ -69,7 +84,7 @@ export default async function AssignLoadsPage({
             </Link>
 
             <Link
-              href="/dashboard/broker/loads/assign?tab=assigned"
+              href="/dashboard/broker/brokerLoads/assign?tab=assigned"
               className={`flex items-center gap-2 whitespace-nowrap border-b-2 pb-3 transition ${
                 activeTab === "assigned"
                   ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
@@ -139,7 +154,7 @@ export default async function AssignLoadsPage({
                       </span>
 
                       <Link
-                        href={`/dashboard/broker/loads/assign/${load.id}`}
+                        href={`/dashboard/broker/brokerLoads/assign/${load.id}`}
                         className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                       >
                         {assignedTrip ? "Reassign" : "Assign"}
@@ -203,6 +218,7 @@ function InfoBlock({
           {label}
         </span>
       </div>
+
       <p className="mt-1 text-sm font-medium text-slate-800 dark:text-white">
         {value}
       </p>

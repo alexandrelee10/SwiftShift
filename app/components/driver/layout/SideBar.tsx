@@ -41,14 +41,6 @@ const sidebarSections = [
             name: "My Loads",
             href: "/dashboard/driver/loads/myloads",
           },
-          {
-            name: "Requested Loads",
-            href: "/dashboard/driver/loads/requestedLoads",
-          },
-          {
-            name: "Approved Loads",
-            href: "/dashboard/driver/loads/approvedLoads",
-          },
         ],
       },
       {

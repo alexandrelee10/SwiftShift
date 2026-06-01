@@ -1,12 +1,20 @@
 import { requireUser } from "@/lib/requireUser";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import { BookingStatus, LoadStatus } from "@prisma/client";
 import { startTrip, markDelivered } from "./action";
 
 const tabs = [
   { label: "Requested", value: "REQUESTED" },
-  { label: "In Transit", value: "IN_TRANSIT" },
-  { label: "Delivered", value: "DELIVERED" },
+  { label: "Approved", value: LoadStatus.BOOKED },
+  { label: "In Transit", value: LoadStatus.IN_TRANSIT },
+  { label: "Delivered", value: LoadStatus.DELIVERED },
+];
+
+const loadStatusValues: LoadStatus[] = [
+  LoadStatus.BOOKED,
+  LoadStatus.IN_TRANSIT,
+  LoadStatus.DELIVERED,
 ];
 
 export default async function MyLoadsPage({
@@ -31,7 +39,16 @@ export default async function MyLoadsPage({
     throw new Error("User not found");
   }
 
-  const status = params.status || "REQUESTED";
+  const rawStatus = params.status || "REQUESTED";
+
+  const status =
+    rawStatus === "APPROVED"
+      ? LoadStatus.BOOKED
+      : rawStatus === "REQUESTED"
+        ? "REQUESTED"
+        : loadStatusValues.includes(rawStatus as LoadStatus)
+          ? (rawStatus as LoadStatus)
+          : "REQUESTED";
 
   const loads = await prisma.load.findMany({
     where: {
@@ -41,7 +58,11 @@ export default async function MyLoadsPage({
           ...(status === "REQUESTED"
             ? {
                 status: {
-                  in: ["PENDING", "APPROVED", "REJECTED"],
+                  in: [
+                    BookingStatus.PENDING,
+                    BookingStatus.APPROVED,
+                    BookingStatus.REJECTED,
+                  ],
                 },
               }
             : {}),
@@ -49,7 +70,7 @@ export default async function MyLoadsPage({
       },
       ...(status !== "REQUESTED"
         ? {
-            status: status as any,
+            status: status,
           }
         : {}),
     },
@@ -76,7 +97,7 @@ export default async function MyLoadsPage({
             My Loads
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Track your requested, booked, active, and delivered loads.
+            Track your requested, approved, active, and delivered loads.
           </p>
         </div>
 
@@ -143,7 +164,7 @@ function LoadRow({ load }: { load: any }) {
           View
         </Link>
 
-        {bookingStatus === "PENDING" && (
+        {bookingStatus === BookingStatus.PENDING && (
           <button
             disabled
             className="rounded-lg bg-yellow-100 px-4 py-2 text-sm font-medium text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-300"
@@ -152,7 +173,7 @@ function LoadRow({ load }: { load: any }) {
           </button>
         )}
 
-        {bookingStatus === "REJECTED" && (
+        {bookingStatus === BookingStatus.REJECTED && (
           <button
             disabled
             className="rounded-lg bg-red-100 px-4 py-2 text-sm font-medium text-red-700 dark:bg-red-950/40 dark:text-red-300"
@@ -161,7 +182,7 @@ function LoadRow({ load }: { load: any }) {
           </button>
         )}
 
-        {load.status === "BOOKED" && (
+        {load.status === LoadStatus.BOOKED && (
           <form action={startTrip.bind(null, load.id)}>
             <button
               type="submit"
@@ -172,7 +193,7 @@ function LoadRow({ load }: { load: any }) {
           </form>
         )}
 
-        {load.status === "IN_TRANSIT" && (
+        {load.status === LoadStatus.IN_TRANSIT && (
           <form action={markDelivered.bind(null, load.id)}>
             <button
               type="submit"
@@ -183,7 +204,7 @@ function LoadRow({ load }: { load: any }) {
           </form>
         )}
 
-        {load.status === "DELIVERED" && (
+        {load.status === LoadStatus.DELIVERED && (
           <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
             View POD
           </button>
@@ -197,7 +218,8 @@ function EmptyState({ status }: { status: string }) {
   return (
     <div className="p-8 text-center sm:p-10">
       <p className="font-medium text-slate-900 dark:text-white">
-        No {formatStatus(status)} loads
+        No {status === LoadStatus.BOOKED ? "Approved" : formatStatus(status)}{" "}
+        loads
       </p>
 
       <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -224,12 +246,16 @@ function StatusBadge({ status }: { status: string }) {
       "bg-blue-50 text-blue-700 ring-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:ring-blue-900/60",
     REJECTED:
       "bg-red-50 text-red-700 ring-red-200 dark:bg-red-950/40 dark:text-red-300 dark:ring-red-900/60",
+    CONFIRMED:
+      "bg-blue-50 text-blue-700 ring-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:ring-blue-900/60",
     BOOKED:
       "bg-blue-50 text-blue-700 ring-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:ring-blue-900/60",
     IN_TRANSIT:
       "bg-purple-50 text-purple-700 ring-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:ring-purple-900/60",
     DELIVERED:
       "bg-green-50 text-green-700 ring-green-200 dark:bg-green-950/40 dark:text-green-300 dark:ring-green-900/60",
+    CANCELLED:
+      "bg-red-50 text-red-700 ring-red-200 dark:bg-red-950/40 dark:text-red-300 dark:ring-red-900/60",
   };
 
   return (
@@ -239,7 +265,7 @@ function StatusBadge({ status }: { status: string }) {
         "bg-slate-100 text-slate-600 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700"
       }`}
     >
-      {formatStatus(status)}
+      {status === LoadStatus.BOOKED ? "Approved" : formatStatus(status)}
     </span>
   );
 }
