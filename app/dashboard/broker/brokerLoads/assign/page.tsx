@@ -7,7 +7,10 @@ import { CheckCircle2, Clock, MapPin, Truck } from "lucide-react";
 export default async function AssignLoadsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{
+    tab?: string;
+    success?: string;
+  }>;
 }) {
   const params = await searchParams;
 
@@ -16,6 +19,7 @@ export default async function AssignLoadsPage({
   }
 
   const activeTab = params.tab === "assigned" ? "assigned" : "available";
+  const success = params.success;
 
   const session = await requireUser();
 
@@ -68,6 +72,15 @@ export default async function AssignLoadsPage({
             Assign available loads to drivers and view assigned loads.
           </p>
         </div>
+
+        {success === "assigned" && (
+          <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-900 dark:bg-green-950/40 dark:text-green-300">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={16} />
+              <span>Load assigned successfully.</span>
+            </div>
+          </div>
+        )}
 
         <div className="border-b border-slate-200 dark:border-slate-800">
           <div className="flex gap-6 text-sm font-medium">
