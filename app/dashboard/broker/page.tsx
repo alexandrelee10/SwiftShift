@@ -228,24 +228,18 @@ export default async function BrokerDashboardPage() {
               </div>
             </section>
 
-            <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-slate-800">
-                <h3 className="font-semibold">Live Tracking</h3>
-                <Link
-                  href="/dashboard/broker/tracking"
-                  className="text-sm text-blue-600 dark:text-blue-400"
-                >
-                  View Full Map
-                </Link>
-              </div>
+<section className="flex h-full min-h-[520px] flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+  <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-slate-800">
+    <h3 className="font-semibold">Live Tracking</h3>
+  </div>
 
-              <div className="h-[365px]">
-                <BrokerLoadMap
-                  loadId={selectedMapLoad?.id}
-                  className="h-full w-full rounded-none border-0"
-                />
-              </div>
-            </section>
+  <div className="flex-1">
+    <BrokerLoadMap
+      loadId={selectedMapLoad?.id}
+      className="h-full w-full rounded-none border-0"
+    />
+  </div>
+</section>
           </div>
 
           <div className="grid gap-5 xl:grid-cols-3">

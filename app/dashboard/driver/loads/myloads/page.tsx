@@ -188,7 +188,7 @@ function LoadRow({ load }: { load: any }) {
           </button>
         )}
 
-        {load.status === LoadStatus.BOOKED && (
+        {load.status === LoadStatus.BOOKED &&  bookingStatus === BookingStatus.APPROVED && (
           <form action={startTrip.bind(null, load.id)}>
             <button
               type="submit"
