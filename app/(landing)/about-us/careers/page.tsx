@@ -5,17 +5,20 @@ import { useMemo, useState } from "react";
 import {
   ArrowRight,
   BadgeDollarSign,
+  Briefcase,
   BriefcaseBusiness,
   CheckCircle2,
   Code2,
   Compass,
+  DollarSign,
   Headphones,
   HeartPulse,
-  MapPinned,
+  Megaphone,
   Search,
   ShieldCheck,
   Sparkles,
   TruckIcon,
+  Users,
 } from "lucide-react";
 
 export default function CareersPage() {
@@ -32,12 +35,60 @@ export default function CareersPage() {
       icon: Code2,
     },
     {
-      title: "Carrier Support Specialist",
-      department: "Support",
+      title: "Backend Engineer",
+      department: "Engineering",
       type: "Full-time",
-      location: "South Florida",
-      zip: "33324",
-      icon: Headphones,
+      location: "Remote",
+      zip: "33313",
+      icon: Code2,
+    },
+    {
+      title: "Full Stack Engineer",
+      department: "Engineering",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: Code2,
+    },
+    {
+      title: "Software Engineer Intern",
+      department: "Engineering",
+      type: "Internship",
+      location: "Remote",
+      zip: "33313",
+      icon: Code2,
+    },
+    {
+      title: "QA Engineer",
+      department: "Engineering",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: Code2,
+    },
+    {
+      title: "Product Designer",
+      department: "Product",
+      type: "Contract",
+      location: "Remote",
+      zip: "00000",
+      icon: Sparkles,
+    },
+    {
+      title: "UI/UX Designer",
+      department: "Product",
+      type: "Full-time",
+      location: "Remote",
+      zip: "00000",
+      icon: Sparkles,
+    },
+    {
+      title: "Product Manager",
+      department: "Product",
+      type: "Full-time",
+      location: "Remote",
+      zip: "00000",
+      icon: Sparkles,
     },
     {
       title: "Logistics Operations Associate",
@@ -48,16 +99,195 @@ export default function CareersPage() {
       icon: TruckIcon,
     },
     {
-      title: "Product Designer",
-      department: "Product",
-      type: "Contract",
+      title: "Dispatch Coordinator",
+      department: "Operations",
+      type: "Full-time",
+      location: "Fort Lauderdale, FL",
+      zip: "33301",
+      icon: TruckIcon,
+    },
+    {
+      title: "Load Planner",
+      department: "Operations",
+      type: "Full-time",
       location: "Remote",
-      zip: "00000",
-      icon: Sparkles,
+      zip: "33313",
+      icon: TruckIcon,
+    },
+    {
+      title: "Fleet Operations Specialist",
+      department: "Operations",
+      type: "Full-time",
+      location: "South Florida",
+      zip: "33324",
+      icon: TruckIcon,
+    },
+    {
+      title: "Carrier Relations Coordinator",
+      department: "Operations",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: TruckIcon,
+    },
+    {
+      title: "Carrier Support Specialist",
+      department: "Support",
+      type: "Full-time",
+      location: "South Florida",
+      zip: "33324",
+      icon: Headphones,
+    },
+    {
+      title: "Broker Support Specialist",
+      department: "Support",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: Headphones,
+    },
+    {
+      title: "Customer Success Manager",
+      department: "Support",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: Headphones,
+    },
+    {
+      title: "Driver Success Specialist",
+      department: "Support",
+      type: "Full-time",
+      location: "South Florida",
+      zip: "33324",
+      icon: Headphones,
+    },
+    {
+      title: "Account Executive",
+      department: "Sales",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: Briefcase,
+    },
+    {
+      title: "Business Development Representative",
+      department: "Sales",
+      type: "Full-time",
+      location: "Miami, FL",
+      zip: "33101",
+      icon: Briefcase,
+    },
+    {
+      title: "Carrier Acquisition Specialist",
+      department: "Sales",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: Briefcase,
+    },
+    {
+      title: "Broker Acquisition Specialist",
+      department: "Sales",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: Briefcase,
+    },
+    {
+      title: "Growth Marketing Manager",
+      department: "Marketing",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: Megaphone,
+    },
+    {
+      title: "Content Marketing Specialist",
+      department: "Marketing",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: Megaphone,
+    },
+    {
+      title: "Social Media Manager",
+      department: "Marketing",
+      type: "Part-time",
+      location: "Remote",
+      zip: "33313",
+      icon: Megaphone,
+    },
+    {
+      title: "Compliance Specialist",
+      department: "Compliance",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: ShieldCheck,
+    },
+    {
+      title: "Safety Coordinator",
+      department: "Compliance",
+      type: "Full-time",
+      location: "South Florida",
+      zip: "33324",
+      icon: ShieldCheck,
+    },
+    {
+      title: "Accounts Receivable Specialist",
+      department: "Finance",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: DollarSign,
+    },
+    {
+      title: "Payroll Specialist",
+      department: "Finance",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: DollarSign,
+    },
+    {
+      title: "Operations Manager",
+      department: "Leadership",
+      type: "Full-time",
+      location: "South Florida",
+      zip: "33324",
+      icon: Users,
+    },
+    {
+      title: "Director of Carrier Success",
+      department: "Leadership",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: Users,
+    },
+    {
+      title: "VP of Operations",
+      department: "Leadership",
+      type: "Full-time",
+      location: "Remote",
+      zip: "33313",
+      icon: Users,
     },
   ];
 
-  const departments = ["All", "Engineering", "Support", "Operations", "Product"];
+  const departments = [
+    "All",
+    "Engineering",
+    "Product",
+    "Operations",
+    "Support",
+    "Sales",
+    "Marketing",
+    "Compliance",
+    "Finance",
+    "Leadership",
+  ];
 
   const filteredRoles = useMemo(() => {
     return roles.filter((role) => {
@@ -218,7 +448,9 @@ export default function CareersPage() {
                 >
                   <LucideIcon className="text-blue-400" size={30} />
 
-                  <h3 className="mt-5 text-xl font-black">{title as string}</h3>
+                  <h3 className="mt-5 text-xl font-black">
+                    {title as string}
+                  </h3>
 
                   <div className="mt-5 space-y-3 text-sm font-semibold text-slate-400">
                     {["Flexible roles", "Supportive team", "Room to learn"].map(
@@ -263,6 +495,7 @@ export default function CareersPage() {
             {filteredRoles.length > 0 ? (
               filteredRoles.map((role) => {
                 const Icon = role.icon;
+                const slug = role.title.toLowerCase().replaceAll(" ", "-");
 
                 return (
                   <div
@@ -290,7 +523,7 @@ export default function CareersPage() {
                     </div>
 
                     <Link
-                      href="/contact"
+                      href={`/about-us/careers/apply/${slug}`}
                       className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-700 px-6 py-3 text-sm font-black text-white transition hover:bg-blue-800"
                     >
                       Apply now <ArrowRight size={17} />
@@ -300,7 +533,10 @@ export default function CareersPage() {
               })
             ) : (
               <div className="rounded-[2rem] border border-slate-200 bg-slate-50 p-10 text-center">
-                <BriefcaseBusiness className="mx-auto text-slate-400" size={42} />
+                <BriefcaseBusiness
+                  className="mx-auto text-slate-400"
+                  size={42}
+                />
 
                 <h3 className="mt-5 text-2xl font-black text-slate-950">
                   No roles found
