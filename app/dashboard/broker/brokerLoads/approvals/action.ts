@@ -9,7 +9,7 @@ export async function approveLoadRequest(bookingId: string) {
   const session = await requireUser();
 
   if (!session.user?.email) {
-    redirect("/dashboard/broker/loads/approvals?error=Unauthorized");
+    redirect("/dashboard/broker/brokerLoads/approvals?error=Unauthorized");
   }
 
   const broker = await prisma.user.findUnique({
@@ -17,7 +17,7 @@ export async function approveLoadRequest(bookingId: string) {
   });
 
   if (!broker || broker.role !== "BROKER") {
-    redirect("/dashboard/broker/loads/approvals?error=Unauthorized");
+    redirect("/dashboard/broker/brokerLoads/approvals?error=Unauthorized");
   }
 
   const booking = await prisma.booking.findUnique({
@@ -28,11 +28,11 @@ export async function approveLoadRequest(bookingId: string) {
   });
 
   if (!booking) {
-    redirect("/dashboard/broker/loads/approvals?error=Request not found");
+    redirect("/dashboard/broker/brokerLoads/approvals?error=Request not found");
   }
 
   if (booking.load.brokerId !== broker.id) {
-    redirect("/dashboard/broker/loads/approvals?error=You do not own this load");
+    redirect("/dashboard/broker/brokerLoads/approvals?error=You do not own this load");
   }
 
   await prisma.$transaction([
@@ -51,16 +51,16 @@ export async function approveLoadRequest(bookingId: string) {
     }),
   ]);
 
-  revalidatePath("/dashboard/broker/loads/approvals");
+  revalidatePath("/dashboard/broker/brokerLoads/approvals");
 
-  redirect("/dashboard/broker/loads/approvals?success=Request approved");
+  redirect("/dashboard/broker/brokerLoads/approvals?success=Request approved");
 }
 
 export async function rejectLoadRequest(bookingId: string) {
   const session = await requireUser();
 
   if (!session.user?.email) {
-    redirect("/dashboard/broker/loads/approvals?error=Unauthorized");
+    redirect("/dashboard/broker/brokerLoads/approvals?error=Unauthorized");
   }
 
   const broker = await prisma.user.findUnique({
@@ -68,7 +68,7 @@ export async function rejectLoadRequest(bookingId: string) {
   });
 
   if (!broker || broker.role !== "BROKER") {
-    redirect("/dashboard/broker/loads/approvals?error=Unauthorized");
+    redirect("/dashboard/broker/brokerLoads/approvals?error=Unauthorized");
   }
 
   const booking = await prisma.booking.findUnique({
@@ -79,11 +79,11 @@ export async function rejectLoadRequest(bookingId: string) {
   });
 
   if (!booking) {
-    redirect("/dashboard/broker/loads/approvals?error=Request not found");
+    redirect("/dashboard/broker/brokerLoads/approvals?error=Request not found");
   }
 
   if (booking.load.brokerId !== broker.id) {
-    redirect("/dashboard/broker/loads/approvals?error=You do not own this load");
+    redirect("/dashboard/broker/brokerLoads/approvals?error=You do not own this load");
   }
 
   await prisma.booking.update({
@@ -93,7 +93,7 @@ export async function rejectLoadRequest(bookingId: string) {
     },
   });
 
-  revalidatePath("/dashboard/broker/loads/approvals");
+  revalidatePath("/dashboard/broker/brokerLoads/approvals");
 
-  redirect("/dashboard/broker/loads/approvals?success=Request rejected");
+  redirect("/dashboard/broker/brokerLoads/approvals?success=Request rejected");
 }

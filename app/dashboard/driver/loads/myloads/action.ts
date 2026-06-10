@@ -83,5 +83,5 @@ export async function markDelivered(loadId: string) {
     },
   });
 
-  redirect("/dashboard/loads/myloads?status=DELIVERED");
+  redirect("/dashboard/driver/loads/myloads?status=DELIVERED");
 }
