@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   HelpCircle,
   Search,
@@ -7,9 +10,12 @@ import {
   CreditCard,
   MessageCircle,
   FileText,
+  ChevronDown,
 } from "lucide-react";
 
 export default function HelpCenterPage() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   const helpTopics = [
     {
       title: "Getting Started",
@@ -34,11 +40,36 @@ export default function HelpCenterPage() {
   ];
 
   const commonQuestions = [
-    "How do I create an account?",
-    "How do I book a load?",
-    "Where can I view my active loads?",
-    "How do I report a safety issue?",
-    "How do I update my profile information?",
+    {
+      question: "How do I create an account?",
+      answer:
+        "Click Sign Up from the homepage, complete the registration form, and verify your email address to activate your account.",
+    },
+    {
+      question: "How do I book a load?",
+      answer:
+        "Browse available loads, select the load you want, and click Request Load. Once approved by the broker, the load will appear in your approved loads section.",
+    },
+    {
+      question: "Where can I view my active loads?",
+      answer:
+        "Navigate to Dashboard → My Loads. Active and in-transit loads will be displayed there.",
+    },
+    {
+      question: "How do I report a safety issue?",
+      answer:
+        "Open the Support section and submit a safety report with the details of the incident. A team member will review it promptly.",
+    },
+    {
+      question: "How do I update my profile information?",
+      answer:
+        "Go to Settings → Profile and update your personal information, then click Save Changes.",
+    },
+    {
+      question: "Do I need to hire dispatch?",
+      answer:
+        "No. Many owner-operators dispatch themselves using load boards. As your business grows, you can hire a dispatcher if you prefer help finding and managing loads.",
+    },
   ];
 
   return (
@@ -121,19 +152,41 @@ export default function HelpCenterPage() {
           </div>
 
           <div className="divide-y divide-zinc-200">
-            {commonQuestions.map((question) => (
-              <div
-                key={question}
-                className="flex items-center justify-between gap-4 py-5"
-              >
-                <div className="flex items-center gap-3">
-                  <FileText size={20} className="text-blue-600" />
-                  <p className="font-semibold text-zinc-800">{question}</p>
-                </div>
+            {commonQuestions.map((item, index) => {
+              const isOpen = openIndex === index;
 
-                <span className="text-sm font-bold text-blue-600">View</span>
-              </div>
-            ))}
+              return (
+                <div key={item.question} className="py-1">
+                  <button
+                    type="button"
+                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                    className="flex w-full items-center justify-between gap-4 py-5 text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <FileText size={20} className="shrink-0 text-blue-600" />
+                      <p className="font-semibold text-zinc-800">
+                        {item.question}
+                      </p>
+                    </div>
+
+                    <ChevronDown
+                      size={20}
+                      className={`shrink-0 text-blue-600 transition-transform ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {isOpen && (
+                    <div className="pb-5 pl-8 sm:pl-11">
+                      <p className="max-w-3xl text-sm leading-6 text-zinc-500">
+                        {item.answer}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -147,9 +200,7 @@ export default function HelpCenterPage() {
                 <MessageCircle size={24} />
               </div>
 
-              <h2 className="mt-5 text-3xl font-black">
-                Still need help?
-              </h2>
+              <h2 className="mt-5 text-3xl font-black">Still need help?</h2>
 
               <p className="mt-3 max-w-2xl leading-7 text-zinc-300">
                 Contact Swift Shift support for help with your account, loads,

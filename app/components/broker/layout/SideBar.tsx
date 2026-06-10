@@ -59,11 +59,6 @@ const sidebarSections = [
         icon: User,
       },
       {
-        name: "Dispatch",
-        href: "/dashboard/broker/brokerLoads/dispatch",
-        icon: Users2Icon,
-      },
-      {
         name: "Tracking",
         href: "/dashboard/broker/brokerLoads/tracking",
         icon: ChartLine,

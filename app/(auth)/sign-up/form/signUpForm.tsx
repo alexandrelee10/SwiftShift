@@ -22,12 +22,6 @@ const roles = [
     description: "Post and manage available freight.",
     icon: BriefcaseBusiness,
   },
-  {
-    value: "DISPATCH",
-    title: "Dispatch",
-    description: "Coordinate routes and active loads.",
-    icon: Radio,
-  },
 ];
 
 const SignUpForm = () => {
@@ -204,7 +198,7 @@ const SignUpForm = () => {
                 I am signing up as
               </label>
 
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 {roles.map((role) => {
                   const Icon = role.icon;
                   const active = form.role === role.value;

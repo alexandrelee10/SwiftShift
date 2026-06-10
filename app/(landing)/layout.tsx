@@ -1,5 +1,5 @@
-import LandingNavbar from "../components/landingPage/LandingNavbar";
-import LandingFooter from "../components/landingPage/LandingFooter";
+import LandingNavbar from "../components/landingPage/nav/LandingNavbar";
+import LandingFooter from "../components/landingPage/nav/LandingFooter";
 
 export default function LandingLayout({
   children,
