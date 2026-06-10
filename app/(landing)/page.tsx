@@ -87,23 +87,20 @@ export default function HomePage() {
 
       <section
         id="solutions"
-        className="mx-auto grid max-w-7xl scroll-mt-24 gap-5 px-6 py-16 md:grid-cols-3"
+        className="mx-auto grid max-w-7xl scroll-mt-24 gap-5 px-6 py-16 md:grid-cols-2"
       >
         {[
           {
             role: "Carrier",
+            href: "/rolesPages/carriers",
             text: "Find better loads, manage trips, and keep documents organized.",
             icon: Truck,
           },
           {
             role: "Broker",
-            text: "Post freight, manage booked loads, and connect with drivers.",
+            href: "/rolesPages/brokers",
+            text: "Post freight, manage booked loads, and connect with carriers.",
             icon: PackageSearch,
-          },
-          {
-            role: "Dispatcher",
-            text: "Track trucks, organize paperwork, and monitor performance.",
-            icon: MapPinned,
           },
         ].map((card) => {
           const Icon = card.icon;
@@ -114,17 +111,25 @@ export default function HomePage() {
               className="rounded-[2rem] border border-slate-200 bg-slate-50 p-8 transition hover:-translate-y-1 hover:shadow-xl"
             >
               <Icon className="mb-6 text-blue-700" size={36} />
+
               <p className="text-sm font-black uppercase tracking-wide text-slate-500">
                 I am a
               </p>
-              <h3 className="mt-2 text-3xl font-black">{card.role}</h3>
-              <p className="mt-4 leading-7 text-slate-600">{card.text}</p>
+
+              <h3 className="mt-2 text-3xl font-black">
+                {card.role}
+              </h3>
+
+              <p className="mt-4 leading-7 text-slate-600">
+                {card.text}
+              </p>
 
               <Link
-                href="/sign-up"
-                className="mt-6 inline-flex items-center gap-2 font-black text-blue-700"
+                href={card.href}
+                className="mt-6 inline-flex items-center gap-2 font-black text-blue-700 transition hover:text-blue-800"
               >
-                Learn more <ArrowRight size={17} />
+                Learn more
+                <ArrowRight size={17} />
               </Link>
             </div>
           );

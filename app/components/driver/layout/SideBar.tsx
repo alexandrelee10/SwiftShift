@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 
@@ -32,14 +32,17 @@ const sidebarSections = [
         name: "Loads",
         href: "/dashboard/driver/loads/myloads",
         icon: Package,
+        badge: 3,
         items: [
           {
             name: "Search Loads",
             href: "/dashboard/driver/loads/search",
+            badge: 2,
           },
           {
             name: "My Loads",
             href: "/dashboard/driver/loads/myloads",
+            badge: 1,
           },
         ],
       },
@@ -47,6 +50,7 @@ const sidebarSections = [
         name: "Documents",
         href: "/dashboard/driver/loads/documents",
         icon: FilesIcon,
+        badge: 1,
       },
       {
         name: "Earnings",
@@ -57,6 +61,7 @@ const sidebarSections = [
         name: "Fuel Card",
         href: "/dashboard/driver/loads/fuelcards",
         icon: CreditCardIcon,
+        badge: 1,
       },
       {
         name: "Settings",
@@ -74,14 +79,30 @@ type SidebarUser = {
   role?: string | null;
 };
 
-export default function Sidebar({
-  user,
-}: {
-  user?: SidebarUser;
-}) {
+export default function Sidebar({ user }: { user?: SidebarUser }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [seenSections, setSeenSections] = useState<string[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("seenSidebarSections");
+
+    if (saved) {
+      setSeenSections(JSON.parse(saved));
+    }
+  }, []);
+
+  function markSectionAsSeen(sectionName: string) {
+    const updated = [...new Set([...seenSections, sectionName])];
+
+    setSeenSections(updated);
+    localStorage.setItem("seenSidebarSections", JSON.stringify(updated));
+  }
+
+  function hasSeen(sectionName: string) {
+    return seenSections.includes(sectionName);
+  }
 
   return (
     <>
@@ -155,78 +176,56 @@ export default function Sidebar({
                   {hasItems ? (
                     <button
                       type="button"
-                      onClick={() =>
+                      onClick={() => {
                         setOpenDropdown((prev) =>
                           prev === link.name ? null : link.name
-                        )
-                      }
-                      className="
-                        group
-                        flex
-                        w-full
-                        items-center
-                        justify-start
-                        gap-3
-                        rounded-xl
-                        px-3
-                        py-3
-                        text-left
-                        text-base
-                        font-medium
-                        text-slate-300
-                        transition
-                        hover:bg-slate-700
-                        hover:text-white
-                        md:text-sm
-                      "
+                        );
+
+                        markSectionAsSeen(link.name);
+                      }}
+                      className="group flex w-full items-center justify-start gap-3 rounded-xl px-3 py-3 text-left text-base font-medium text-slate-300 transition hover:bg-slate-700 hover:text-white md:text-sm"
                     >
                       <Icon
                         size={19}
                         className="text-slate-400 group-hover:text-white"
                       />
 
-                      <span className="flex-1 text-left">
-                        {link.name}
-                      </span>
+                      <span className="flex-1 text-left">{link.name}</span>
+
+                      {link.badge && !hasSeen(link.name) ? (
+                        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-black text-white">
+                          {link.badge}
+                        </span>
+                      ) : null}
 
                       <ChevronRight
                         size={16}
                         className={`transition ${
-                          openDropdown === link.name
-                            ? "rotate-90"
-                            : ""
+                          openDropdown === link.name ? "rotate-90" : ""
                         }`}
                       />
                     </button>
                   ) : (
                     <Link
                       href={link.href}
-                      onClick={() => setIsOpen(false)}
-                      className="
-                        group
-                        flex
-                        items-center
-                        justify-start
-                        gap-3
-                        rounded-xl
-                        px-3
-                        py-3
-                        text-left
-                        text-base
-                        font-medium
-                        text-slate-300
-                        transition
-                        hover:bg-slate-700
-                        hover:text-white
-                        md:text-sm
-                      "
+                      onClick={() => {
+                        markSectionAsSeen(link.name);
+                        setIsOpen(false);
+                      }}
+                      className="group flex items-center justify-start gap-3 rounded-xl px-3 py-3 text-left text-base font-medium text-slate-300 transition hover:bg-slate-700 hover:text-white md:text-sm"
                     >
                       <Icon
                         size={19}
                         className="text-slate-400 group-hover:text-white"
                       />
 
-                      <span>{link.name}</span>
+                      <span className="flex-1">{link.name}</span>
+
+                      {link.badge && !hasSeen(link.name) ? (
+                        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-black text-white">
+                          {link.badge}
+                        </span>
+                      ) : null}
                     </Link>
                   )}
 
@@ -236,10 +235,19 @@ export default function Sidebar({
                         <Link
                           key={item.name}
                           href={item.href}
-                          onClick={() => setIsOpen(false)}
-                          className="block rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-slate-700 hover:text-white"
+                          onClick={() => {
+                            markSectionAsSeen(item.name);
+                            setIsOpen(false);
+                          }}
+                          className="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-400 transition hover:bg-slate-700 hover:text-white"
                         >
-                          {item.name}
+                          <span>{item.name}</span>
+
+                          {item.badge && !hasSeen(item.name) ? (
+                            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-black text-white">
+                              {item.badge}
+                            </span>
+                          ) : null}
                         </Link>
                       ))}
                     </div>
