@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import Providers from "./providers";
 import "./globals.css";
+import SwiftShiftBot from "./components/shared/SwiftShiftBotButton";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
+          <SwiftShiftBot />
           {children}
           <Toaster position="top-right" richColors closeButton />
         </Providers>
