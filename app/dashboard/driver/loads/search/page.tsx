@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
 import LoadSearchFilters from "@/app/components/driver/loads/LoadSearchFilters";
 import LoadMap from "@/app/components/driver/loads/LoadMap";
-import RequestButton from "@/app/components/driver/loads/RequestLoadButton"
+import RequestButton from "@/app/components/driver/loads/RequestLoadButton";
 import Link from "next/link";
 import {
   Bookmark,
@@ -23,6 +23,7 @@ type SearchParams = {
   destination?: string;
   equipment?: string;
   minRate?: string;
+  maxDistance?: string;
   view?: "list" | "grid";
   sort?: "newest" | "rate-high" | "rate-low" | "distance-low";
 };
@@ -53,6 +54,7 @@ export default async function LoadSearchPage({
   const destination = params.destination?.trim() || "";
   const equipment = params.equipment?.trim() || "";
   const minRate = params.minRate ? Number(params.minRate) : undefined;
+  const maxDistance = params.maxDistance ? Number(params.maxDistance) : undefined;
   const view = params.view === "grid" ? "grid" : "list";
 
   const baseParams = new URLSearchParams();
@@ -61,6 +63,7 @@ export default async function LoadSearchPage({
   if (destination) baseParams.set("destination", destination);
   if (equipment) baseParams.set("equipment", equipment);
   if (params.minRate) baseParams.set("minRate", params.minRate);
+  if (params.maxDistance) baseParams.set("maxDistance", params.maxDistance);
 
   const listParams = new URLSearchParams(baseParams);
   listParams.set("view", "list");
@@ -79,7 +82,6 @@ export default async function LoadSearchPage({
             },
           },
         },
-
         origin
           ? {
               OR: [
@@ -88,7 +90,6 @@ export default async function LoadSearchPage({
               ],
             }
           : {},
-
         destination
           ? {
               OR: [
@@ -107,7 +108,6 @@ export default async function LoadSearchPage({
               ],
             }
           : {},
-
         equipment
           ? {
               equipmentType: {
@@ -116,11 +116,17 @@ export default async function LoadSearchPage({
               },
             }
           : {},
-
-        minRate
+        minRate && !Number.isNaN(minRate)
           ? {
               rate: {
                 gte: minRate,
+              },
+            }
+          : {},
+        maxDistance && !Number.isNaN(maxDistance)
+          ? {
+              distanceMiles: {
+                lte: maxDistance,
               },
             }
           : {},
@@ -260,7 +266,11 @@ export default async function LoadSearchPage({
                 Market Insights
               </h2>
 
-              <InsightRow label="Average Rate" value="$2.28 / mi" trend="↑ 5.6%" />
+              <InsightRow
+                label="Average Rate"
+                value="$2.28 / mi"
+                trend="↑ 5.6%"
+              />
               <InsightRow label="Load Volume" trend="+12.4%" />
               <InsightRow label="Best Time to Book" trend="Now" />
               <InsightRow label="Fuel Average" value="$3.72 / gal" />
@@ -364,53 +374,18 @@ function LoadRow({ load }: { load: any }) {
         {load.distanceMiles ? load.distanceMiles.toLocaleString() : "—"} mi
       </div>
 
-<div className="flex items-center justify-end gap-2">
-  <Link
-    href={`/dashboard/driver/loads/search/${load.id}`}
-    className="
-      inline-flex
-      items-center
-      justify-center
-      rounded-md
-      border
-      border-slate-200
-      px-3
-      py-2
-      text-xs
-      font-medium
-      text-slate-700
-      transition
-      hover:bg-slate-50
-      dark:border-slate-700
-      dark:text-slate-300
-      dark:hover:bg-slate-800
-    "
-  >
-    View
-  </Link>
-  <div className="
-      inline-flex
-      items-center
-      justify-center
-      rounded-md
-      border
-      border-slate-200
-      bg-blue-700
-      px-3
-      py-2
-      text-xs
-      font-medium
-      text-white
-      transition
-      hover:bg-blue-500
-      dark:border-slate-700
-      dark:text-slate-300
-      dark:hover:bg-blue-600
-      ">
-    <RequestButton loadId={load.id} />
-  </div>
-  
-</div>
+      <div className="flex items-center justify-end gap-2">
+        <Link
+          href={`/dashboard/loads/search/${load.id}`}
+          className="inline-flex items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+        >
+          View
+        </Link>
+
+        <div className="inline-flex items-center justify-center rounded-md bg-blue-700 px-3 py-2 text-xs font-medium text-white transition hover:bg-blue-500 dark:hover:bg-blue-600">
+          <RequestButton loadId={load.id} />
+        </div>
+      </div>
     </div>
   );
 }
@@ -461,6 +436,7 @@ function LoadGridCard({ load }: { load: any }) {
           <p className="font-semibold text-slate-950 dark:text-white">
             ${rate ? rate.toLocaleString() : "—"}
           </p>
+
           {ratePerMile && (
             <p className="text-xs font-medium text-green-600 dark:text-green-400">
               ${ratePerMile}/mi
@@ -503,6 +479,10 @@ function LoadGridCard({ load }: { load: any }) {
           View Details
           <ChevronRight size={16} />
         </Link>
+
+        <div className="flex flex-1 items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500">
+          <RequestButton loadId={load.id} />
+        </div>
       </div>
     </article>
   );
@@ -563,6 +543,7 @@ function InsightRow({
             {value}
           </p>
         )}
+
         {trend && (
           <p className="font-semibold text-green-600 dark:text-green-400">
             {trend}

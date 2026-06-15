@@ -40,7 +40,7 @@ export default function LoadSearchFilters() {
       }
     });
 
-    router.push(`/dashboard/loads/search?${params.toString()}`);
+    router.push(`/dashboard/driver/loads/search?${params.toString()}`);
   }
 
   function clearFilters() {
@@ -53,7 +53,7 @@ export default function LoadSearchFilters() {
       loadType: "",
     });
 
-    router.push("/dashboard/loads/search");
+    router.push("/dashboard/driver/loads/search");
   }
 
   return (
