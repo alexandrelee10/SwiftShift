@@ -13,10 +13,26 @@ export async function getDriverDocuments() {
   if (!dbUser) throw new Error("User not found");
   if (dbUser.role !== "DRIVER") throw new Error("Forbidden");
 
-  const bolDocuments = await prisma.document.findMany({
+  const documents = await prisma.document.findMany({
     where: {
-      userId: dbUser.id,
-      type: "BILL_OF_LADING",
+      load: {
+        OR: [
+          {
+            bookings: {
+              some: {
+                driverId: dbUser.id,
+              },
+            },
+          },
+          {
+            trips: {
+              some: {
+                driverId: dbUser.id,
+              },
+            },
+          },
+        ],
+      },
     },
     include: {
       load: true,
@@ -27,21 +43,8 @@ export async function getDriverDocuments() {
     },
   });
 
-  const podDocuments = await prisma.document.findMany({
-    where: {
-      userId: dbUser.id,
-      type: "PROOF_OF_DELIVERY",
-    },
-    include: {
-      load: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
   return {
-    bols: bolDocuments,
-    pods: podDocuments,
+    bols: documents.filter((doc) => doc.type === "BILL_OF_LADING"),
+    pods: documents.filter((doc) => doc.type === "PROOF_OF_DELIVERY"),
   };
 }

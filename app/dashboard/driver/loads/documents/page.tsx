@@ -1,4 +1,3 @@
-// app/dashboard/driver/documents/page.tsx
 
 import { requireUser } from "@/lib/requireUser";
 import prisma from "@/lib/prisma";
