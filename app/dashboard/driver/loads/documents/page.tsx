@@ -36,37 +36,6 @@ export default async function DriverDocumentsPage() {
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <StatCard label="Bills of lading"   value={bols.length} />
-          <StatCard label="Proof of delivery" value={pods.length} />
-        </div>
-
-        {/* Filter + search */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-wrap gap-2">
-              {["All", "BOL", "POD"].map((tab) => (
-                <button
-                  key={tab}
-                  className="rounded-full border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-            <div className="relative w-full lg:w-80">
-              <Search
-                size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
-              />
-              <input
-                placeholder="Search documents..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500 dark:focus:bg-slate-900"
-              />
-            </div>
-          </div>
-        </div>
 
         {/* Document list */}
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">

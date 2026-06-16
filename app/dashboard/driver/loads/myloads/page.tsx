@@ -58,25 +58,22 @@ export default async function MyLoadsPage({
 
           ...(status === "REQUESTED"
             ? {
-              status: {
-                in: [
-                  BookingStatus.PENDING,
-                  BookingStatus.REJECTED,
-                ],
-              },
-            }
+                status: {
+                  in: [BookingStatus.PENDING, BookingStatus.REJECTED],
+                },
+              }
             : status === LoadStatus.BOOKED
               ? {
-                status: BookingStatus.APPROVED,
-              }
+                  status: BookingStatus.APPROVED,
+                }
               : {}),
         },
       },
 
       ...(status !== "REQUESTED"
         ? {
-          status,
-        }
+            status,
+          }
         : {}),
     },
 
@@ -113,10 +110,11 @@ export default async function MyLoadsPage({
             <Link
               key={tab.value}
               href={`?status=${tab.value}`}
-              className={`shrink-0 rounded-lg px-4 py-2 text-sm transition ${status === tab.value
+              className={`shrink-0 rounded-lg px-4 py-2 text-sm transition ${
+                status === tab.value
                   ? "bg-blue-50 font-medium text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
                   : "text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
-                }`}
+              }`}
             >
               {tab.label}
             </Link>
@@ -137,7 +135,11 @@ export default async function MyLoadsPage({
 
 function LoadRow({ load }: { load: any }) {
   const bookingStatus = load.bookings?.[0]?.status;
-  const displayStatus = bookingStatus || load.status;
+
+  const displayStatus =
+    load.status === LoadStatus.DELIVERED
+      ? LoadStatus.DELIVERED
+      : bookingStatus || load.status;
 
   return (
     <div className="grid gap-4 border-b border-slate-100 px-4 py-5 transition last:border-0 hover:bg-slate-50 md:grid-cols-[1fr_auto] md:items-center md:px-5 dark:border-slate-800 dark:hover:bg-slate-800/60">
@@ -188,16 +190,17 @@ function LoadRow({ load }: { load: any }) {
           </button>
         )}
 
-        {load.status === LoadStatus.BOOKED &&  bookingStatus === BookingStatus.APPROVED && (
-          <form action={startTrip.bind(null, load.id)}>
-            <button
-              type="submit"
-              className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-            >
-              Start Trip
-            </button>
-          </form>
-        )}
+        {load.status === LoadStatus.BOOKED &&
+          bookingStatus === BookingStatus.APPROVED && (
+            <form action={startTrip.bind(null, load.id)}>
+              <button
+                type="submit"
+                className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+              >
+                Start Trip
+              </button>
+            </form>
+          )}
 
         {load.status === LoadStatus.IN_TRANSIT && (
           <form action={markDelivered.bind(null, load.id)}>
@@ -208,12 +211,6 @@ function LoadRow({ load }: { load: any }) {
               Mark Delivered
             </button>
           </form>
-        )}
-
-        {load.status === LoadStatus.DELIVERED && (
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
-            View POD
-          </button>
         )}
       </div>
     </div>
@@ -266,9 +263,10 @@ function StatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={`w-fit rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${styles[status] ||
+      className={`w-fit rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${
+        styles[status] ||
         "bg-slate-100 text-slate-600 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700"
-        }`}
+      }`}
     >
       {status === LoadStatus.BOOKED ? "Approved" : formatStatus(status)}
     </span>

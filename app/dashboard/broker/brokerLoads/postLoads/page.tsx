@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { ArrowLeft, PlusCircle } from "lucide-react";
 import { LoadStatus, UserRole } from "@prisma/client";
+import BackButton from "@/app/components/shared/BackButton";
 
 async function postLoad(formData: FormData) {
   "use server";
@@ -98,7 +99,7 @@ export default async function PostLoadPage() {
             className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
           >
             <ArrowLeft size={16} />
-            Back to dashboard
+            <BackButton />
           </Link>
 
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">

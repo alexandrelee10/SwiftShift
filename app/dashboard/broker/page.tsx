@@ -1,10 +1,17 @@
 import StatusPage from "@/app/components/shared/StatusPage";
-import BrokerLoadMap from "@/app/components/broker/loads/LoadMap";
 import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Truck, Calendar, Landmark, Users, ClockCheck } from "lucide-react";
+import {
+  Truck,
+  Calendar,
+  Landmark,
+  Users,
+  ClockCheck,
+  AlertTriangle,
+  ArrowRight,
+} from "lucide-react";
 
 export default async function BrokerDashboardPage() {
   const session = await requireUser();
@@ -80,7 +87,25 @@ export default async function BrokerDashboardPage() {
     return total + Number(load.rate);
   }, 0);
 
-  const selectedMapLoad = activeLoads[0] ?? pendingLoads[0] ?? deliveredLoads[0];
+  const urgentLoads = pendingLoads
+    .filter((load) => {
+      if (!load.pickupDate) return false;
+
+      const pickupDate = new Date(load.pickupDate);
+      const now = new Date();
+      const diffInHours =
+        (pickupDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+      return diffInHours <= 48;
+    })
+    .slice(0, 4);
+
+  const upcomingLoads = [...pendingLoads, ...activeLoads]
+    .sort(
+      (a, b) =>
+        new Date(a.pickupDate).getTime() - new Date(b.pickupDate).getTime()
+    )
+    .slice(0, 5);
 
   const upperIcons = [
     {
@@ -146,9 +171,6 @@ export default async function BrokerDashboardPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="hidden w-80 items-center rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-400 dark:border-slate-800 dark:bg-slate-900 md:flex">
-                Search loads, drivers, trucks...
-              </div>
               <Link
                 href="/dashboard/broker/brokerLoads/postLoads"
                 className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
@@ -158,34 +180,51 @@ export default async function BrokerDashboardPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-            {upperIcons.map((item) => {
-              const Icon = item.icon;
+          <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                  Operations Summary
+                </p>
+                <p className="mt-1 text-sm text-zinc-500 dark:text-slate-400">
+                  Quick snapshot of your brokerage performance.
+                </p>
+              </div>
 
-              return (
-                <div
-                  key={item.name}
-                  className="flex items-center gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
-                >
-                  <div
-                    className={`flex h-11 w-11 items-center justify-center rounded-xl ${item.color}`}
-                  >
-                    <Icon size={21} />
-                  </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                {upperIcons.map((item) => {
+                  const Icon = item.icon;
 
-                  <div>
-                    <p className="text-xs font-medium text-zinc-500 dark:text-slate-400">
-                      {item.name}
-                    </p>
-                    <p className="text-xl font-semibold">{item.content}</p>
-                    <p className="text-xs text-zinc-400 dark:text-slate-500">
-                      {item.status}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                  return (
+                    <div
+                      key={item.name}
+                      className="rounded-xl bg-zinc-50 p-4 dark:bg-slate-950"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-slate-400">
+                          {item.name}
+                        </p>
+
+                        <div
+                          className={`flex h-8 w-8 items-center justify-center rounded-lg ${item.color}`}
+                        >
+                          <Icon size={16} />
+                        </div>
+                      </div>
+
+                      <p className="mt-3 text-xl font-semibold text-zinc-950 dark:text-white">
+                        {item.content}
+                      </p>
+
+                      <p className="mt-1 line-clamp-1 text-xs text-zinc-400 dark:text-slate-500">
+                        {item.status}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
 
           <div className="grid gap-5 xl:grid-cols-[1.15fr_1fr]">
             <section className="rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -199,20 +238,14 @@ export default async function BrokerDashboardPage() {
                 </Link>
               </div>
 
-              {/* Inside the Dispatch Board <section> — replace the inner grid div */}
-              <div className="grid gap-3 p-4 grid-cols-2 md:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 p-4 md:grid-cols-4">
                 <LoadColumn
                   title="Posted"
                   count={pendingLoads.length}
                   loads={pendingLoads.slice(0, 3)}
                   status="posted"
                 />
-                <LoadColumn
-                  title="Booked"
-                  count={0}
-                  loads={[]}
-                  status="booked"
-                />
+                <LoadColumn title="Booked" count={0} loads={[]} status="booked" />
                 <LoadColumn
                   title="In Transit"
                   count={activeLoads.length}
@@ -228,16 +261,104 @@ export default async function BrokerDashboardPage() {
               </div>
             </section>
 
-            <section className="flex h-full min-h-[520px] flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <section className="rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-slate-800">
-                <h3 className="font-semibold">Live Tracking</h3>
+                <div>
+                  <h3 className="font-semibold">Broker Priorities</h3>
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-slate-400">
+                    Loads needing attention, coverage, or follow-up.
+                  </p>
+                </div>
+
+                <Link
+                  href="/dashboard/broker/brokerLoads"
+                  className="text-sm text-blue-600 dark:text-blue-400"
+                >
+                  Manage
+                </Link>
               </div>
 
-              <div className="flex-1">
-                <BrokerLoadMap
-                  loadId={selectedMapLoad?.id}
-                  className="h-full w-full rounded-none border-0"
-                />
+              <div className="space-y-5 p-5">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <PriorityStat
+                    label="Needs Coverage"
+                    value={pendingLoads.length.toString()}
+                  />
+                  <PriorityStat
+                    label="Urgent Pickups"
+                    value={urgentLoads.length.toString()}
+                  />
+                  <PriorityStat
+                    label="Active Today"
+                    value={activeLoads.length.toString()}
+                  />
+                </div>
+
+                <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 dark:border-orange-900/50 dark:bg-orange-950/20">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-600 dark:bg-orange-950/60 dark:text-orange-300">
+                      <AlertTriangle size={18} />
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                        Coverage Reminder
+                      </p>
+                      <p className="mt-1 text-sm text-zinc-600 dark:text-slate-400">
+                        Prioritize posted loads with pickup dates within the
+                        next 48 hours.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="mb-3 flex items-center justify-between">
+                    <h4 className="text-sm font-semibold">
+                      Upcoming Broker Actions
+                    </h4>
+                    <span className="text-xs text-zinc-400 dark:text-slate-500">
+                      Next {upcomingLoads.length}
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {upcomingLoads.length > 0 ? (
+                      upcomingLoads.map((load) => (
+                        <Link
+                          key={load.id}
+                          href={`/dashboard/broker/brokerLoads/load/${load.id}`}
+                          className="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 p-3 transition hover:border-blue-200 hover:bg-blue-50/40 dark:border-slate-800 dark:hover:border-blue-900/60 dark:hover:bg-blue-950/20"
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium">
+                              {load.originCity}, {load.originState} →{" "}
+                              {load.destinationCity}, {load.destinationState}
+                            </p>
+                            <p className="mt-1 text-xs text-zinc-500 dark:text-slate-400">
+                              #{load.referenceNumber || load.id.slice(0, 6)} •{" "}
+                              {formatDate(load.pickupDate)}
+                            </p>
+                          </div>
+
+                          <div className="flex shrink-0 items-center gap-2">
+                            <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:bg-slate-800 dark:text-slate-300">
+                              {formatStatus(load.status)}
+                            </span>
+                            <ArrowRight
+                              size={15}
+                              className="text-zinc-400 dark:text-slate-500"
+                            />
+                          </div>
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500 dark:border-slate-800 dark:text-slate-400">
+                        No upcoming broker actions right now.
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </section>
           </div>
@@ -326,12 +447,31 @@ export default async function BrokerDashboardPage() {
                   value={`$${totalEarnings.toLocaleString()}`}
                 />
 
-                <div className="mt-4 h-28 rounded-xl bg-zinc-100 dark:bg-slate-800" />
+                <div className="mt-4 rounded-xl bg-zinc-100 p-4 dark:bg-slate-800">
+                  <p className="text-xs text-zinc-500 dark:text-slate-400">
+                    Delivery rate
+                  </p>
+                  <div className="mt-3 h-2 rounded-full bg-zinc-200 dark:bg-slate-700">
+                    <div className="h-2 w-[90%] rounded-full bg-green-500" />
+                  </div>
+                  <p className="mt-2 text-xs text-zinc-500 dark:text-slate-400">
+                    90% on-time performance
+                  </p>
+                </div>
               </div>
             </section>
           </div>
         </div>
       </main>
+    </div>
+  );
+}
+
+function PriorityStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+      <p className="text-xs text-zinc-500 dark:text-slate-400">{label}</p>
+      <p className="mt-2 text-2xl font-semibold">{value}</p>
     </div>
   );
 }
@@ -348,8 +488,6 @@ function CardTitle({ title, href }: { title: string; href?: string }) {
     </div>
   );
 }
-
-// Replace the LoadColumn component and the Dispatch Board section
 
 function LoadColumn({
   title,
@@ -386,7 +524,7 @@ function LoadColumn({
   const statusLabel = {
     posted: null,
     booked: null,
-    transit: "En route",
+    transit: "Pending",
     delivered: "Delivered",
   }[status];
 
@@ -399,8 +537,10 @@ function LoadColumn({
     <div
       className={`flex flex-col gap-2 rounded-xl bg-zinc-50 p-3 dark:bg-slate-950 ${topBorder}`}
     >
-      <div className="flex items-center justify-between mb-1">
-        <p className={`flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide ${labelColor}`}>
+      <div className="mb-1 flex items-center justify-between">
+        <p
+          className={`flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide ${labelColor}`}
+        >
           <span className={`inline-block h-1.5 w-1.5 rounded-full ${dotColor}`} />
           {title}
         </p>
@@ -414,34 +554,31 @@ function LoadColumn({
           loads.map((load) => (
             <div
               key={load.id}
-              className="rounded-lg border border-zinc-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900 hover:border-zinc-300 dark:hover:border-slate-700 transition-colors cursor-pointer"
+              className="cursor-pointer rounded-lg border border-zinc-200 bg-white p-3 transition-colors hover:border-zinc-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
             >
-              <p className="text-xs text-zinc-400 dark:text-slate-500 mb-1">
+              <p className="mb-1 text-xs text-zinc-400 dark:text-slate-500">
                 #{load.referenceNumber}
               </p>
               <p className="text-xs font-semibold leading-snug">
                 {load.originCity}, {load.originState} →{" "}
                 {load.destinationCity}, {load.destinationState}
               </p>
-              <p className="mt-1 text-xs text-zinc-400 dark:text-slate-500 truncate">
+              <p className="mt-1 truncate text-xs text-zinc-400 dark:text-slate-500">
                 {load.commodity || "General freight"}
               </p>
-              <div className="mt-2 flex items-center justify-between">
+              <div className="mt-2">
                 <p className="text-sm font-semibold">
                   ${Number(load.rate).toLocaleString()}
                 </p>
-                {statusLabel ? (
-                  <span className={`text-xs ${statusTextColor}`}>
-                    {statusLabel}
-                  </span>
-                ) : (
-                  <span className="text-xs text-zinc-400 dark:text-slate-500">
-                    {new Date(load.pickupDate).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
-                )}
+
+                <p
+                  className={`mt-1 text-xs ${statusLabel
+                      ? statusTextColor
+                      : "text-zinc-400 dark:text-slate-500"
+                    }`}
+                >
+                  {statusLabel || formatDate(load.pickupDate)}
+                </p>
               </div>
             </div>
           ))
@@ -462,4 +599,20 @@ function StatRow({ label, value }: { label: string; value: string }) {
       <p className="text-sm font-semibold">{value}</p>
     </div>
   );
+}
+
+function formatDate(date: Date | string | null) {
+  if (!date) return "No date";
+
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatStatus(status: string) {
+  return status
+    .toLowerCase()
+    .replace("_", " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }

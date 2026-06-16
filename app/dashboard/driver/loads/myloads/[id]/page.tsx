@@ -1,38 +1,69 @@
+import { requireUser } from "@/lib/requireUser";
 import prisma from "@/lib/prisma";
 import LoadMap from "@/app/components/driver/loads/LoadMap";
 import Link from "next/link";
+import type { ReactNode } from "react";
+import { BookingStatus, LoadStatus } from "@prisma/client";
 import {
   ArrowLeft,
-  Bookmark,
   Box,
   CalendarDays,
+  CheckCircle2,
+  DollarSign,
+  EyeIcon,
+  FileText,
   MapPin,
   MessageSquare,
   Package,
   Phone,
-  Play,
   ShieldAlert,
   Truck,
   Weight,
-  EyeIcon,
-  FileText,
 } from "lucide-react";
 
-import { bookLoad } from "./action";
 import BackButton from "@/app/components/shared/BackButton";
-import RequestLoadButton from "@/app/components/driver/loads/RequestLoadButton";
 
 export default async function LoadDetailsPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await requireUser();
   const { id } = await params;
 
-  const load = await prisma.load.findUnique({
-    where: { id },
+  if (!session.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: {
+      email: session.user.email,
+    },
+  });
+
+  if (!dbUser) {
+    throw new Error("User not found");
+  }
+
+  const load = await prisma.load.findFirst({
+    where: {
+      id,
+      bookings: {
+        some: {
+          driverId: dbUser.id,
+        },
+      },
+    },
     include: {
       broker: true,
+      bookings: {
+        where: {
+          driverId: dbUser.id,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
   });
 
@@ -45,8 +76,56 @@ export default async function LoadDetailsPage({
   }
 
   const rate = Number(load.rate);
+
   const ratePerMile =
     rate && load.distanceMiles ? (rate / load.distanceMiles).toFixed(2) : null;
+
+  const completedLoads = await prisma.load.findMany({
+    where: {
+      status: LoadStatus.DELIVERED,
+      bookings: {
+        some: {
+          driverId: dbUser.id,
+          status: BookingStatus.APPROVED,
+        },
+      },
+    },
+    select: {
+      rate: true,
+      deliveryDate: true,
+    },
+  });
+
+  const now = new Date();
+
+  const monthlyRevenue = completedLoads
+    .filter((completedLoad) => {
+      if (!completedLoad.deliveryDate) return false;
+
+      const deliveryDate = new Date(completedLoad.deliveryDate);
+
+      return (
+        deliveryDate.getMonth() === now.getMonth() &&
+        deliveryDate.getFullYear() === now.getFullYear()
+      );
+    })
+    .reduce((total, completedLoad) => total + Number(completedLoad.rate), 0);
+
+  const totalRevenue = completedLoads.reduce(
+    (total, completedLoad) => total + Number(completedLoad.rate),
+    0
+  );
+
+  const pickupCompleted =
+    load.status === LoadStatus.BOOKED ||
+    load.status === LoadStatus.IN_TRANSIT ||
+    load.status === LoadStatus.DELIVERED;
+
+  const transitCompleted =
+    load.status === LoadStatus.IN_TRANSIT ||
+    load.status === LoadStatus.DELIVERED;
+
+  const deliveredCompleted = load.status === LoadStatus.DELIVERED;
 
   return (
     <main className="min-h-screen bg-slate-50 px-5 py-7 text-slate-900 dark:bg-[#0b1120] dark:text-slate-100">
@@ -98,11 +177,9 @@ export default async function LoadDetailsPage({
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-                  Route Overview
-                </h2>
-              </div>
+              <h2 className="mb-4 text-base font-semibold text-slate-900 dark:text-white">
+                Route Overview
+              </h2>
 
               <div className="h-[380px] overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
                 <LoadMap loadId={id} className="h-full w-full" />
@@ -118,32 +195,49 @@ export default async function LoadDetailsPage({
                 <TimelineItem
                   icon={<Package size={18} />}
                   color="bg-blue-600"
+                  completed={pickupCompleted}
                   title="Pickup"
                   location={`${load.originCity}, ${load.originState}`}
                   address={load.originAddress}
-                  date={formatDate(load.pickupDate)}
+                  date={pickupCompleted ? formatDate(load.pickupDate) : "Pending"}
                 />
 
                 <TimelineItem
                   icon={<Truck size={18} />}
                   color="bg-green-600"
+                  completed={transitCompleted}
                   title="In Transit"
-                  location="Current Location"
-                  address={
-                    load.status === "IN_TRANSIT"
-                      ? "Live tracking active"
-                      : "Trip has not started"
+                  location={
+                    transitCompleted ? "Trip is active" : "Waiting to start"
                   }
-                  date={load.status === "IN_TRANSIT" ? "Live" : "Pending"}
+                  address={
+                    load.status === LoadStatus.IN_TRANSIT
+                      ? "Live tracking active"
+                      : load.status === LoadStatus.DELIVERED
+                        ? "Trip completed"
+                        : "Trip has not started"
+                  }
+                  date={
+                    load.status === LoadStatus.IN_TRANSIT
+                      ? "Live"
+                      : load.status === LoadStatus.DELIVERED
+                        ? "Completed"
+                        : "Pending"
+                  }
                 />
 
                 <TimelineItem
-                  icon={<Package size={18} />}
+                  icon={<CheckCircle2 size={18} />}
                   color="bg-purple-600"
+                  completed={deliveredCompleted}
                   title="Delivery"
                   location={`${load.destinationCity}, ${load.destinationState}`}
                   address={load.destinationAddress}
-                  date={formatDate(load.deliveryDate)}
+                  date={
+                    deliveredCompleted
+                      ? formatDate(load.deliveryDate)
+                      : "Pending"
+                  }
                 />
               </div>
             </div>
@@ -154,42 +248,12 @@ export default async function LoadDetailsPage({
               </h2>
 
               <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                <DetailBox
-                  icon={<Truck />}
-                  label="Equipment"
-                  value={load.equipmentType}
-                />
-                <DetailBox
-                  icon={<Box />}
-                  label="Commodity"
-                  value={load.commodity || "General Freight"}
-                />
-                <DetailBox
-                  icon={<Weight />}
-                  label="Weight"
-                  value={
-                    load.weight ? `${load.weight.toLocaleString()} lbs` : "—"
-                  }
-                />
-                <DetailBox
-                  icon={<MapPin />}
-                  label="Distance"
-                  value={
-                    load.distanceMiles
-                      ? `${load.distanceMiles.toLocaleString()} mi`
-                      : "—"
-                  }
-                />
-                <DetailBox
-                  icon={<CalendarDays />}
-                  label="Pickup Date"
-                  value={formatDate(load.pickupDate)}
-                />
-                <DetailBox
-                  icon={<CalendarDays />}
-                  label="Delivery Date"
-                  value={formatDate(load.deliveryDate)}
-                />
+                <DetailBox icon={<Truck />} label="Equipment" value={load.equipmentType} />
+                <DetailBox icon={<Box />} label="Commodity" value={load.commodity || "General Freight"} />
+                <DetailBox icon={<Weight />} label="Weight" value={load.weight ? `${load.weight.toLocaleString()} lbs` : "—"} />
+                <DetailBox icon={<MapPin />} label="Distance" value={load.distanceMiles ? `${load.distanceMiles.toLocaleString()} mi` : "—"} />
+                <DetailBox icon={<CalendarDays />} label="Pickup Date" value={formatDate(load.pickupDate)} />
+                <DetailBox icon={<CalendarDays />} label="Delivery Date" value={formatDate(load.deliveryDate)} />
               </div>
             </div>
 
@@ -220,12 +284,21 @@ export default async function LoadDetailsPage({
               )}
 
               <div className="mt-6 space-y-3 border-t border-slate-100 pt-5 text-sm dark:border-slate-800">
-                <SideRow
-                  label="Base Rate"
-                  value={`$${rate.toLocaleString()}`}
-                />
+                <SideRow label="Base Rate" value={`$${rate.toLocaleString()}`} />
                 <SideRow label="Payment Terms" value="Net 30" />
                 <SideRow label="Status" value={formatStatus(load.status)} />
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                Driver Revenue
+              </h2>
+
+              <div className="mt-5 space-y-3 text-sm">
+                <SideRow label="This Load" value={`$${rate.toLocaleString()}`} />
+                <SideRow label="This Month" value={`$${monthlyRevenue.toLocaleString()}`} />
+                <SideRow label="Total Earned" value={`$${totalRevenue.toLocaleString()}`} />
               </div>
             </div>
 
@@ -261,28 +334,16 @@ export default async function LoadDetailsPage({
               </h2>
 
               <div className="mt-5 space-y-3">
-                <div className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold bg-blue-700 text-white transition hover:bg-blue-600 dark:border-slate-700 dark:text-white dark:hover:bg-blue-600">
-                  <RequestLoadButton 
-                  loadId={load.id} 
-                  loadingMessage="Requesting..."
-                  successMessage="Request Sent!"
-                  label="Request Load"
-                  />
-                </div>
                 <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
                   <Phone size={16} />
                   Call Broker
                 </button>
 
                 <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
-                  <Bookmark size={16} />
-                  Save Load
-                </button>
-
-                <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
                   <ShieldAlert size={16} />
                   Report Issue
                 </button>
+
                 <Link
                   href={`/dashboard/driver/loads/myloads/${load.id}/bol/pdf`}
                   target="_blank"
@@ -291,6 +352,46 @@ export default async function LoadDetailsPage({
                   <EyeIcon size={16} />
                   View BOL
                 </Link>
+
+                {load.status === LoadStatus.BOOKED && (
+                  <div className="rounded-xl bg-blue-50 p-4 text-sm text-blue-700 dark:bg-blue-950/30 dark:text-blue-300">
+                    This load is booked and ready to start.
+                  </div>
+                )}
+
+                {load.status === LoadStatus.IN_TRANSIT && (
+                  <>
+                    <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-700">
+                      <FileText size={16} />
+                      Upload POD
+                    </button>
+
+                    <div className="rounded-xl bg-green-50 p-4 text-sm text-green-700 dark:bg-green-950/30 dark:text-green-300">
+                      This load is currently in transit.
+                    </div>
+                  </>
+                )}
+
+                {load.status === LoadStatus.DELIVERED && (
+                  <>
+                    <Link
+                      href="/dashboard/driver/revenue"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-700"
+                    >
+                      <DollarSign size={16} />
+                      View Revenue
+                    </Link>
+
+                    <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
+                      <FileText size={16} />
+                      Download Settlement
+                    </button>
+
+                    <div className="rounded-xl bg-green-50 p-4 text-sm text-green-700 dark:bg-green-950/30 dark:text-green-300">
+                      This load has been delivered successfully.
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </aside>
@@ -303,13 +404,15 @@ export default async function LoadDetailsPage({
 function TimelineItem({
   icon,
   color,
+  completed,
   title,
   location,
   address,
   date,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: string;
+  completed: boolean;
   title: string;
   location: string;
   address: string | null;
@@ -318,22 +421,28 @@ function TimelineItem({
   return (
     <div className="grid gap-4 sm:grid-cols-[52px_1fr_auto] sm:items-center">
       <div
-        className={`flex h-11 w-11 items-center justify-center rounded-full text-white ${color}`}
+        className={`flex h-11 w-11 items-center justify-center rounded-full text-white ${
+          completed ? color : "bg-slate-300 dark:bg-slate-700"
+        }`}
       >
         {icon}
       </div>
 
       <div>
         <p className="font-semibold text-slate-900 dark:text-white">{title}</p>
-        <p className="text-sm text-slate-700 dark:text-slate-300">
-          {location}
-        </p>
+        <p className="text-sm text-slate-700 dark:text-slate-300">{location}</p>
         <p className="text-sm text-slate-500 dark:text-slate-400">
           {address || "No address provided"}
         </p>
       </div>
 
-      <div className="rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 dark:bg-slate-950 dark:text-slate-300">
+      <div
+        className={`rounded-xl px-4 py-3 text-sm font-medium ${
+          completed
+            ? "bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300"
+            : "bg-slate-50 text-slate-500 dark:bg-slate-950 dark:text-slate-400"
+        }`}
+      >
         {date}
       </div>
     </div>
@@ -345,7 +454,7 @@ function DetailBox({
   label,
   value,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
   value: string;
 }) {
@@ -383,4 +492,3 @@ function formatStatus(status: string) {
     .replace("_", " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
-

@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/requireUser";
-import LoadSearchFilters from "@/app/components/driver/loads/LoadSearchFilters";
+import LoadSearchFilters from "@/app/components/broker/loads/LoadSearchFilter";
 import LoadMap from "@/app/components/driver/loads/LoadMap";
 import Link from "next/link";
 import {

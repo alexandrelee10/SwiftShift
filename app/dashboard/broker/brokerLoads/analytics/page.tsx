@@ -80,14 +80,18 @@ export default async function BrokerAnalyticsPage() {
     0
   );
 
+  const postedRevenue = postedLoads.reduce(
+    (sum, load) => sum + Number(load.rate),
+    0
+  );
+
   const totalMiles = loads.reduce(
     (sum, load) => sum + (load.distanceMiles || 0),
     0
   );
 
   const averageRate = totalLoads > 0 ? totalRevenue / totalLoads : 0;
-  const averageRatePerMile =
-    totalMiles > 0 ? totalRevenue / totalMiles : 0;
+  const averageRatePerMile = totalMiles > 0 ? totalRevenue / totalMiles : 0;
 
   const assignmentRate =
     totalLoads > 0 ? Math.round((assignedLoads.length / totalLoads) * 100) : 0;
@@ -186,66 +190,147 @@ export default async function BrokerAnalyticsPage() {
           </p>
         </div>
 
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label="Total Loads"
-            value={totalLoads.toString()}
-            subtext={`${assignedLoads.length} assigned`}
-            icon={<Truck size={18} />}
-          />
+        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="grid lg:grid-cols-[1.15fr_1fr]">
+            <div className="border-b border-slate-100 p-6 dark:border-slate-800 lg:border-b-0 lg:border-r">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Total Brokerage Activity
+                  </p>
 
-          <StatCard
-            label="Total Revenue"
-            value={formatCurrency(totalRevenue)}
-            subtext={`${formatCurrency(deliveredRevenue)} delivered`}
-            icon={<DollarSign size={18} />}
-          />
+                  <h2 className="mt-3 text-5xl font-semibold tracking-tight text-slate-950 dark:text-white">
+                    {totalLoads}
+                  </h2>
 
-          <StatCard
-            label="Average Rate"
-            value={formatCurrency(averageRate)}
-            subtext={`${formatCurrency(averageRatePerMile)} / mile`}
-            icon={<BarChart3 size={18} />}
-          />
+                  <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+                    Loads tracked with{" "}
+                    <span className="font-medium text-slate-900 dark:text-white">
+                      {assignedLoads.length}
+                    </span>{" "}
+                    assigned and{" "}
+                    <span className="font-medium text-slate-900 dark:text-white">
+                      {deliveredLoads.length}
+                    </span>{" "}
+                    delivered.
+                  </p>
+                </div>
 
-          <StatCard
-            label="Delivery Rate"
-            value={`${deliveryRate}%`}
-            subtext={`${deliveredLoads.length} delivered`}
-            icon={<CheckCircle2 size={18} />}
-          />
+                <div className="rounded-2xl bg-blue-50 p-3 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300">
+                  <BarChart3 size={24} />
+                </div>
+              </div>
+
+              <div className="mt-8 grid gap-4 sm:grid-cols-3">
+                <HealthBox label="Assignment" value={`${assignmentRate}%`} />
+                <HealthBox label="Delivery" value={`${deliveryRate}%`} />
+                <HealthBox label="Cancel Rate" value={`${cancellationRate}%`} />
+              </div>
+
+              <div className="mt-8 space-y-4">
+                <ProgressRow
+                  label="Assignment Rate"
+                  value={`${assignmentRate}%`}
+                  width={`${assignmentRate}%`}
+                  tone="blue"
+                />
+
+                <ProgressRow
+                  label="Delivery Rate"
+                  value={`${deliveryRate}%`}
+                  width={`${deliveryRate}%`}
+                  tone="green"
+                />
+
+                <ProgressRow
+                  label="Cancellation Rate"
+                  value={`${cancellationRate}%`}
+                  width={`${cancellationRate}%`}
+                  tone="red"
+                />
+              </div>
+            </div>
+
+            <div className="grid divide-y divide-slate-100 dark:divide-slate-800">
+              <SummaryRow
+                icon={<DollarSign size={18} />}
+                label="Total Revenue"
+                value={formatCurrency(totalRevenue)}
+                subtext={`${formatCurrency(deliveredRevenue)} delivered`}
+              />
+
+              <SummaryRow
+                icon={<BarChart3 size={18} />}
+                label="Average Rate"
+                value={formatCurrency(averageRate)}
+                subtext={`${formatCurrency(averageRatePerMile)} per mile`}
+              />
+
+              <SummaryRow
+                icon={<Truck size={18} />}
+                label="Active Revenue"
+                value={formatCurrency(activeRevenue)}
+                subtext={`${bookedLoads.length + inTransitLoads.length} active loads`}
+              />
+
+              <SummaryRow
+                icon={<Clock size={18} />}
+                label="Posted Revenue"
+                value={formatCurrency(postedRevenue)}
+                subtext={`${postedLoads.length} posted loads`}
+              />
+            </div>
+          </div>
         </section>
 
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <StatusCard
-            label="Posted"
-            value={postedLoads.length}
-            icon={<Clock size={16} />}
-          />
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="font-semibold text-slate-950 dark:text-white">
+                Load Status Breakdown
+              </h2>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Current load movement across your brokerage pipeline.
+              </p>
+            </div>
 
-          <StatusCard
-            label="Booked"
-            value={bookedLoads.length}
-            icon={<Truck size={16} />}
-          />
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {totalLoads} total loads
+            </p>
+          </div>
 
-          <StatusCard
-            label="In Transit"
-            value={inTransitLoads.length}
-            icon={<Route size={16} />}
-          />
-
-          <StatusCard
-            label="Delivered"
-            value={deliveredLoads.length}
-            icon={<CheckCircle2 size={16} />}
-          />
-
-          <StatusCard
-            label="Cancelled"
-            value={cancelledLoads.length}
-            icon={<Activity size={16} />}
-          />
+          <div className="mt-6 grid gap-3 md:grid-cols-5">
+            <PipelineSegment
+              label="Posted"
+              value={postedLoads.length}
+              icon={<Clock size={16} />}
+              tone="slate"
+            />
+            <PipelineSegment
+              label="Booked"
+              value={bookedLoads.length}
+              icon={<Truck size={16} />}
+              tone="blue"
+            />
+            <PipelineSegment
+              label="In Transit"
+              value={inTransitLoads.length}
+              icon={<Route size={16} />}
+              tone="purple"
+            />
+            <PipelineSegment
+              label="Delivered"
+              value={deliveredLoads.length}
+              icon={<CheckCircle2 size={16} />}
+              tone="green"
+            />
+            <PipelineSegment
+              label="Cancelled"
+              value={cancelledLoads.length}
+              icon={<Activity size={16} />}
+              tone="red"
+            />
+          </div>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-3">
@@ -289,7 +374,7 @@ export default async function BrokerAnalyticsPage() {
                 {topLanes.map((lane) => (
                   <div
                     key={lane.lane}
-                    className="flex flex-col justify-between gap-2 rounded-xl bg-slate-50 p-4 sm:flex-row sm:items-center dark:bg-slate-950"
+                    className="grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-[1fr_auto] sm:items-center dark:bg-slate-950"
                   >
                     <div>
                       <p className="font-medium text-slate-900 dark:text-white">
@@ -323,7 +408,7 @@ export default async function BrokerAnalyticsPage() {
                 {topDrivers.map((driver) => (
                   <div
                     key={driver.driver}
-                    className="flex items-center justify-between rounded-xl bg-slate-50 p-4 dark:bg-slate-950"
+                    className="grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-[1fr_auto] sm:items-center dark:bg-slate-950"
                   >
                     <div>
                       <p className="font-medium text-slate-900 dark:text-white">
@@ -351,9 +436,7 @@ export default async function BrokerAnalyticsPage() {
             <div className="mt-5 space-y-4">
               <MetricRow
                 label="Posted Revenue"
-                value={formatCurrency(
-                  postedLoads.reduce((sum, load) => sum + Number(load.rate), 0)
-                )}
+                value={formatCurrency(postedRevenue)}
               />
 
               <MetricRow
@@ -378,57 +461,121 @@ export default async function BrokerAnalyticsPage() {
   );
 }
 
-function StatCard({
+function SummaryRow({
+  icon,
   label,
   value,
   subtext,
-  icon,
 }: {
+  icon: React.ReactNode;
   label: string;
   value: string;
   subtext: string;
-  icon: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
-
-        <div className="rounded-lg bg-slate-100 p-2 text-slate-500 dark:bg-slate-800 dark:text-slate-300">
+    <div className="flex items-center justify-between gap-4 p-5">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
           {icon}
+        </div>
+
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-slate-900 dark:text-white">
+            {label}
+          </p>
+          <p className="mt-1 truncate text-xs text-slate-500 dark:text-slate-400">
+            {subtext}
+          </p>
         </div>
       </div>
 
-      <p className="mt-3 text-2xl font-semibold text-slate-950 dark:text-white">
+      <p className="shrink-0 text-sm font-semibold text-slate-950 dark:text-white">
         {value}
-      </p>
-
-      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-        {subtext}
       </p>
     </div>
   );
 }
 
-function StatusCard({
+function HealthBox({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
+      <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        {label}
+      </p>
+
+      <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function PipelineSegment({
   label,
   value,
   icon,
+  tone,
 }: {
   label: string;
   value: number;
   icon: React.ReactNode;
+  tone: "slate" | "blue" | "purple" | "green" | "red";
 }) {
+  const styles = {
+    slate:
+      "bg-slate-50 text-slate-600 dark:bg-slate-950 dark:text-slate-300",
+    blue: "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
+    purple:
+      "bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300",
+    green:
+      "bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300",
+    red: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300",
+  }[tone];
+
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-        {icon}
+    <div className={`rounded-2xl p-4 ${styles}`}>
+      <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-medium">{label}</p>
+        {icon}
       </div>
 
-      <p className="mt-3 text-xl font-semibold text-slate-950 dark:text-white">
-        {value}
-      </p>
+      <p className="mt-4 text-2xl font-semibold">{value}</p>
+    </div>
+  );
+}
+
+function ProgressRow({
+  label,
+  value,
+  width,
+  tone,
+}: {
+  label: string;
+  value: string;
+  width: string;
+  tone: "blue" | "green" | "red";
+}) {
+  const color = {
+    blue: "bg-blue-500",
+    green: "bg-green-500",
+    red: "bg-red-500",
+  }[tone];
+
+  return (
+    <div>
+      <div className="mb-2 flex items-center justify-between gap-4">
+        <p className="text-sm font-medium text-slate-900 dark:text-white">
+          {label}
+        </p>
+
+        <p className="text-sm font-semibold text-slate-900 dark:text-white">
+          {value}
+        </p>
+      </div>
+
+      <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+        <div className={`h-full rounded-full ${color}`} style={{ width }} />
+      </div>
     </div>
   );
 }
