@@ -13,9 +13,6 @@ import {
   WalletCards,
 } from "lucide-react";
 
-import TA from "@/public/assets/fuel/TA.svg";
-import loves from "@/public/assets/fuel/love's.png";
-import p from "@/public/assets/fuel/p.png";
 
 import Image, { type StaticImageData } from "next/image";
 import { Switch } from "@/app/components/shared/Switch";
@@ -67,7 +64,7 @@ export default async function FuelCardPage() {
           <section className="space-y-5">
             <Card>
               <div className="grid gap-5 lg:grid-cols-[minmax(0,430px)_1fr] lg:items-stretch">
-                <div className="rounded-2xl bg-slate-950 p-5 text-white shadow-lg dark:border dark:border-slate-800 sm:p-6">
+                <div className="rounded-2xl bg-slate-950 p-5 text-white shadow-lg dark:border dark:border-slate-800 sm:p-6 w-">
                   <div className="flex items-center justify-between gap-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-300">
                       COMDATA
@@ -259,9 +256,9 @@ export default async function FuelCardPage() {
               </h2>
 
               <div className="mt-5 grid grid-cols-2 gap-3">
-                <LogoBox label="Pilot" src={p} />
-                <LogoBox label="Love's" src={loves} />
-                <LogoBox label="TA" src={TA} />
+                <LogoBox label="Pilot" />
+                <LogoBox label="Love's" />
+                <LogoBox label="TA" />
                 <LogoBox label="Sapp Bros" />
               </div>
             </Card>
