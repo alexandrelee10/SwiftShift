@@ -16,6 +16,7 @@ import {
 
 import Image, { type StaticImageData } from "next/image";
 import { Switch } from "@/app/components/shared/Switch";
+import FuelCardActions from "@/app/components/driver/fuel/FuelCardActions";
 
 export default async function FuelCardPage() {
   const session = await requireUser();
@@ -103,17 +104,8 @@ export default async function FuelCardPage() {
                     <InfoPanel label="Card Number" value="•••• 5678" />
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <button className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800">
-                      <Eye size={16} />
-                      View PIN
-                    </button>
+                    <FuelCardActions />
 
-                    <button className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 px-4 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-900/60 dark:text-red-400 dark:hover:bg-red-950/30">
-                      <AlertTriangle size={16} />
-                      Report Lost
-                    </button>
-                  </div>
 
                   <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 dark:border-blue-900/50 dark:bg-blue-950/30">
                     <div className="flex items-start gap-3">
