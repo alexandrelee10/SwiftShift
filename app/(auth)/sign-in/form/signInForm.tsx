@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 import DarkLogo from "@/public/assets/main-logo/logoDark.svg";
 
@@ -15,6 +16,8 @@ const SignInForm = () => {
   });
 
   const [serverMessage, setServerMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const router = useRouter();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,29 +27,38 @@ const SignInForm = () => {
       ...prev,
       [name]: value,
     }));
+
+    setServerMessage("");
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     setServerMessage("");
+    setIsSubmitting(true);
 
-    const res = await signIn("credentials", {
-      email: form.email,
-      password: form.password,
-      redirect: false,
-    });
+    try {
+      const res = await signIn("credentials", {
+        email: form.email,
+        password: form.password,
+        redirect: false,
+      });
 
-    if (res?.error) {
-      setServerMessage("Invalid email or password");
-      return;
+      if (res?.error) {
+        setServerMessage("Invalid email or password");
+        return;
+      }
+
+      router.push("/dashboard");
+    } catch {
+      setServerMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    router.push("/dashboard");
   };
 
   return (
     <div className="grid min-h-screen bg-white md:grid-cols-2">
-      {/* LEFT */}
       <div className="relative hidden items-center justify-center overflow-hidden bg-gradient-to-br from-blue-950 via-blue-700 to-blue-600 p-12 text-white md:flex">
         <div className="absolute inset-0 bg-black/20" />
 
@@ -83,10 +95,8 @@ const SignInForm = () => {
         </div>
       </div>
 
-      {/* RIGHT */}
       <div className="flex items-center justify-center px-6 py-10 sm:px-10 md:px-14">
         <div className="w-full max-w-xl">
-          {/* BACK */}
           <Link
             href="/"
             className="mb-8 inline-flex items-center text-sm font-semibold text-blue-600 transition hover:text-blue-700"
@@ -94,7 +104,6 @@ const SignInForm = () => {
             ← Back to Home
           </Link>
 
-          {/* MOBILE LOGO */}
           <div className="mb-8 flex items-center gap-3 md:hidden">
             <Image
               src={DarkLogo}
@@ -106,7 +115,6 @@ const SignInForm = () => {
             <p className="text-lg font-bold text-zinc-900">SwiftShift</p>
           </div>
 
-          {/* HEADER */}
           <div className="mb-8">
             <p className="text-sm font-medium uppercase tracking-[0.2em] text-blue-600">
               Welcome back
@@ -121,9 +129,7 @@ const SignInForm = () => {
             </p>
           </div>
 
-          {/* FORM */}
           <form className="space-y-5" onSubmit={handleSubmit}>
-            {/* EMAIL */}
             <div>
               <label className="mb-2 block text-sm font-medium text-zinc-700">
                 Email
@@ -140,7 +146,6 @@ const SignInForm = () => {
               />
             </div>
 
-            {/* PASSWORD */}
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <label className="block text-sm font-medium text-zinc-700">
@@ -166,7 +171,6 @@ const SignInForm = () => {
               />
             </div>
 
-            {/* SERVER MESSAGE */}
             {serverMessage && (
               <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
                 <p className="text-sm font-medium text-red-600">
@@ -175,16 +179,22 @@ const SignInForm = () => {
               </div>
             )}
 
-            {/* BUTTON */}
             <button
               type="submit"
-              className="w-full rounded-xl bg-zinc-900 py-3.5 text-sm font-semibold text-white transition hover:bg-zinc-800"
+              disabled={isSubmitting}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 py-3.5 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Sign In
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Signing In...
+                </>
+              ) : (
+                "Sign In"
+              )}
             </button>
           </form>
 
-          {/* DIVIDER */}
           <div className="my-8 flex items-center gap-4">
             <div className="h-px flex-1 bg-zinc-200" />
 
@@ -195,7 +205,6 @@ const SignInForm = () => {
             <div className="h-px flex-1 bg-zinc-200" />
           </div>
 
-          {/* SIGN UP */}
           <Link
             href="/sign-up"
             className="block w-full rounded-xl border border-zinc-300 bg-white py-3.5 text-center text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50"

@@ -301,7 +301,7 @@ export default async function SettingsPage({
                     title="Password"
                     desc="Update your password regularly."
                     action="Change Password"
-                    href="/dashboard/loads/settings/changePassword"
+                    href="/dashboard/driver/loads/settings/changePassword"
                   />
 
                   <ToggleActionRow

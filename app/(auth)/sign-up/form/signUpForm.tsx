@@ -4,10 +4,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Truck, BriefcaseBusiness, Radio } from "lucide-react";
+import { Truck, BriefcaseBusiness, Loader2 } from "lucide-react";
 
 import DarkLogo from "@/public/assets/main-logo/logoDark.svg";
-import { getSession } from "next-auth/react";
 
 const roles = [
   {
@@ -24,10 +23,33 @@ const roles = [
   },
 ];
 
+type SignUpFormData = {
+  firstName: string;
+  lastName: string;
+  phoneNum: string;
+  email: string;
+  password: string;
+  role: "DRIVER" | "BROKER" | "DISPATCH";
+};
+
+type FieldErrors = Partial<Record<keyof SignUpFormData, string>>;
+
+const formatPhoneNumber = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 10);
+
+  if (digits.length < 4) return digits;
+
+  if (digits.length < 7) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  }
+
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+};
+
 const SignUpForm = () => {
   const router = useRouter();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<SignUpFormData>({
     firstName: "",
     lastName: "",
     phoneNum: "",
@@ -36,27 +58,31 @@ const SignUpForm = () => {
     role: "DRIVER",
   });
 
-  const [fieldErrors, setFieldErrors] = useState<{
-    [key: string]: string;
-  }>({});
-
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [serverMessage, setServerMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    const fieldName = name as keyof SignUpFormData;
+
+    const formattedValue =
+      fieldName === "phoneNum" ? formatPhoneNumber(value) : value;
 
     setForm((prev) => ({
       ...prev,
-      [name]: value,
+      [fieldName]: formattedValue,
     }));
 
     setFieldErrors((prev) => ({
       ...prev,
-      [name]: "",
+      [fieldName]: undefined,
     }));
+
+    setServerMessage("");
   };
 
-  const selectRole = (role: string) => {
+  const selectRole = (role: SignUpFormData["role"]) => {
     setForm((prev) => ({
       ...prev,
       role,
@@ -64,8 +90,10 @@ const SignUpForm = () => {
 
     setFieldErrors((prev) => ({
       ...prev,
-      role: "",
+      role: undefined,
     }));
+
+    setServerMessage("");
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -73,49 +101,60 @@ const SignUpForm = () => {
 
     setFieldErrors({});
     setServerMessage("");
-
-    const res = await fetch("/api/auth/sign-up", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
-
-    let data;
+    setIsSubmitting(true);
 
     try {
-      data = await res.json();
-    } catch {
-      data = { message: "Something went wrong" };
-    }
+      const res = await fetch("/api/auth/sign-up", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
 
-    if (!res.ok) {
-      setServerMessage(data.message || "Something went wrong");
+      let data: {
+        message?: string;
+        fields?: Record<string, string[] | string>;
+      };
 
-      if (data.fields) {
-        const flattenedErrors: { [key: string]: string } = {};
-
-        Object.entries(data.fields).forEach(([key, value]) => {
-          if (Array.isArray(value) && value.length > 0) {
-            flattenedErrors[key] = value[0] as string;
-          } else if (typeof value === "string") {
-            flattenedErrors[key] = value;
-          }
-        });
-
-        setFieldErrors(flattenedErrors);
+      try {
+        data = await res.json();
+      } catch {
+        data = { message: "Something went wrong" };
       }
 
-      return;
-    }
+      if (!res.ok) {
+        setServerMessage(data.message || "Something went wrong");
 
-    router.push("/sign-in");
+        if (data.fields) {
+          const flattenedErrors: FieldErrors = {};
+
+          Object.entries(data.fields).forEach(([key, value]) => {
+            const fieldKey = key as keyof SignUpFormData;
+
+            if (Array.isArray(value) && value.length > 0) {
+              flattenedErrors[fieldKey] = value[0];
+            } else if (typeof value === "string") {
+              flattenedErrors[fieldKey] = value;
+            }
+          });
+
+          setFieldErrors(flattenedErrors);
+        }
+
+        return;
+      }
+
+      router.push("/dashboard");
+    } catch {
+      setServerMessage("Unable to create account. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="grid min-h-screen bg-white md:grid-cols-2">
-      {/* LEFT */}
       <div className="relative hidden items-center justify-center overflow-hidden bg-gradient-to-br from-blue-950 via-blue-700 to-blue-600 p-12 text-white md:flex">
         <div className="absolute inset-0 bg-black/20" />
 
@@ -152,10 +191,8 @@ const SignUpForm = () => {
         </div>
       </div>
 
-      {/* RIGHT */}
       <div className="flex items-center justify-center px-6 py-10 sm:px-10 md:px-14">
         <div className="w-full max-w-xl">
-          {/* BACK */}
           <Link
             href="/"
             className="mb-8 inline-flex items-center text-sm font-semibold text-blue-600 transition hover:text-blue-700"
@@ -163,7 +200,6 @@ const SignUpForm = () => {
             ← Back to Home
           </Link>
 
-          {/* MOBILE LOGO */}
           <div className="mb-8 flex items-center gap-3 md:hidden">
             <Image
               src={DarkLogo}
@@ -175,7 +211,6 @@ const SignUpForm = () => {
             <p className="text-lg font-bold text-zinc-900">SwiftShift</p>
           </div>
 
-          {/* HEADER */}
           <div className="mb-8">
             <p className="text-sm font-medium uppercase tracking-[0.2em] text-blue-600">
               Get started
@@ -190,9 +225,7 @@ const SignUpForm = () => {
             </p>
           </div>
 
-          {/* FORM */}
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            {/* ROLE SELECTION */}
+          <form className="space-y-5" onSubmit={handleSubmit} noValidate>
             <div>
               <label className="mb-3 block text-sm font-semibold text-zinc-800">
                 I am signing up as
@@ -207,7 +240,9 @@ const SignUpForm = () => {
                     <button
                       key={role.value}
                       type="button"
-                      onClick={() => selectRole(role.value)}
+                      onClick={() =>
+                        selectRole(role.value as SignUpFormData["role"])
+                      }
                       className={`rounded-2xl border p-5 text-center transition ${
                         active
                           ? "border-blue-600 bg-blue-50 shadow-lg shadow-blue-100"
@@ -245,142 +280,62 @@ const SignUpForm = () => {
               </div>
 
               {fieldErrors.role && (
-                <p className="mt-2 text-sm text-red-500">{fieldErrors.role}</p>
+                <p className="mt-2 text-sm font-medium text-red-500">
+                  {fieldErrors.role}
+                </p>
               )}
             </div>
 
-            {/* NAME */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">
-                  First Name
-                </label>
-
-                <input
-                  name="firstName"
-                  value={form.firstName}
-                  onChange={onChange}
-                  placeholder="John"
-                  className={`w-full rounded-xl border bg-white px-4 py-3 text-zinc-700 shadow-sm outline-none transition placeholder:text-zinc-400 focus:ring-4 ${
-                    fieldErrors.firstName
-                      ? "border-red-400 focus:border-red-400 focus:ring-red-100"
-                      : "border-zinc-300 focus:border-blue-500 focus:ring-blue-100"
-                  }`}
-                  required
-                />
-
-                {fieldErrors.firstName && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {fieldErrors.firstName}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-zinc-700">
-                  Last Name
-                </label>
-
-                <input
-                  name="lastName"
-                  value={form.lastName}
-                  onChange={onChange}
-                  placeholder="Doe"
-                  className={`w-full rounded-xl border bg-white px-4 py-3 text-zinc-700 shadow-sm outline-none transition placeholder:text-zinc-400 focus:ring-4 ${
-                    fieldErrors.lastName
-                      ? "border-red-400 focus:border-red-400 focus:ring-red-100"
-                      : "border-zinc-300 focus:border-blue-500 focus:ring-blue-100"
-                  }`}
-                  required
-                />
-
-                {fieldErrors.lastName && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {fieldErrors.lastName}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* EMAIL */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-zinc-700">
-                Email
-              </label>
-
-              <input
-                name="email"
-                type="email"
-                value={form.email}
+              <FormInput
+                label="First Name"
+                name="firstName"
+                value={form.firstName}
                 onChange={onChange}
-                placeholder="johndoe@swiftshift.com"
-                className={`w-full rounded-xl border bg-white px-4 py-3 text-zinc-700 shadow-sm outline-none transition placeholder:text-zinc-400 focus:ring-4 ${
-                  fieldErrors.email
-                    ? "border-red-400 focus:border-red-400 focus:ring-red-100"
-                    : "border-zinc-300 focus:border-blue-500 focus:ring-blue-100"
-                }`}
-                required
+                placeholder="John"
+                error={fieldErrors.firstName}
               />
 
-              {fieldErrors.email && (
-                <p className="mt-1 text-sm text-red-500">{fieldErrors.email}</p>
-              )}
-            </div>
-
-            {/* PHONE */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-zinc-700">
-                Phone Number
-              </label>
-
-              <input
-                name="phoneNum"
-                value={form.phoneNum}
+              <FormInput
+                label="Last Name"
+                name="lastName"
+                value={form.lastName}
                 onChange={onChange}
-                placeholder="(123) 456-7890"
-                className={`w-full rounded-xl border bg-white px-4 py-3 text-zinc-700 shadow-sm outline-none transition placeholder:text-zinc-400 focus:ring-4 ${
-                  fieldErrors.phoneNum
-                    ? "border-red-400 focus:border-red-400 focus:ring-red-100"
-                    : "border-zinc-300 focus:border-blue-500 focus:ring-blue-100"
-                }`}
-                required
+                placeholder="Doe"
+                error={fieldErrors.lastName}
               />
-
-              {fieldErrors.phoneNum && (
-                <p className="mt-1 text-sm text-red-500">
-                  {fieldErrors.phoneNum}
-                </p>
-              )}
             </div>
 
-            {/* PASSWORD */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-zinc-700">
-                Password
-              </label>
+            <FormInput
+              label="Email"
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={onChange}
+              placeholder="johndoe@swiftshift.com"
+              error={fieldErrors.email}
+            />
 
-              <input
-                name="password"
-                type="password"
-                value={form.password}
-                onChange={onChange}
-                placeholder="Create a strong password"
-                className={`w-full rounded-xl border bg-white px-4 py-3 text-zinc-700 shadow-sm outline-none transition placeholder:text-zinc-400 focus:ring-4 ${
-                  fieldErrors.password
-                    ? "border-red-400 focus:border-red-400 focus:ring-red-100"
-                    : "border-zinc-300 focus:border-blue-500 focus:ring-blue-100"
-                }`}
-                required
-              />
+            <FormInput
+              label="Phone Number"
+              name="phoneNum"
+              type="tel"
+              value={form.phoneNum}
+              onChange={onChange}
+              placeholder="(123) 456-7890"
+              error={fieldErrors.phoneNum}
+            />
 
-              {fieldErrors.password && (
-                <p className="mt-1 text-sm text-red-500">
-                  {fieldErrors.password}
-                </p>
-              )}
-            </div>
+            <FormInput
+              label="Password"
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={onChange}
+              placeholder="Create a strong password"
+              error={fieldErrors.password}
+            />
 
-            {/* SERVER MESSAGE */}
             {serverMessage && (
               <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
                 <p className="text-sm font-medium text-red-600">
@@ -389,16 +344,22 @@ const SignUpForm = () => {
               </div>
             )}
 
-            {/* BUTTON */}
             <button
               type="submit"
-              className="w-full rounded-xl bg-zinc-900 py-3.5 text-sm font-semibold text-white transition hover:bg-zinc-800"
+              disabled={isSubmitting}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 py-3.5 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Create Account
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Creating Account...
+                </>
+              ) : (
+                "Create Account"
+              )}
             </button>
           </form>
 
-          {/* DIVIDER */}
           <div className="my-8 flex items-center gap-4">
             <div className="h-px flex-1 bg-zinc-200" />
 
@@ -409,7 +370,6 @@ const SignUpForm = () => {
             <div className="h-px flex-1 bg-zinc-200" />
           </div>
 
-          {/* SIGN IN */}
           <Link
             href="/sign-in"
             className="block w-full rounded-xl border border-zinc-300 bg-white py-3.5 text-center text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50"
@@ -421,5 +381,56 @@ const SignUpForm = () => {
     </div>
   );
 };
+
+function FormInput({
+  label,
+  name,
+  type = "text",
+  value,
+  onChange,
+  placeholder,
+  error,
+}: {
+  label: string;
+  name: keyof SignUpFormData;
+  type?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  error?: string;
+}) {
+  return (
+    <div>
+      <label
+        htmlFor={name}
+        className="mb-2 block text-sm font-medium text-zinc-700"
+      >
+        {label}
+      </label>
+
+      <input
+        id={name}
+        name={name}
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${name}-error` : undefined}
+        className={`w-full rounded-xl border bg-white px-4 py-3 text-zinc-700 shadow-sm outline-none transition placeholder:text-zinc-400 focus:ring-4 ${
+          error
+            ? "border-red-400 focus:border-red-400 focus:ring-red-100"
+            : "border-zinc-300 focus:border-blue-500 focus:ring-blue-100"
+        }`}
+      />
+
+      {error && (
+        <p id={`${name}-error`} className="mt-1 text-sm font-medium text-red-500">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default SignUpForm;
