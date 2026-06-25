@@ -132,7 +132,7 @@ export default async function DriverDashboardPage() {
     },
     {
       name: "Fuel Spending",
-      content: "$3,123",
+      content: "$1,254.25",
       status: "-10% vs last 30d",
       icon: FuelIcon,
       color:
