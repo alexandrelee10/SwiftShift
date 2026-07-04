@@ -3,9 +3,17 @@ import { Resend } from "resend";
 import crypto from "crypto";
 import prisma from "@/lib/prisma";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+function getResendClient() {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error(
+      "RESEND_API_KEY is not set. Password reset emails cannot be sent."
+    );
+  }
+
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 export async function POST(req: Request) {
   try {
@@ -51,6 +59,8 @@ export async function POST(req: Request) {
     const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}&email=${encodeURIComponent(
       email
     )}`;
+
+    const resend = getResendClient();
 
     await resend.emails.send({
       from: "Swift Shift <onboarding@resend.dev>",
