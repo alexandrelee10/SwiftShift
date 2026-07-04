@@ -11,7 +11,14 @@ export async function GET(
   const load = await prisma.load.findUnique({
     where: { id },
     include: {
-      broker: true,
+      broker: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
     },
   });
 
@@ -44,6 +51,10 @@ export async function PATCH(
 
   if(!existingLoad) {
     return NextResponse.json({ error: "Load not found" }, { status: 404 });
+  }
+
+  if (existingLoad.brokerId !== session.user.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
   const updatedLoad = await prisma.load.update({
@@ -91,6 +102,10 @@ export async function DELETE(
 
   if (!load) {
     return NextResponse.json({ error: "Load not found" }, { status: 404 });
+  }
+
+  if (load.brokerId !== session.user.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
   const cancelledLoad = await prisma.load.update({

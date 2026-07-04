@@ -108,7 +108,7 @@ export default async function EarningsPage({
                   return (
                     <Link
                       key={load.id}
-                      href={`/dashboard/loads/earnings?loadId=${load.id}`}
+                      href={`/dashboard/driver/loads/earnings?loadId=${load.id}`}
                       className={`block border-b border-slate-100 p-4 transition hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/60 ${
                         selectedLoad?.id === load.id
                           ? "border-l-4 border-l-blue-600 bg-blue-50 dark:bg-blue-950/30"
@@ -154,7 +154,7 @@ export default async function EarningsPage({
 
                 {selectedLoad && (
                   <Link
-                    href={`/dashboard/loads/search/${selectedLoad.id}`}
+                    href={`/dashboard/driver/loads/search/${selectedLoad.id}`}
                     className="w-fit rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800"
                   >
                     View Load

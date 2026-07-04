@@ -18,7 +18,6 @@ import {
   FileText,
 } from "lucide-react";
 
-import { bookLoad } from "./action";
 import BackButton from "@/app/components/shared/BackButton";
 import RequestLoadButton from "@/app/components/driver/loads/RequestLoadButton";
 
@@ -52,7 +51,7 @@ export default async function LoadDetailsPage({
     <main className="min-h-screen bg-slate-50 px-5 py-7 text-slate-900 dark:bg-[#0b1120] dark:text-slate-100">
       <div className="mx-auto max-w-7xl space-y-5">
         <Link
-          href="/dashboard/loads/search"
+          href="/dashboard/driver/loads/search"
           className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-blue-950 dark:text-slate-400 dark:hover:text-white"
         >
           <ArrowLeft size={16} />
@@ -284,7 +283,7 @@ export default async function LoadDetailsPage({
                   Report Issue
                 </button>
                 <Link
-                  href={`/dashboard/loads/search/${load.id}/bol/pdf`}
+                  href={`/dashboard/driver/loads/search/${load.id}/bol/pdf`}
                   target="_blank"
                   className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-blue-400 dark:hover:bg-slate-800"
                 >

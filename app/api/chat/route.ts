@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-sonnet-4-6";
 const MAX_HISTORY_MESSAGES = 20;
+const RATE_LIMIT_MAX_REQUESTS = 20;
+const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
 
 const SYSTEM_PROMPT = `You are the SwiftShift Assistant, an AI chat assistant embedded in SwiftShift, a freight load-board platform used by truck drivers, carriers, dispatchers, and freight brokers.
 
@@ -28,6 +33,25 @@ type IncomingMessage = {
 };
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  const { allowed, retryAfterSeconds } = checkRateLimit(
+    session.user.id,
+    RATE_LIMIT_MAX_REQUESTS,
+    RATE_LIMIT_WINDOW_MS
+  );
+
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please slow down and try again shortly." },
+      { status: 429, headers: { "Retry-After": String(retryAfterSeconds) } }
+    );
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
   if (!apiKey) {

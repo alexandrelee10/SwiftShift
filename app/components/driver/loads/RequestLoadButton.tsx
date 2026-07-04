@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { requestLoad } from "@/app/dashboard/driver/loads/search/[id]/action";
+import { requestLoad } from "@/lib/actions/loadRequest";
 
 interface RequestLoadButtonProps {
   loadId: string;

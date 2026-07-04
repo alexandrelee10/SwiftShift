@@ -12,11 +12,25 @@ type PageProps = {
 async function assignDriver(formData: FormData) {
   "use server";
 
+  const session = await requireUser();
+
+  if (!session.user?.email || session.user.role !== "BROKER") {
+    throw new Error("Unauthorized");
+  }
+
   const loadId = formData.get("loadId")?.toString();
   const driverId = formData.get("driverId")?.toString();
 
   if (!loadId || !driverId) {
     throw new Error("Missing load or driver");
+  }
+
+  const load = await prisma.load.findUnique({
+    where: { id: loadId },
+  });
+
+  if (!load || load.brokerId !== session.user.id) {
+    throw new Error("Unauthorized");
   }
 
   const existingTrip = await prisma.trip.findFirst({
