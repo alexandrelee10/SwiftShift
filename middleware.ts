@@ -6,7 +6,7 @@ import { getToken } from "next-auth/jwt";
 // centralized first line of defense — it only confirms a valid session
 // exists and does not replace the role/ownership checks that already live
 // in each dashboard layout, server action, and API route.
-export default async function proxy(req: NextRequest) {
+export default async function middleware(req: NextRequest) {
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,

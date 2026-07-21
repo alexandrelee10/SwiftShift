@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth-options";
 import { checkRateLimit } from "@/lib/rateLimit";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
-const MODEL = "claude-sonnet-4-6";
+const MODEL = "claude-sonnet-5";
 const MAX_HISTORY_MESSAGES = 20;
 const RATE_LIMIT_MAX_REQUESTS = 20;
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
