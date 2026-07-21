@@ -1,7 +1,6 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,8 +16,6 @@ const SignInForm = () => {
 
   const [serverMessage, setServerMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const router = useRouter();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,13 +43,19 @@ const SignInForm = () => {
 
       if (res?.error) {
         setServerMessage("Invalid email or password");
+        setIsSubmitting(false);
         return;
       }
 
-      router.push("/dashboard");
+      // Hard redirect instead of router.push: middleware's session check on
+      // /dashboard runs immediately, and a soft client-side navigation can
+      // race the freshly-set session cookie, landing back on sign-in even
+      // though the session is actually valid. A full navigation avoids the
+      // race entirely (confirmed: direct navigation to /dashboard works
+      // right after sign-in, router.push did not).
+      window.location.href = "/dashboard";
     } catch {
       setServerMessage("Something went wrong. Please try again.");
-    } finally {
       setIsSubmitting(false);
     }
   };
