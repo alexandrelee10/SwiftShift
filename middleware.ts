@@ -10,6 +10,11 @@ export default async function middleware(req: NextRequest) {
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
+    // Edge middleware's own "is this HTTPS" detection is unreliable behind
+    // Vercel's proxy, so it can look for the wrong cookie name
+    // (next-auth.session-token vs __Secure-next-auth.session-token) and miss
+    // a session that was just set. Force it explicitly instead of guessing.
+    secureCookie: process.env.NODE_ENV === "production",
   });
 
   if (!token) {

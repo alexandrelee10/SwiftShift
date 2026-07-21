@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm /Users/alexandrelee/Desktop/SwiftShift/app/dashboard/driver/loads/search/\\\\[id\\\\]/action.ts /Users/alexandrelee/Desktop/SwiftShift/app/dashboard/driver/loads/myloads/\\\\[id\\\\]/action.ts)",
+      "Bash(echo \"exit code: $?\")",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(printenv)",
+      "Bash(RESEND_API_KEY= npm run build)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(jobs -l)"
+    ]
+  }
+}
